@@ -6,10 +6,12 @@ import org.osmdroid.config.Configuration
 class MeteoApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        val baseDir = getExternalFilesDir(null)?.absolutePath
+            ?: filesDir.absolutePath
         Configuration.getInstance().apply {
             userAgentValue = packageName
-            osmdroidBasePath = getExternalFilesDir(null)?.absolutePath
-            osmdroidTileCache = "${getExternalFilesDir(null)?.absolutePath}/osmdroid"
+            osmdroidBasePath = baseDir
+            osmdroidTileCache = "$baseDir/osmdroid"
             load(this@MeteoApp, androidx.preference.PreferenceManager.getDefaultSharedPreferences(this@MeteoApp))
         }
     }
