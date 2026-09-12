@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.meteoapp.data.Result
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
+import com.meteoapp.data.model.RegionCity
 import com.meteoapp.data.model.WeatherData
 import com.meteoapp.location.LocationHelper
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ data class UiState(
     val refreshing: Boolean = false,
     val weather: WeatherData? = null,
     val city: GeoLocation? = null,
+    val regionCities: List<RegionCity> = emptyList(),
     val error: String? = null
 )
 
@@ -42,6 +44,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         city = city,
                         error = null
                     )
+                    loadRegionCities(city.lat, city.lon)
                 }
                 is Result.Error -> {
                     _state.value = _state.value?.copy(
@@ -67,11 +70,23 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         weather = result.data,
                         error = null
                     )
+                    loadRegionCities(lat, lon)
                 }
                 is Result.Error -> {
                     _state.value = current.copy(refreshing = false, error = result.message)
                 }
                 Result.Loading -> {}
+            }
+        }
+    }
+
+    private fun loadRegionCities(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            when (val result = repository.getRegionCities(lat, lon)) {
+                is Result.Success -> {
+                    _state.value = _state.value?.copy(regionCities = result.data)
+                }
+                else -> {}
             }
         }
     }
@@ -112,6 +127,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         city = city,
                         error = null
                     )
+                    loadRegionCities(location.latitude, location.longitude)
                 }
                 is Result.Error -> {
                     _state.value = _state.value?.copy(

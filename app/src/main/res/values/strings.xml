@@ -7,6 +7,7 @@
     <string name="current_weather">Aujourd\'hui</string>
     <string name="hourly_forecast">Prévisions par heure</string>
     <string name="daily_forecast">Prévisions sur 7 jours</string>
+    <string name="region_map">Météo de la région</string>
     <string name="feels_like">Ressenti %1$d°</string>
     <string name="humidity">Humidité</string>
     <string name="wind">Vent</string>

@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.meteoapp.R
 import com.meteoapp.data.model.GeoLocation
+import com.meteoapp.data.model.RegionCity
 import com.meteoapp.data.model.WeatherData
 import com.meteoapp.databinding.ActivityMainBinding
 import com.meteoapp.ui.adapter.DailyAdapter
@@ -130,11 +131,15 @@ class MainActivity : AppCompatActivity() {
 
         val weather = state.weather
         if (weather != null) {
-            showContent(weather, state.city)
+            showContent(weather, state.city, state.regionCities)
         }
     }
 
-    private fun showContent(weather: WeatherData, city: GeoLocation?) {
+    private fun showContent(
+        weather: WeatherData,
+        city: GeoLocation?,
+        regionCities: List<RegionCity>
+    ) {
         binding.errorLayout.visibility = View.GONE
         binding.loadingBar.visibility = View.GONE
 
@@ -144,6 +149,8 @@ class MainActivity : AppCompatActivity() {
         binding.cityName.text = displayName
         binding.headerLayout.visibility = View.VISIBLE
         binding.detailsCard.visibility = View.VISIBLE
+        binding.regionMapTitle.visibility = View.VISIBLE
+        binding.regionMapCard.visibility = View.VISIBLE
         binding.hourlyTitle.visibility = View.VISIBLE
         binding.dailyTitle.visibility = View.VISIBLE
         binding.hourlyRecycler.visibility = View.VISIBLE
@@ -178,6 +185,13 @@ class MainActivity : AppCompatActivity() {
         // Daily : 7 jours
         binding.dailyRecycler.layoutManager = LinearLayoutManager(this)
         binding.dailyRecycler.adapter = DailyAdapter(this, weather.daily.take(7))
+
+        // Minimap région : villes proches avec météo
+        if (regionCities.isNotEmpty()) {
+            binding.regionMapView.showCities(regionCities, weather.lat, weather.lon)
+        } else {
+            binding.regionMapView.clear()
+        }
     }
 
     private fun showError(message: String) {
@@ -186,10 +200,22 @@ class MainActivity : AppCompatActivity() {
         binding.loadingBar.visibility = View.GONE
         binding.headerLayout.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
+        binding.regionMapTitle.visibility = View.GONE
+        binding.regionMapCard.visibility = View.GONE
         binding.hourlyTitle.visibility = View.GONE
         binding.dailyTitle.visibility = View.GONE
         binding.hourlyRecycler.visibility = View.GONE
         binding.dailyRecycler.visibility = View.GONE
         binding.swipeRefresh.isRefreshing = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.regionMapView.onResume()
+    }
+
+    override fun onPause() {
+        binding.regionMapView.onPause()
+        super.onPause()
     }
 }

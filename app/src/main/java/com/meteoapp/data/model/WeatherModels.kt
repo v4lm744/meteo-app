@@ -105,6 +105,23 @@ data class ForecastResponse(
 )
 
 @JsonClass(generateAdapter = false)
+data class FindCityItem(
+    val id: Long,
+    val name: String,
+    val coord: Coord,
+    val main: MainMetrics,
+    val weather: List<WeatherCondition>,
+    val sys: Sys? = null
+)
+
+@JsonClass(generateAdapter = false)
+data class FindResponse(
+    val cod: String? = null,
+    val count: Long? = null,
+    val list: List<FindCityItem> = emptyList()
+)
+
+@JsonClass(generateAdapter = false)
 data class GeoLocation(
     val name: String,
     @Json(name = "local_names") val localNames: LocalNames? = null,

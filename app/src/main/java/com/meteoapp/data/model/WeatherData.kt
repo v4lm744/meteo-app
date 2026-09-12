@@ -58,3 +58,13 @@ data class WeatherData(
     val hourly: List<HourlyData>,
     val daily: List<DailyData>
 )
+
+data class RegionCity(
+    val id: Long,
+    val name: String,
+    val lat: Double,
+    val lon: Double,
+    val temp: Double,
+    val weatherIcon: String,
+    val weatherDescription: String
+)
