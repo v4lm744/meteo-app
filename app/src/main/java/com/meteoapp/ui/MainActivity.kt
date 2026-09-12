@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.meteoapp.R
 import com.meteoapp.data.model.GeoLocation
-import com.meteoapp.data.model.OneCallResponse
+import com.meteoapp.data.model.WeatherData
 import com.meteoapp.databinding.ActivityMainBinding
 import com.meteoapp.ui.adapter.DailyAdapter
 import com.meteoapp.ui.adapter.HourlyAdapter
@@ -134,13 +134,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showContent(weather: OneCallResponse, city: GeoLocation?) {
+    private fun showContent(weather: WeatherData, city: GeoLocation?) {
         binding.errorLayout.visibility = View.GONE
         binding.loadingBar.visibility = View.GONE
 
         val displayName = city?.localNames?.fr
             ?: city?.name
-            ?: weather.timezone.split("/").lastOrNull()
             ?: ""
         binding.cityName.text = displayName
         binding.headerLayout.visibility = View.VISIBLE
@@ -158,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 
         val today = weather.daily.firstOrNull()
         if (today != null) {
-            binding.minMax.text = "Max ${WeatherUtils.roundToInt(today.temp.max)}°  Min ${WeatherUtils.roundToInt(today.temp.min)}°"
+            binding.minMax.text = "Max ${WeatherUtils.roundToInt(today.tempMax)}°  Min ${WeatherUtils.roundToInt(today.tempMin)}°"
         } else {
             binding.minMax.text = ""
         }
@@ -174,9 +173,7 @@ class MainActivity : AppCompatActivity() {
         // Hourly : 24 prochaines heures
         binding.hourlyRecycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.hourlyRecycler.adapter = HourlyAdapter(
-            this, weather.hourly.take(24), weather.timezoneOffset
-        )
+        binding.hourlyRecycler.adapter = HourlyAdapter(this, weather.hourly.take(24))
 
         // Daily : 7 jours
         binding.dailyRecycler.layoutManager = LinearLayoutManager(this)

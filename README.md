@@ -30,6 +30,20 @@ OPEN_WEATHER_API_KEY=votre_cle_api_ici
 > ⚠️ L'API One Call 2.5 (utilisée ici) nécessite une clé valide.
 > N'ajoutez jamais `local.properties` à git (il est dans `.gitignore`).
 
+## Endpoints OpenWeather utilisés (tier gratuit)
+
+L'application n'utilise **pas** l'API One Call (payante) mais les endpoints gratuits :
+
+- `GET /data/2.5/weather` — météo actuelle
+- `GET /data/2.5/forecast` — prévisions 5 jours / 3 heures
+- `GET /geo/1.0/direct` — géocoding (recherche de ville)
+- `GET /geo/1.0/reverse` — géocoding inverse (position → ville)
+
+Les prévisions sur 7 jours sont reconstruites en regroupant par jour les données 3h.
+
+> ⚠️ Une clé OpenWeather nouvellement créée peut mettre **jusqu'à 1–2h** à s'activer.
+> Avant cela, l'API renvoie `401 Invalid API key` même sur les endpoints gratuits.
+
 ## Build
 
 Ouvrez le projet dans Android Studio (Giraffe+ / Hedgehog+) puis lancez

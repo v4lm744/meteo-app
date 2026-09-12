@@ -15,17 +15,29 @@ object WeatherUtils {
     fun formatHour(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
         val millis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
         val sdf = SimpleDateFormat("HH", Locale.FRANCE)
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
         return "${sdf.format(Date(millis))}h"
     }
 
-    fun formatDayName(timestampSeconds: Long): String {
-        val cal = Calendar.getInstance().apply { timeInMillis = timestampSeconds * 1000L }
+    fun formatDayName(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
+        val cal = Calendar.getInstance().apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        }
         return dayNames[cal.get(Calendar.DAY_OF_WEEK) - 1]
     }
 
-    fun isToday(timestampSeconds: Long): Boolean {
-        val cal1 = Calendar.getInstance().apply { timeInMillis = timestampSeconds * 1000L }
-        val cal2 = Calendar.getInstance()
+    fun isToday(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): Boolean {
+        val target = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        val now = System.currentTimeMillis() + timezoneOffsetSeconds * 1000L
+        val cal1 = Calendar.getInstance().apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+            timeInMillis = target
+        }
+        val cal2 = Calendar.getInstance().apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+            timeInMillis = now
+        }
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
