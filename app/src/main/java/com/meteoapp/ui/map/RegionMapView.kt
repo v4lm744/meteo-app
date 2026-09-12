@@ -68,14 +68,12 @@ class RegionMapView @JvmOverloads constructor(
         mapView.invalidate()
     }
 
-    override fun onResume() {
-        super.onResume()
+    fun onResume() {
         mapView.onResume()
     }
 
-    override fun onPause() {
+    fun onPause() {
         mapView.onPause()
-        super.onPause()
     }
 
     private class WeatherMarker(
