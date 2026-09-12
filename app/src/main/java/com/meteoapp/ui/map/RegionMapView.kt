@@ -3,6 +3,7 @@ package com.meteoapp.ui.map
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.bumptech.glide.Glide
 import com.meteoapp.R
@@ -39,6 +40,21 @@ class RegionMapView @JvmOverloads constructor(
         mapView.isVerticalMapRepetitionEnabled = false
         mapView.controller.setZoom(9.0)
         mapView.overlays.clear()
+
+        mapView.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN,
+                MotionEvent.ACTION_POINTER_DOWN -> {
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_POINTER_UP,
+                MotionEvent.ACTION_CANCEL -> {
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false
+        }
     }
 
     fun showCities(cities: List<RegionCity>, centerLat: Double, centerLon: Double) {
