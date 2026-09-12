@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Météo</string>
+    <string name="action_search">Rechercher une ville</string>
+    <string name="action_locate">Ma position</string>
+    <string name="hint_city">Saisissez une ville…</string>
+    <string name="current_weather">Aujourd\'hui</string>
+    <string name="hourly_forecast">Prévisions par heure</string>
+    <string name="daily_forecast">Prévisions sur 7 jours</string>
+    <string name="feels_like">Ressenti %1$d°</string>
+    <string name="humidity">Humidité</string>
+    <string name="wind">Vent</string>
+    <string name="pressure">Pression</string>
+    <string name="sunrise">Lever du soleil</string>
+    <string name="sunset">Coucher du soleil</string>
+    <string name="error_no_api_key">Clé API OpenWeather non configurée. Ajoutez OPEN_WEATHER_API_KEY dans local.properties.</string>
+    <string name="error_generic">Une erreur est survenue. Vérifiez votre connexion.</string>
+    <string name="error_city_not_found">Ville introuvable.</string>
+    <string name="permission_required">Autorisation de localisation requise.</string>
+    <string name="loading">Chargement…</string>
+    <string name="retry">Réessayer</string>
+    <string name="kmh">%1$d km/h</string>
+    <string name="hpa">%1$d hPa</string>
+    <string name="percent">%1$d %%</string>
+</resources>

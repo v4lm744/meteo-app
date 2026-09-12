@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="md_blue_deep">#1B3A5B</color>
+    <color name="md_blue_main">#2364AA</color>
+    <color name="md_blue_sky">#3DA9FC</color>
+    <color name="md_blue_light">#A5D8FF</color>
+    <color name="md_sun">#FFB703</color>
+    <color name="md_warn">#FB8500</color>
+    <color name="md_red">#E63946</color>
+    <color name="md_white">#FFFFFF</color>
+    <color name="md_grey_light">#F2F4F7</color>
+    <color name="md_text_dark">#1A1A2E</color>
+    <color name="md_text_light">#F2F4F7</color>
+    <color name="md_card_overlay">#33FFFFFF</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
