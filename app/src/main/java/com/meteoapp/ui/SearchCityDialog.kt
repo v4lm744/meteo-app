@@ -75,7 +75,7 @@ class SearchCityDialog(
             when (val result = repository.searchCity(query)) {
                 is Result.Success -> {
                     binding.searchProgress.visibility = View.GONE
-                    val results = result.data
+                    val results = result.data.deduplicate()
                     if (results.isEmpty()) {
                         binding.searchHint.visibility = View.VISIBLE
                         binding.searchHint.text = "Aucun résultat"
@@ -94,6 +94,18 @@ class SearchCityDialog(
                 }
                 Result.Loading -> {}
             }
+        }
+    }
+
+    private fun List<GeoLocation>.deduplicate(): List<GeoLocation> {
+        val seen = mutableSetOf<String>()
+        return filter { city ->
+            val key = listOf(
+                city.name.trim().lowercase(),
+                city.country?.trim()?.lowercase().orEmpty(),
+                city.state?.trim()?.lowercase().orEmpty()
+            ).joinToString("|")
+            seen.add(key)
         }
     }
 
