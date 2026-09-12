@@ -6,6 +6,7 @@ import com.meteoapp.data.model.CurrentData
 import com.meteoapp.data.model.DailyData
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.data.model.HourlyData
+import com.meteoapp.data.model.RegionCity
 import com.meteoapp.data.model.WeatherData
 import kotlinx.coroutines.coroutineScope
 import java.util.Calendar
@@ -201,6 +202,33 @@ class WeatherRepository {
             )
         } catch (e: Exception) {
             Result.Error("Erreur lors de la recherche")
+        }
+    }
+
+    suspend fun getRegionCities(lat: Double, lon: Double): Result<List<RegionCity>> {
+        if (!isApiKeyConfigured) {
+            return Result.Error("Clé API non configurée")
+        }
+        return try {
+            val response = api.findCities(lat = lat, lon = lon, count = 10, apiKey = apiKey)
+            val cities = response.list.map { item ->
+                RegionCity(
+                    id = item.id,
+                    name = item.name,
+                    lat = item.coord.lat,
+                    lon = item.coord.lon,
+                    temp = item.main.temp,
+                    weatherIcon = item.weather.firstOrNull()?.icon ?: "",
+                    weatherDescription = item.weather.firstOrNull()?.description ?: ""
+                )
+            }
+            Result.Success(cities)
+        } catch (e: retrofit2.HttpException) {
+            Result.Error(
+                message = if (e.code() == 401 || e.code() == 403) "Clé API invalide" else "Erreur villes proches"
+            )
+        } catch (e: Exception) {
+            Result.Error("Erreur villes proches")
         }
     }
 

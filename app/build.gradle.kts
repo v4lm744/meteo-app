@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.preference.ktx)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
@@ -85,6 +86,9 @@ dependencies {
     implementation(libs.glide)
 
     implementation(libs.play.services.location)
+
+    implementation(libs.osmdroid.android)
+    implementation(libs.osmdroid.mapsforge)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

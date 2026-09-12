@@ -1,6 +1,7 @@
 package com.meteoapp.data.api
 
 import com.meteoapp.data.model.CurrentWeatherResponse
+import com.meteoapp.data.model.FindResponse
 import com.meteoapp.data.model.ForecastResponse
 import com.meteoapp.data.model.GeoLocation
 import retrofit2.http.GET
@@ -25,6 +26,16 @@ interface OpenWeatherApi {
         @Query("lang") lang: String = "fr",
         @Query("appid") apiKey: String
     ): ForecastResponse
+
+    @GET("data/2.5/find")
+    suspend fun findCities(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("cnt") count: Int = 10,
+        @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "fr",
+        @Query("appid") apiKey: String
+    ): FindResponse
 
     @GET("geo/1.0/direct")
     suspend fun geocode(

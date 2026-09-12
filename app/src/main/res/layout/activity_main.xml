@@ -319,7 +319,41 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <TextView
-                    android:id="@+id/hourlyTitle"
+                    android:id="@+id/regionMapTitle"
+                    style="@style/Widget.MeteoApp.Label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/region_map"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detailsCard" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="+id/regionMapCard"
+                    style="@style/Widget.MeteoApp.Card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:clipChildren="true"
+                    android:visibility="gone"
+                    app:cardCornerRadius="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/regionMapTitle">
+
+                    <com.meteoapp.ui.map.RegionMapView
+                        android:id="+id/regionMapView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="+id/hourlyTitle"
                     style="@style/Widget.MeteoApp.Label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -329,10 +363,10 @@
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/detailsCard" />
+                    app:layout_constraintTop_toBottomOf="@id/regionMapCard" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/hourlyRecycler"
+                    android:id="+id/hourlyRecycler"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"

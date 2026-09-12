@@ -8,9 +8,12 @@ avec un design Material Design moderne inspiré de l'application Météo France.
 - Météo actuelle (température, ressenti, min/max, description)
 - Prévisions par heure (24 h)
 - Prévisions sur 7 jours
+- **Minimap de la région** de la ville sélectionnée (osmdroid / OpenStreetMap) avec
+  les principales villes voisines, leur icône météo et leur température ;
+  tap sur une ville voisine charge sa météo, et le pull-to-refresh rafraîchit les marqueurs
 - Recherche de ville (géocoding OpenWeather)
 - Géolocalisation (position courante)
-- Rafraîchissement par « pull-to-refresh »
+- Rafaîchissement par « pull-to-refresh »
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
 
 ## Configuration de la clé API
@@ -36,6 +39,7 @@ L'application n'utilise **pas** l'API One Call (payante) mais les endpoints grat
 
 - `GET /data/2.5/weather` — météo actuelle
 - `GET /data/2.5/forecast` — prévisions 5 jours / 3 heures
+- `GET /data/2.5/find` — villes proches (alimente la minimap région)
 - `GET /geo/1.0/direct` — géocoding (recherche de ville)
 - `GET /geo/1.0/reverse` — géocoding inverse (position → ville)
 
@@ -61,4 +65,4 @@ l'application sur un émulateur ou un appareil (API 24 minimum).
 - `util/` : formatage des dates/températures
 
 Technologies : Kotlin, Coroutines, Retrofit + Moshi, Glide, Material 3,
-ViewBinding, LiveData, FusedLocationProvider.
+ViewBinding, LiveData, FusedLocationProvider, osmdroid (cartes OpenStreetMap).
