@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.MeteoApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/md_blue_main</item>
+        <item name="colorPrimaryVariant">@color/md_blue_deep</item>
+        <item name="colorOnPrimary">@color/md_white</item>
+        <item name="colorSecondary">@color/md_blue_sky</item>
+        <item name="colorOnSecondary">@color/md_white</item>
+        <item name="android:colorBackground">@color/md_blue_deep</item>
+        <item name="android:windowBackground">@drawable/bg_sky_gradient</item>
+        <item name="android:statusBarColor" tools:targetApi="21">@color/md_blue_deep</item>
+        <item name="android:navigationBarColor">@color/md_blue_deep</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+    </style>
+
+    <style name="TextAppearance.Headline.City" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/md_white</item>
+    </style>
+
+    <style name="TextAppearance.Display.Temp" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textColor">@color/md_white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.MeteoApp.Card" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">@color/md_card_overlay</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="Widget.MeteoApp.Label" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">@color/md_blue_light</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="Widget.MeteoApp.Value" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/md_white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
