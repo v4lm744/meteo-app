@@ -8,14 +8,14 @@ import androidx.lifecycle.viewModelScope
 import com.meteoapp.data.Result
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
-import com.meteoapp.data.model.OneCallResponse
+import com.meteoapp.data.model.WeatherData
 import com.meteoapp.location.LocationHelper
 import kotlinx.coroutines.launch
 
 data class UiState(
     val loading: Boolean = false,
     val refreshing: Boolean = false,
-    val weather: OneCallResponse? = null,
+    val weather: WeatherData? = null,
     val city: GeoLocation? = null,
     val error: String? = null
 )

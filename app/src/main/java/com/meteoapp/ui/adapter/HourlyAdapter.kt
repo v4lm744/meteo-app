@@ -5,14 +5,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.meteoapp.data.model.HourlyForecast
+import com.meteoapp.data.model.HourlyData
 import com.meteoapp.databinding.ItemHourlyBinding
 import com.meteoapp.util.WeatherUtils
 
 class HourlyAdapter(
     private val context: Context,
-    private val items: List<HourlyForecast>,
-    private val timezoneOffset: Long
+    private val items: List<HourlyData>
 ) : RecyclerView.Adapter<HourlyAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: ItemHourlyBinding) : RecyclerView.ViewHolder(binding.root)
@@ -27,7 +26,7 @@ class HourlyAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         with(holder.binding) {
-            hourText.text = WeatherUtils.formatHour(item.dt, timezoneOffset)
+            hourText.text = WeatherUtils.formatHour(item.dt, item.timezoneOffset)
             hourTemp.text = "${WeatherUtils.roundToInt(item.temp)}°"
             val iconCode = item.weather.firstOrNull()?.icon
             if (!iconCode.isNullOrEmpty()) {

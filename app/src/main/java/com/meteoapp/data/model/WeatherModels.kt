@@ -12,91 +12,111 @@ data class WeatherCondition(
 )
 
 @JsonClass(generateAdapter = false)
-data class CurrentWeather(
-    val dt: Long,
-    val sunrise: Long?,
-    val sunset: Long?,
-    val temp: Double,
-    @Json(name = "feels_like") val feelsLike: Double,
-    val pressure: Long,
-    val humidity: Long,
-    @Json(name = "dew_point") val dewPoint: Double?,
-    val uvi: Double?,
-    val clouds: Long?,
-    val visibility: Long?,
-    @Json(name = "wind_speed") val windSpeed: Double,
-    @Json(name = "wind_deg") val windDeg: Long,
-    @Json(name = "wind_gust") val windGust: Double?,
-    val weather: List<WeatherCondition>
+data class Clouds(val all: Long?)
+
+@JsonClass(generateAdapter = false)
+data class Wind(
+    val speed: Double,
+    val deg: Long,
+    val gust: Double?
 )
 
 @JsonClass(generateAdapter = false)
-data class HourlyForecast(
-    val dt: Long,
+data class Sys(
+    val country: String?,
+    val sunrise: Long?,
+    val sunset: Long?
+)
+
+@JsonClass(generateAdapter = false)
+data class MainMetrics(
     val temp: Double,
     @Json(name = "feels_like") val feelsLike: Double,
-    val humidity: Long,
-    @Json(name = "wind_speed") val windSpeed: Double,
-    @Json(name = "wind_deg") val windDeg: Long,
+    val tempMin: Double? = null,
+    val tempMax: Double? = null,
+    val pressure: Long,
+    val humidity: Long
+)
+
+@JsonClass(generateAdapter = false)
+data class Coord(
+    val lon: Double,
+    val lat: Double
+)
+
+@JsonClass(generateAdapter = false)
+data class CityInfo(
+    val id: Long? = null,
+    val name: String,
+    val coord: Coord? = null,
+    val country: String? = null,
+    val sunrise: Long? = null,
+    val sunset: Long? = null,
+    val timezone: Long? = null
+)
+
+@JsonClass(generateAdapter = false)
+data class CurrentWeatherResponse(
+    val coord: Coord? = null,
     val weather: List<WeatherCondition>,
-    val pop: Double?,
-    @Json(name = "rain") val rain: RainVolume?,
-    @Json(name = "snow") val snow: SnowVolume?
+    val base: String? = null,
+    val main: MainMetrics,
+    val visibility: Long? = null,
+    val wind: Wind,
+    val clouds: Clouds? = null,
+    val dt: Long,
+    val sys: Sys? = null,
+    val timezone: Long? = null,
+    val name: String? = null
+)
+
+@JsonClass(generateAdapter = false)
+data class ForecastItem(
+    val dt: Long,
+    val main: MainMetrics,
+    val weather: List<WeatherCondition>,
+    val clouds: Clouds? = null,
+    val wind: Wind,
+    val pop: Double? = null,
+    @Json(name = "rain") val rain: RainVolume? = null,
+    @Json(name = "snow") val snow: SnowVolume? = null,
+    @Json(name = "dt_txt") val dtTxt: String? = null
 )
 
 @JsonClass(generateAdapter = false)
 data class RainVolume(
-    @Json(name = "1h") val oneHour: Double?
+    @Json(name = "1h") val oneHour: Double? = null,
+    @Json(name = "3h") val threeHour: Double? = null
 )
 
 @JsonClass(generateAdapter = false)
 data class SnowVolume(
-    @Json(name = "1h") val oneHour: Double?
+    @Json(name = "1h") val oneHour: Double? = null,
+    @Json(name = "3h") val threeHour: Double? = null
 )
 
 @JsonClass(generateAdapter = false)
-data class DailyTemp(
-    val morn: Double,
-    val day: Double,
-    val eve: Double,
-    val night: Double,
-    val min: Double,
-    val max: Double
+data class ForecastResponse(
+    val cod: String? = null,
+    val message: Long? = null,
+    val cnt: Long? = null,
+    val list: List<ForecastItem>,
+    val city: CityInfo
 )
 
 @JsonClass(generateAdapter = false)
-data class DailyFeelsLike(
-    val morn: Double,
-    val day: Double,
-    val eve: Double,
-    val night: Double
-)
-
-@JsonClass(generateAdapter = false)
-data class DailyForecast(
-    val dt: Long,
-    val sunrise: Long,
-    val sunset: Long,
-    val temp: DailyTemp,
-    @Json(name = "feels_like") val feelsLike: DailyFeelsLike,
-    val pressure: Long,
-    val humidity: Long,
-    @Json(name = "wind_speed") val windSpeed: Double,
-    @Json(name = "wind_deg") val windDeg: Long,
-    val weather: List<WeatherCondition>,
-    val clouds: Long,
-    val pop: Double?,
-    val rain: Double?,
-    val uvi: Double?
-)
-
-@JsonClass(generateAdapter = false)
-data class OneCallResponse(
+data class GeoLocation(
+    val name: String,
+    @Json(name = "local_names") val localNames: LocalNames? = null,
     val lat: Double,
     val lon: Double,
-    val timezone: String,
-    @Json(name = "timezone_offset") val timezoneOffset: Long,
-    val current: CurrentWeather,
-    val hourly: List<HourlyForecast>,
-    val daily: List<DailyForecast>
+    val country: String?,
+    val state: String?
+)
+
+@JsonClass(generateAdapter = false)
+data class LocalNames(
+    val fr: String? = null,
+    val en: String? = null,
+    @Json(name = "feature_name") val featureName: String? = null
 )
