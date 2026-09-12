@@ -23,6 +23,8 @@ class RegionMapView @JvmOverloads constructor(
     private val mapView: MapView
     private val markersHolder = mutableListOf<Marker>()
 
+    var onCitySelected: ((RegionCity) -> Unit)? = null
+
     init {
         orientation = VERTICAL
         LayoutInflater.from(context).inflate(R.layout.view_region_map, this, true)
@@ -45,7 +47,9 @@ class RegionMapView @JvmOverloads constructor(
 
         for (city in cities) {
             val point = GeoPoint(city.lat, city.lon)
-            val marker = WeatherMarker(mapView, city)
+            val marker = WeatherMarker(mapView, city) { selected ->
+                onCitySelected?.invoke(selected)
+            }
             marker.position = point
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             marker.title = city.name
@@ -76,7 +80,8 @@ class RegionMapView @JvmOverloads constructor(
 
     private class WeatherMarker(
         private val mapView: MapView,
-        private val city: RegionCity
+        private val city: RegionCity,
+        private val onSelect: (RegionCity) -> Unit
     ) : Marker(mapView) {
 
         init {
@@ -100,12 +105,9 @@ class RegionMapView @JvmOverloads constructor(
             setOnMarkerClickListener { m, _ ->
                 showInfoWindow()
                 mapView.controller.animateTo(m.position)
+                onSelect(city)
                 true
             }
-        }
-
-        override fun showInfoWindow() {
-            super.showInfoWindow()
         }
     }
 }

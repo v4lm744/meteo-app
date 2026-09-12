@@ -46,6 +46,18 @@ class MainActivity : AppCompatActivity() {
         binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
         binding.retryButton.setOnClickListener { retryLast() }
 
+        binding.regionMapView.onCitySelected = { regionCity ->
+            val city = com.meteoapp.data.model.GeoLocation(
+                name = regionCity.name,
+                localNames = null,
+                lat = regionCity.lat,
+                lon = regionCity.lon,
+                country = null,
+                state = null
+            )
+            viewModel.loadWeatherForCity(city)
+        }
+
         viewModel.state.observe(this) { state -> render(state) }
 
         if (!viewModel.isApiKeyConfigured) {

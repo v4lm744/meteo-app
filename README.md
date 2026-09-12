@@ -9,7 +9,8 @@ avec un design Material Design moderne inspiré de l'application Météo France.
 - Prévisions par heure (24 h)
 - Prévisions sur 7 jours
 - **Minimap de la région** de la ville sélectionnée (osmdroid / OpenStreetMap) avec
-  les principales villes voisines, leur icône météo et leur température
+  les principales villes voisines, leur icône météo et leur température ;
+  tap sur une ville voisine charge sa météo, et le pull-to-refresh rafraîchit les marqueurs
 - Recherche de ville (géocoding OpenWeather)
 - Géolocalisation (position courante)
 - Rafaîchissement par « pull-to-refresh »
