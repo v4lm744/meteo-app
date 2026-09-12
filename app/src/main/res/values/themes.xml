@@ -29,6 +29,11 @@
         <item name="cardElevation">0dp</item>
     </style>
 
+    <style name="Theme.MeteoApp.Config" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/md_blue_main</item>
+        <item name="android:statusBarColor" tools:targetApi="21">@color/md_blue_deep</item>
+    </style>
+
     <style name="Widget.MeteoApp.Label" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textColor">@color/md_blue_light</item>
         <item name="android:textAllCaps">true</item>

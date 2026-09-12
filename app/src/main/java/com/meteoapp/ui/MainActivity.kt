@@ -22,6 +22,12 @@ import com.meteoapp.util.WeatherUtils
 
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_CITY_NAME = "com.meteoapp.EXTRA_CITY_NAME"
+        const val EXTRA_CITY_LAT = "com.meteoapp.EXTRA_CITY_LAT"
+        const val EXTRA_CITY_LON = "com.meteoapp.EXTRA_CITY_LON"
+    }
+
     private lateinit var binding: ActivityMainBinding
     private val viewModel: WeatherViewModel by viewModels()
 
@@ -63,7 +69,23 @@ class MainActivity : AppCompatActivity() {
         if (!viewModel.isApiKeyConfigured) {
             showError(getString(R.string.error_no_api_key))
         } else {
-            requestLocationAndLoad()
+            val launchName = intent?.getStringExtra(EXTRA_CITY_NAME)
+            val launchLat = intent?.getDoubleExtra(EXTRA_CITY_LAT, Double.NaN)
+            val launchLon = intent?.getDoubleExtra(EXTRA_CITY_LON, Double.NaN)
+            if (!launchName.isNullOrBlank() && !launchLat!!.isNaN() && !launchLon!!.isNaN()) {
+                viewModel.loadWeatherForCity(
+                    GeoLocation(
+                        name = launchName,
+                        localNames = null,
+                        lat = launchLat,
+                        lon = launchLon,
+                        country = null,
+                        state = null
+                    )
+                )
+            } else {
+                requestLocationAndLoad()
+            }
         }
     }
 

@@ -23,4 +23,7 @@
     <string name="kmh">%1$d km/h</string>
     <string name="hpa">%1$d hPa</string>
     <string name="percent">%1$d %%</string>
+    <string name="widget_configure_prompt">Choisissez une ville</string>
+    <string name="widget_title">Météo</string>
+    <string name="widget_confirm">Valider</string>
 </resources>

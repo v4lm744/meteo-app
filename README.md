@@ -13,7 +13,9 @@ avec un design Material Design moderne inspiré de l'application Météo France.
   tap sur une ville voisine charge sa météo, et le pull-to-refresh rafraîchit les marqueurs
 - Recherche de ville (géocoding OpenWeather)
 - Géolocalisation (position courante)
-- Rafaîchissement par « pull-to-refresh »
+- **Widget d'accueil** : résumé météo du jour (icône, température, description, min/max)
+  pour une ville choisie à l'ajout du widget (écran de configuration avec recherche)
+- Rafraîchissement par « pull-to-refresh »
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
 
 ## Configuration de la clé API
@@ -61,6 +63,7 @@ l'application sur un émulateur ou un appareil (API 24 minimum).
 
 - `data/` : modèles, API Retrofit, repository
 - `location/` : géolocalisation (FusedLocationProvider)
+- `widget/` : `WeatherWidgetProvider`, `WeatherWidgetConfigureActivity`, `WidgetPrefs`
 - `ui/` : MainActivity, ViewModel, adapters, dialog de recherche
 - `util/` : formatage des dates/températures
 
