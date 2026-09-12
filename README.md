@@ -14,7 +14,8 @@ avec un design Material Design moderne inspiré de l'application Météo France.
 - Recherche de ville (géocoding OpenWeather)
 - Géolocalisation (position courante)
 - **Widget d'accueil** : résumé météo du jour (icône, température, description, min/max)
-  pour une ville choisie à l'ajout du widget (écran de configuration avec recherche)
+  pour une ville choisie à l'ajout du widget (écran de configuration avec recherche) ;
+  fond en dégradé dynamique selon la météo et l'heure (jour/nuit, soleil, nuages, pluie, neige…)
 - Rafraîchissement par « pull-to-refresh »
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
 

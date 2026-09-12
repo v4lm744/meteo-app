@@ -128,6 +128,21 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                             views.setTextViewText(R.id.widgetMinMax, "")
                         }
 
+                        // Fond dégradé dynamique selon météo + heure
+                        try {
+                            val opts = appWidgetManager.getAppWidgetOptions(appWidgetId)
+                            val density = context.resources.displayMetrics.density
+                            var w = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 0)
+                            var h = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
+                            if (w <= 0) w = (250 * density).toInt()
+                            if (h <= 0) h = (70 * density).toInt()
+                            val bg = WidgetGradient.buildBackground(
+                                context.applicationContext, result.data, w, h
+                            )
+                            views.setImageViewBitmap(R.id.widgetBackground, bg)
+                        } catch (_: Exception) {
+                        }
+
                         val iconCode = current.weather.firstOrNull()?.icon
                         if (!iconCode.isNullOrEmpty()) {
                             try {
