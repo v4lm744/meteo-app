@@ -68,6 +68,19 @@ object WeatherUtils {
         return sdf.format(Date(millis))
     }
 
+    fun formatFullDateTime(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
+        val millis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        val sdf = SimpleDateFormat("EEEE HH:mm", Locale.FRANCE)
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
+        return sdf.format(Date(millis))
+    }
+
+    fun formatFullDayNameTime(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
+        val dayName = formatFullDayName(timestampSeconds, timezoneOffsetSeconds)
+        val hour = formatTime(timestampSeconds, timezoneOffsetSeconds)
+        return "$dayName $hour"
+    }
+
     fun roundToInt(value: Double): Int = Math.round(value).toInt()
 
     fun iconUrl(icon: String): String = "https://openweathermap.org/img/wn/$icon@2x.png"

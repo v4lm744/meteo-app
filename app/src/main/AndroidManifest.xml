@@ -41,6 +41,11 @@
             android:theme="@style/Theme.MeteoApp" />
 
         <activity
+            android:name=".ui.HourDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MeteoApp" />
+
+        <activity
             android:name=".widget.WeatherWidgetConfigureActivity"
             android:exported="true"
             android:theme="@style/Theme.MeteoApp.Config">

@@ -28,7 +28,12 @@ data class HourlyData(
     val windDeg: Long,
     val weather: List<WeatherCondition>,
     val pop: Double?,
-    val timezoneOffset: Long
+    val timezoneOffset: Long,
+    val pressure: Long = 0L,
+    val cloudiness: Long = 0L,
+    val visibility: Long? = null,
+    val rainVolume: Double = 0.0,
+    val snowVolume: Double = 0.0
 )
 
 @JsonClass(generateAdapter = true)

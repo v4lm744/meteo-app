@@ -70,7 +70,12 @@ class WeatherRepository(
                         windDeg = item.wind.deg,
                         weather = item.weather,
                         pop = item.pop,
-                        timezoneOffset = timezoneOffset
+                        timezoneOffset = timezoneOffset,
+                        pressure = item.main.pressure,
+                        cloudiness = item.clouds?.all ?: 0L,
+                        visibility = null,
+                        rainVolume = item.rain?.threeHour ?: item.rain?.oneHour ?: 0.0,
+                        snowVolume = item.snow?.threeHour ?: item.snow?.oneHour ?: 0.0
                     )
                 }
 

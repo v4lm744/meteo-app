@@ -11,7 +11,8 @@ import com.meteoapp.util.WeatherUtils
 
 class HourlyAdapter(
     private val context: Context,
-    private val items: List<HourlyData>
+    private val items: List<HourlyData>,
+    private val onItemClick: (HourlyData) -> Unit = {}
 ) : RecyclerView.Adapter<HourlyAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: ItemHourlyBinding) : RecyclerView.ViewHolder(binding.root)
@@ -20,14 +21,19 @@ class HourlyAdapter(
         val binding = ItemHourlyBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
-        return ViewHolder(binding)
+        return ViewHolder(binding).apply {
+            itemView.setOnClickListener {
+                val pos = adapterPosition
+                if (pos != RecyclerView.NO_POSITION) onItemClick(items[pos])
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         with(holder.binding) {
             hourText.text = WeatherUtils.formatHour(item.dt, item.timezoneOffset)
-            hourTemp.text = "${WeatherUtils.roundToInt(item.temp)}°"
+            hourTemp.text = "${WeatherUtils.roundToInt(item.temp)}\u00b0"
             val iconCode = item.weather.firstOrNull()?.icon
             if (!iconCode.isNullOrEmpty()) {
                 Glide.with(context)
