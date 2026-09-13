@@ -8,7 +8,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.meteoapp.R
-import com.meteoapp.data.Result
+import com.meteoapp.data.WeatherResult
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.databinding.DialogSearchBinding
@@ -19,7 +19,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@Suppress("unused")
 class WeatherWidgetConfigureActivity : AppCompatActivity() {
 
     private lateinit var binding: DialogSearchBinding
@@ -79,12 +78,12 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
         binding.searchHint.visibility = View.GONE
         lifecycleScope.launch {
             when (val result = repository.searchCity(query)) {
-                is Result.Success -> {
+                is WeatherResult.Success -> {
                     binding.searchProgress.visibility = View.GONE
                     val results = deduplicate(result.data)
                     if (results.isEmpty()) {
                         binding.searchHint.visibility = View.VISIBLE
-                        binding.searchHint.text = "Aucun résultat"
+                        binding.searchHint.text = getString(R.string.no_result)
                     } else {
                         binding.searchHint.visibility = View.GONE
                     }
@@ -92,12 +91,12 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
                         onCityChosen(city)
                     }
                 }
-                is Result.Error -> {
+                is WeatherResult.Error -> {
                     binding.searchProgress.visibility = View.GONE
                     binding.searchHint.visibility = View.VISIBLE
                     binding.searchHint.text = result.message
                 }
-                Result.Loading -> {}
+                WeatherResult.Loading -> {}
             }
         }
     }

@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.meteoapp.data.Result
+import com.meteoapp.data.WeatherResult
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.databinding.DialogSearchBinding
@@ -20,7 +20,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@Suppress("unused")
 class SearchCityDialog(
     private val onCitySelected: (GeoLocation) -> Unit
 ) : DialogFragment() {
@@ -36,7 +35,7 @@ class SearchCityDialog(
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(com.meteoapp.R.string.action_search)
             .setView(binding.root)
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(com.meteoapp.R.string.cancel, null)
             .create()
         setupSearch()
         return dialog
@@ -74,12 +73,12 @@ class SearchCityDialog(
         binding.searchHint.visibility = View.GONE
         lifecycleScope.launch {
             when (val result = repository.searchCity(query)) {
-                is Result.Success -> {
+                is WeatherResult.Success -> {
                     binding.searchProgress.visibility = View.GONE
                     val results = result.data.deduplicate()
                     if (results.isEmpty()) {
                         binding.searchHint.visibility = View.VISIBLE
-                        binding.searchHint.text = "Aucun résultat"
+                        binding.searchHint.text = getString(com.meteoapp.R.string.no_result)
                     } else {
                         binding.searchHint.visibility = View.GONE
                     }
@@ -88,12 +87,12 @@ class SearchCityDialog(
                         dismiss()
                     }
                 }
-                is Result.Error -> {
+                is WeatherResult.Error -> {
                     binding.searchProgress.visibility = View.GONE
                     binding.searchHint.visibility = View.VISIBLE
                     binding.searchHint.text = result.message
                 }
-                Result.Loading -> {}
+                WeatherResult.Loading -> {}
             }
         }
     }

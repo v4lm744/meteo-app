@@ -13,7 +13,6 @@ import com.meteoapp.databinding.DialogAboutBinding
  * (source des données, politique de confidentialité, permissions,
  * licences open-source, éditeur).
  */
-@Suppress("unused")
 class AboutDialog : DialogFragment() {
 
     private var _binding: DialogAboutBinding? = null

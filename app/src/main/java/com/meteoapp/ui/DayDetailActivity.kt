@@ -9,7 +9,6 @@ import com.meteoapp.util.WeatherColors
 import com.meteoapp.util.WeatherUtils
 import com.squareup.moshi.Moshi
 
-@Suppress("unused")
 class DayDetailActivity : AppCompatActivity() {
 
     companion object {

@@ -5,7 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.meteoapp.data.Result
+import com.meteoapp.R
+import com.meteoapp.data.WeatherResult
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.data.model.RegionCity
@@ -37,7 +38,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             _state.value = _state.value?.copy(loading = true, error = null, city = city)
             when (val result = repository.getWeather(city.lat, city.lon)) {
-                is Result.Success -> {
+                is WeatherResult.Success -> {
                     _state.value = UiState(
                         loading = false,
                         weather = result.data,
@@ -46,13 +47,13 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     )
                     loadRegionCities(city.lat, city.lon)
                 }
-                is Result.Error -> {
+                is WeatherResult.Error -> {
                     _state.value = _state.value?.copy(
                         loading = false,
                         error = result.message
                     )
                 }
-                Result.Loading -> {}
+                WeatherResult.Loading -> {}
             }
         }
     }
@@ -64,7 +65,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             _state.value = current.copy(refreshing = true, error = null)
             when (val result = repository.getWeather(lat, lon)) {
-                is Result.Success -> {
+                is WeatherResult.Success -> {
                     _state.value = current.copy(
                         refreshing = false,
                         weather = result.data,
@@ -72,10 +73,10 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     )
                     loadRegionCities(lat, lon)
                 }
-                is Result.Error -> {
+                is WeatherResult.Error -> {
                     _state.value = current.copy(refreshing = false, error = result.message)
                 }
-                Result.Loading -> {}
+                WeatherResult.Loading -> {}
             }
         }
     }
@@ -83,7 +84,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     private fun loadRegionCities(lat: Double, lon: Double) {
         viewModelScope.launch {
             when (val result = repository.getRegionCities(lat, lon)) {
-                is Result.Success -> {
+                is WeatherResult.Success -> {
                     _state.value = _state.value?.copy(regionCities = result.data)
                 }
                 else -> {}
@@ -95,7 +96,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             if (!locationHelper.hasLocationPermission()) {
                 _state.value = _state.value?.copy(
-                    error = "Autorisation de localisation requise"
+                    error = getApplication<Application>().getString(R.string.error_location_permission)
                 )
                 return@launch
             }
@@ -104,14 +105,14 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
             if (location == null) {
                 _state.value = _state.value?.copy(
                     loading = false,
-                    error = "Position indisponible"
+                    error = getApplication<Application>().getString(R.string.error_location_unavailable)
                 )
                 return@launch
             }
             val geoResult = repository.reverseGeocode(location.latitude, location.longitude)
-            val city = (geoResult as? Result.Success)?.data?.firstOrNull()
+            val city = (geoResult as? WeatherResult.Success)?.data?.firstOrNull()
                 ?: GeoLocation(
-                    name = "Position actuelle",
+                    name = getApplication<Application>().getString(R.string.current_position),
                     localNames = null,
                     lat = location.latitude,
                     lon = location.longitude,
@@ -120,7 +121,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                 )
 
             when (val result = repository.getWeather(location.latitude, location.longitude)) {
-                is Result.Success -> {
+                is WeatherResult.Success -> {
                     _state.value = UiState(
                         loading = false,
                         weather = result.data,
@@ -129,13 +130,13 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     )
                     loadRegionCities(location.latitude, location.longitude)
                 }
-                is Result.Error -> {
+                is WeatherResult.Error -> {
                     _state.value = _state.value?.copy(
                         loading = false,
                         error = result.message
                     )
                 }
-                Result.Loading -> {}
+                WeatherResult.Loading -> {}
             }
         }
     }

@@ -8,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.meteoapp.R
-import com.meteoapp.data.Result
+import com.meteoapp.data.WeatherResult
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.ui.MainActivity
@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@Suppress("unused")
 class WeatherWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(
@@ -108,7 +107,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
             val result = repository.getWeather(city.lat, city.lon)
             withContext(Dispatchers.Main) {
                 when (result) {
-                    is Result.Success -> {
+                    is WeatherResult.Success -> {
                         val current = result.data.current
                         views.setTextViewText(R.id.widgetCity, city.localNames?.fr ?: city.name)
                         views.setTextViewText(
@@ -164,13 +163,13 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                         }
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
-                    is Result.Error -> {
+                    is WeatherResult.Error -> {
                         views.setTextViewText(
                             R.id.widgetDesc, context.getString(R.string.error_generic)
                         )
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
-                    Result.Loading -> {}
+                    WeatherResult.Loading -> {}
                 }
             }
         }

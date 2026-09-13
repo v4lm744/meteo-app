@@ -4,7 +4,6 @@ import android.app.Application
 import org.osmdroid.config.Configuration
 import java.io.File
 
-@Suppress("unused")
 class MeteoApp : Application() {
     override fun onCreate() {
         super.onCreate()

@@ -19,14 +19,17 @@ object ApiClient {
     }
 
     private val okHttpClient: OkHttpClient by lazy {
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BASIC
-        }
-        OkHttpClient.Builder()
-            .addInterceptor(logging)
+        val builder = OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
-            .build()
+        if (com.meteoapp.BuildConfig.DEBUG) {
+            builder.addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BASIC
+                }
+            )
+        }
+        builder.build()
     }
 
     val api: OpenWeatherApi by lazy {
