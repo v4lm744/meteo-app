@@ -2,6 +2,7 @@ package com.meteoapp.data.model
 
 import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class CurrentData(
     val dt: Long,
     val sunrise: Long?,
@@ -17,6 +18,7 @@ data class CurrentData(
     val timezoneOffset: Long
 )
 
+@JsonClass(generateAdapter = true)
 data class HourlyData(
     val dt: Long,
     val temp: Double,
@@ -29,6 +31,7 @@ data class HourlyData(
     val timezoneOffset: Long
 )
 
+@JsonClass(generateAdapter = true)
 data class DailyData(
     val dt: Long,
     val sunrise: Long?,
@@ -49,6 +52,7 @@ data class DailyData(
     val timezoneOffset: Long
 )
 
+@JsonClass(generateAdapter = true)
 data class WeatherData(
     val lat: Double,
     val lon: Double,
@@ -59,6 +63,7 @@ data class WeatherData(
     val daily: List<DailyData>
 )
 
+@JsonClass(generateAdapter = true)
 data class RegionCity(
     val id: Long,
     val name: String,

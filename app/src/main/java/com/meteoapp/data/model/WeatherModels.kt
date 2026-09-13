@@ -3,7 +3,7 @@ package com.meteoapp.data.model
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class WeatherCondition(
     val id: Long,
     val main: String,
@@ -11,24 +11,24 @@ data class WeatherCondition(
     val icon: String
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class Clouds(val all: Long?)
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class Wind(
     val speed: Double,
     val deg: Long,
     val gust: Double?
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class Sys(
     val country: String?,
     val sunrise: Long?,
     val sunset: Long?
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class MainMetrics(
     val temp: Double,
     @Json(name = "feels_like") val feelsLike: Double,
@@ -38,13 +38,13 @@ data class MainMetrics(
     val humidity: Long
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class Coord(
     val lon: Double,
     val lat: Double
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class CityInfo(
     val id: Long? = null,
     val name: String,
@@ -55,7 +55,7 @@ data class CityInfo(
     val timezone: Long? = null
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class CurrentWeatherResponse(
     val coord: Coord? = null,
     val weather: List<WeatherCondition>,
@@ -70,7 +70,7 @@ data class CurrentWeatherResponse(
     val name: String? = null
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class ForecastItem(
     val dt: Long,
     val main: MainMetrics,
@@ -83,19 +83,19 @@ data class ForecastItem(
     @Json(name = "dt_txt") val dtTxt: String? = null
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class RainVolume(
     @Json(name = "1h") val oneHour: Double? = null,
     @Json(name = "3h") val threeHour: Double? = null
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class SnowVolume(
     @Json(name = "1h") val oneHour: Double? = null,
     @Json(name = "3h") val threeHour: Double? = null
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class ForecastResponse(
     val cod: String? = null,
     val message: Long? = null,
@@ -104,7 +104,7 @@ data class ForecastResponse(
     val city: CityInfo
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class FindCityItem(
     val id: Long,
     val name: String,
@@ -114,14 +114,14 @@ data class FindCityItem(
     val sys: Sys? = null
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class FindResponse(
     val cod: String? = null,
     val count: Long? = null,
     val list: List<FindCityItem> = emptyList()
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class GeoLocation(
     val name: String,
     @Json(name = "local_names") val localNames: LocalNames? = null,
@@ -131,7 +131,7 @@ data class GeoLocation(
     val state: String?
 )
 
-@JsonClass(generateAdapter = false)
+@JsonClass(generateAdapter = true)
 data class LocalNames(
     val fr: String? = null,
     val en: String? = null,
