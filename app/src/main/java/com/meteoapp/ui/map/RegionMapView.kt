@@ -15,6 +15,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 
+@Suppress("unused")
 class RegionMapView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

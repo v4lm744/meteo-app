@@ -20,6 +20,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@Suppress("unused")
 class SearchCityDialog(
     private val onCitySelected: (GeoLocation) -> Unit
 ) : DialogFragment() {

@@ -20,6 +20,7 @@ import com.meteoapp.ui.adapter.DailyAdapter
 import com.meteoapp.ui.adapter.HourlyAdapter
 import com.meteoapp.util.WeatherUtils
 
+@Suppress("unused")
 class MainActivity : AppCompatActivity() {
 
     companion object {
