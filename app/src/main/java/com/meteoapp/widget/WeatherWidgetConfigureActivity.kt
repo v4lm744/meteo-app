@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class WeatherWidgetConfigureActivity : AppCompatActivity() {
 
     private lateinit var binding: DialogSearchBinding
-    private val repository = WeatherRepository(this)
+    private val repository by lazy { WeatherRepository(this) }
     private var searchJob: Job? = null
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
