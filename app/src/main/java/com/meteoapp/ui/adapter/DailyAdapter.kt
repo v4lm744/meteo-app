@@ -11,7 +11,8 @@ import com.meteoapp.util.WeatherUtils
 
 class DailyAdapter(
     private val context: Context,
-    private val items: List<DailyData>
+    private val items: List<DailyData>,
+    private val onItemClick: (DailyData) -> Unit = {}
 ) : RecyclerView.Adapter<DailyAdapter.ViewHolder>() {
 
     class ViewHolder(val binding: ItemDailyBinding) : RecyclerView.ViewHolder(binding.root)
@@ -25,6 +26,7 @@ class DailyAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
+        holder.itemView.setOnClickListener { onItemClick(item) }
         with(holder.binding) {
             dayText.text = if (WeatherUtils.isToday(item.dt, item.timezoneOffset)) {
                 "Auj."

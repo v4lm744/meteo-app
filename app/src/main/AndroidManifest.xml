@@ -29,6 +29,11 @@
         </activity>
 
         <activity
+            android:name=".ui.DayDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MeteoApp" />
+
+        <activity
             android:name=".widget.WeatherWidgetConfigureActivity"
             android:exported="true"
             android:theme="@style/Theme.MeteoApp.Config">

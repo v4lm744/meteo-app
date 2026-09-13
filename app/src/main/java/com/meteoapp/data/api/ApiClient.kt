@@ -12,7 +12,7 @@ object ApiClient {
 
     private const val BASE_URL = "https://api.openweathermap.org/"
 
-    private val moshi: Moshi by lazy {
+    val moshi: Moshi by lazy {
         Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
