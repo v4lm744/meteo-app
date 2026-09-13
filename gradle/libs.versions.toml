@@ -1,7 +1,6 @@
 [versions]
 agp = "8.7.3"
 kotlin = "2.0.21"
-ksp = "2.0.21-2.0.5"
 coreKtx = "1.15.0"
 appcompat = "1.7.0"
 material = "1.12.0"
@@ -58,4 +57,3 @@ okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver",
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
