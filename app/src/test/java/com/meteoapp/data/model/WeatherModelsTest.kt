@@ -51,7 +51,7 @@ class WeatherModelsTest {
         assertEquals(10000L, response.visibility)
         assertEquals(3.6, response.wind.speed, 0.001)
         assertEquals(200L, response.wind.deg)
-        assertEquals(5.0, response.wind.gust, 0.001)
+        assertEquals(5.0, response.wind.gust!!, 0.001)
         assertEquals("FR", response.sys?.country)
         assertEquals(1699980000L, response.sys?.sunrise)
         assertEquals("Paris", response.name)
