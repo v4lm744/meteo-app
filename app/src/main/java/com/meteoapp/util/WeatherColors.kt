@@ -80,6 +80,19 @@ object WeatherColors {
         bottom = appBaseColor
     )
 
+    /**
+     * Couleur de contraste (blanc ou noir) selon la luminance de [bgColor],
+     * afin que les icônes/contrôles restent lisibles sur n'importe quel fond.
+     */
+    fun contrastColor(bgColor: Int): Int {
+        val r = (bgColor shr 16) and 0xFF
+        val g = (bgColor shr 8) and 0xFF
+        val b = bgColor and 0xFF
+        // luminance perçue (rec. 709)
+        val luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0
+        return if (luminance > 0.6) 0xFF000000.toInt() else 0xFFFFFFFF.toInt()
+    }
+
     private fun colorForCode(code: Long, isDay: Boolean): Int {
         return when {
             code in 200..232 -> 0xFF222B45.toInt()      // orage
