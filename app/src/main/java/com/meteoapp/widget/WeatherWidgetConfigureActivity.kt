@@ -19,6 +19,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@Suppress("unused")
 class WeatherWidgetConfigureActivity : AppCompatActivity() {
 
     private lateinit var binding: DialogSearchBinding
