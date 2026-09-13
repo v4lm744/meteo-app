@@ -1,6 +1,7 @@
 package com.meteoapp.ui
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
@@ -19,7 +20,12 @@ class SplashActivity : AppCompatActivity() {
         splashView.listener = object : SplashAnimationView.AnimationListener {
             override fun onAnimationEnd() {
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                @Suppress("DEPRECATION")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, android.R.anim.fade_in, android.R.anim.fade_out)
+                } else {
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                }
                 finish()
             }
         }
