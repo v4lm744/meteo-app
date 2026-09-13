@@ -11,6 +11,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlinx.coroutines.runBlocking
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Retrofit
@@ -56,7 +57,7 @@ class WeatherRepositoryTest {
         ApiKeyStore.setApiKey(context, "")
         val repo = WeatherRepository(context, buildApi())
 
-        val result = repo.getWeather(48.85, 2.35)
+        val result = runBlocking { repo.getWeather(48.85, 2.35) }
 
         assertTrue(result is WeatherResult.Error)
         assertFalse((result as WeatherResult.Error).cityNotFound)
@@ -67,7 +68,7 @@ class WeatherRepositoryTest {
         server.enqueue(MockResponse().setBody(CURRENT_JSON))
         server.enqueue(MockResponse().setBody(FORECAST_JSON))
 
-        val result = repository.getWeather(48.85, 2.35)
+        val result = runBlocking { repository.getWeather(48.85, 2.35) }
 
         assertTrue(result is WeatherResult.Success)
         val data = (result as WeatherResult.Success).data
@@ -85,7 +86,7 @@ class WeatherRepositoryTest {
         server.enqueue(MockResponse().setResponseCode(404).setBody("{}"))
         server.enqueue(MockResponse().setResponseCode(404).setBody("{}"))
 
-        val result = repository.getWeather(0.0, 0.0)
+        val result = runBlocking { repository.getWeather(0.0, 0.0) }
 
         assertTrue(result is WeatherResult.Error)
         assertTrue((result as WeatherResult.Error).cityNotFound)
@@ -95,7 +96,7 @@ class WeatherRepositoryTest {
     fun searchCity_returnsResults() {
         server.enqueue(MockResponse().setBody(GEO_JSON))
 
-        val result = repository.searchCity("Paris")
+        val result = runBlocking { repository.searchCity("Paris") }
 
         assertTrue(result is WeatherResult.Success)
         val cities = (result as WeatherResult.Success).data
@@ -106,7 +107,7 @@ class WeatherRepositoryTest {
 
     @Test
     fun searchCity_returnsEmptyForBlankQuery() {
-        val result = repository.searchCity("   ")
+        val result = runBlocking { repository.searchCity("   ") }
 
         assertTrue(result is WeatherResult.Success)
         assertTrue((result as WeatherResult.Success).data.isEmpty())
@@ -116,7 +117,7 @@ class WeatherRepositoryTest {
     fun getRegionCities_mapsResponse() {
         server.enqueue(MockResponse().setBody(FIND_JSON))
 
-        val result = repository.getRegionCities(48.85, 2.35)
+        val result = runBlocking { repository.getRegionCities(48.85, 2.35) }
 
         assertTrue(result is WeatherResult.Success)
         val cities = (result as WeatherResult.Success).data
