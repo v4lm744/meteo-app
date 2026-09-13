@@ -122,10 +122,7 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
         setResult(RESULT_OK, resultValue)
         finish()
 
-        val mgr = AppWidgetManager.getInstance(this)
-        WeatherWidgetProvider().onUpdate(
-            this, mgr, intArrayOf(appWidgetId)
-        )
+        WeatherWidgetProvider.triggerUpdate(this)
     }
 
     private class ResultAdapter(

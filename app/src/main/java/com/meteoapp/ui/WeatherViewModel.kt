@@ -12,6 +12,7 @@ import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.data.model.RegionCity
 import com.meteoapp.data.model.WeatherData
 import com.meteoapp.location.LocationHelper
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 data class UiState(
@@ -31,11 +32,14 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     private val _state = MutableLiveData(UiState())
     val state: LiveData<UiState> = _state
 
+    private var weatherJob: Job? = null
+
     val isApiKeyConfigured: Boolean
         get() = repository.isApiKeyConfigured
 
     fun loadWeatherForCity(city: GeoLocation) {
-        viewModelScope.launch {
+        weatherJob?.cancel()
+        weatherJob = viewModelScope.launch {
             _state.value = _state.value?.copy(loading = true, error = null, city = city)
             when (val result = repository.getWeather(city.lat, city.lon)) {
                 is WeatherResult.Success -> {
@@ -62,7 +66,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         val current = _state.value ?: return
         val lat = current.weather?.lat ?: current.city?.lat ?: return
         val lon = current.weather?.lon ?: current.city?.lon ?: return
-        viewModelScope.launch {
+        weatherJob?.cancel()
+        weatherJob = viewModelScope.launch {
             _state.value = current.copy(refreshing = true, error = null)
             when (val result = repository.getWeather(lat, lon)) {
                 is WeatherResult.Success -> {
