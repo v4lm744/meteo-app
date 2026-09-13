@@ -9,7 +9,7 @@
     <string name="hint_api_key">Clé API OpenWeatherMap</string>
     <string name="api_key_hint">Clé stockée sur l’appareil. Obtenez une clé gratuite sur openweathermap.org.</string>
     <string name="hint_city">Saisissez une ville…</string>
-    <string name="current_weather">Aujourd\'hui</string>
+    <string name="current_weather">Aujourd'hui</string>
     <string name="hourly_forecast">Prévisions par heure</string>
     <string name="daily_forecast">Prévisions sur 7 jours</string>
     <string name="region_map">Météo de la région</string>
@@ -38,4 +38,22 @@
     <string name="night">Nuit</string>
     <string name="conditions">Conditions</string>
     <string name="rain_probability">Risque de pluie</string>
+    <string name="about_version_format">Version %1$s</string>
+    <string name="openweathermap_url">https://openweathermap.org</string>
+    <string name="about_data_source">Source des données</string>
+    <string name="about_data_source_text">Les données météorologiques sont fournies par OpenWeatherMap (service tiers). Conformément aux conditions d\'utilisation d\'OpenWeatherMap, l\'attribution « Données météo : OpenWeatherMap » est obligatoire. OpenWeatherMap n\'est pas responsable de l\'exactitude des prévisions affichées.</string>
+    <string name="about_map_source">Source des cartes</string>
+    <string name="about_map_source_text">Les fonds de carte proviennent d\'OpenStreetMap (OSM), des contributeurs OpenStreetMap sous licence Open Data Commons Open Database License (ODbL).</string>
+    <string name="about_privacy">Politique de confidentialité</string>
+    <string name="about_privacy_text">Cette application ne collecte aucune donnée personnelle et n\'utilise aucun service de pistage. La clé API OpenWeatherMap que vous saisissez est stockée uniquement sur votre appareil (elle n\'est jamais transmise hors de l\'appareil sauf pour interroger l\'API OpenWeatherMap). La position géographique n\'est utilisée que localement pour afficher la météo et n\'est jamais transmise ni enregistrée sur un serveur. Les recherches de ville et les coordonnées sont envoyées à l\'API OpenWeatherMap pour obtenir les prévisions.</string>
+    <string name="about_permissions">Permissions</string>
+    <string name="about_permissions_text">• Internet : récupérer les données météo auprès d\'OpenWeatherMap.
+• État du réseau : vérifier la connectivité.
+• Localisation (approximative/précise) : afficher la météo de votre position, uniquement à votre demande.</string>
+    <string name="about_oss">Licences open-source</string>
+    <string name="about_oss_text">Cette application est open-source et utilise des bibliothèques tierces : Retrofit, OkHttp, Moshi, Glide, osmdroid, Material Components for Android, AndroidX et les services Google Play. Chacune est diffusée sous sa propre licence open-source.</string>
+    <string name="about_licenses_link">Voir le code source et les licences</string>
+    <string name="about_publisher">Éditeur</string>
+    <string name="about_publisher_text">Application météo éditée à titre personnel. Le code source est disponible publiquement.</string>
+    <string name="about_contact">Contacter l\'éditeur</string>
 </resources>
