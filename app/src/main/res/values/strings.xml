@@ -4,6 +4,7 @@
     <string name="action_search">Rechercher une ville</string>
     <string name="action_locate">Ma position</string>
     <string name="action_api_key">Clé API</string>
+    <string name="action_about">À propos</string>
     <string name="action_save">Enregistrer</string>
     <string name="action_get_key">Obtenir une clé</string>
     <string name="hint_api_key">Clé API OpenWeatherMap</string>
