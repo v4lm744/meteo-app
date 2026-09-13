@@ -24,7 +24,7 @@ data class UiState(
 
 class WeatherViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = WeatherRepository()
+    private val repository = WeatherRepository(application)
     private val locationHelper = LocationHelper(application)
 
     private val _state = MutableLiveData(UiState())
