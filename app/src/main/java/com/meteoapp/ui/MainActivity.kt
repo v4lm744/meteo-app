@@ -226,12 +226,25 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.regionMapView.clear()
         }
+
+        applyDynamicBackground(weather)
+    }
+
+    private fun applyDynamicBackground(weather: WeatherData) {
+        val grad = com.meteoapp.util.WeatherColors.gradient(weather)
+        val drawable = android.graphics.drawable.GradientDrawable(
+            android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(grad.top, grad.bottom)
+        )
+        binding.root.background = drawable
+        window.statusBarColor = grad.top
     }
 
     private fun showError(message: String) {
         binding.errorLayout.visibility = View.VISIBLE
         binding.errorText.text = message
         binding.loadingBar.visibility = View.GONE
+        binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
         binding.headerLayout.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
         binding.regionMapTitle.visibility = View.GONE
