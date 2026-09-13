@@ -18,6 +18,9 @@ avec un design Material Design moderne inspiré de l'application Météo France.
   fond en dégradé dynamique selon la météo et l'heure (jour/nuit, soleil, nuages, pluie, neige…)
 - Rafraîchissement par « pull-to-refresh »
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
+- **Fond dynamique de l'app** : dégradé vertical en haut selon la météo et l'heure
+  (jour/nuit, soleil, nuages, pluie, neige…), se fondant vers le bleu de l'app
+  à mesure qu'on descend
 
 ## Configuration de la clé API
 
