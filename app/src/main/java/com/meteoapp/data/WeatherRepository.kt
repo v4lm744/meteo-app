@@ -1,6 +1,5 @@
 package com.meteoapp.data
 
-import com.meteoapp.BuildConfig
 import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.CurrentData
 import com.meteoapp.data.model.DailyData
@@ -17,12 +16,13 @@ sealed class Result<out T> {
     object Loading : Result<Nothing>()
 }
 
-class WeatherRepository {
+class WeatherRepository(context: android.content.Context) {
 
+    private val appContext = context.applicationContext
     private val api = ApiClient.api
 
     private val apiKey: String
-        get() = BuildConfig.OPEN_WEATHER_API_KEY
+        get() = ApiKeyStore.getApiKey(appContext)
 
     val isApiKeyConfigured: Boolean
         get() = apiKey.isNotBlank()

@@ -28,7 +28,7 @@ class SearchCityDialog(
     private var _binding: DialogSearchBinding? = null
     private val binding get() = _binding!!
 
-    private val repository = WeatherRepository()
+    private val repository by lazy { WeatherRepository(requireContext()) }
     private var searchJob: Job? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

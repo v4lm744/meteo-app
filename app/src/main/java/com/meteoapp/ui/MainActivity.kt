@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         if (!viewModel.isApiKeyConfigured) {
             showError(getString(R.string.error_no_api_key))
+            openApiKeyDialog()
         } else {
             val launchName = intent?.getStringExtra(EXTRA_CITY_NAME)
             val launchLat = intent?.getDoubleExtra(EXTRA_CITY_LAT, Double.NaN)
@@ -122,6 +123,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openApiKeyDialog() {
+        ApiKeyDialog {
+            if (viewModel.isApiKeyConfigured) {
+                binding.errorLayout.visibility = View.GONE
+                requestLocationAndLoad()
+            } else {
+                showError(getString(R.string.error_no_api_key))
+            }
+        }.show(supportFragmentManager, "api_key")
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -145,6 +157,10 @@ class MainActivity : AppCompatActivity() {
                         )
                     )
                 }
+                true
+            }
+            R.id.action_api_key -> {
+                openApiKeyDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)

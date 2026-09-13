@@ -104,7 +104,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         city: GeoLocation
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val repository = WeatherRepository()
+            val repository = WeatherRepository(context)
             val result = repository.getWeather(city.lat, city.lon)
             withContext(Dispatchers.Main) {
                 when (result) {

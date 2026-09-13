@@ -13,4 +13,9 @@
         android:icon="@drawable/ic_search"
         android:title="@string/action_search"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_api_key"
+        android:icon="@drawable/ic_key"
+        android:title="@string/action_api_key"
+        app:showAsAction="never" />
 </menu>
