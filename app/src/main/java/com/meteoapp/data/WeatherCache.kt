@@ -9,7 +9,10 @@ import java.io.File
  * Cache hors ligne simple des dernières données météo récupérées.
  *
  * Stocke le [WeatherData] sérialisé en JSON dans le cache de fichiers de
- * l'application, indexé par une clé (lat, lon) arrondie, avec un timestamp.
+ * l'application, indexé par une clé (lat, lon) arrondie. L'horodatage du
+ * cache repose sur la date de modification du fichier, évitant un wrapper
+ * supplémentaire à sérialiser.
+ *
  * Permet d'afficher une météo périmée mais pertinente en cas d'échec réseau,
  * plutôt qu'un écran d'erreur vide.
  */
@@ -20,11 +23,7 @@ class WeatherCache(context: Context) {
     private val adapter = moshi.adapter(WeatherData::class.java)
 
     fun save(lat: Double, lon: Double, data: WeatherData) {
-        val payload = CachedWeather(
-            savedAt = System.currentTimeMillis(),
-            data = data
-        )
-        val json = cacheAdapter.toJson(payload) ?: return
+        val json = adapter.toJson(data)
         runCatching {
             File(cacheDir, fileName(lat, lon)).writeText(json)
         }
@@ -33,18 +32,15 @@ class WeatherCache(context: Context) {
     fun load(lat: Double, lon: Double): WeatherData? {
         val file = File(cacheDir, fileName(lat, lon))
         if (!file.exists()) return null
-        return runCatching {
-            cacheAdapter.fromJson(file.readText())?.data
-        }.getOrNull()
+        return runCatching { adapter.fromJson(file.readText()) }.getOrNull()
     }
 
     fun ageMillis(lat: Double, lon: Double): Long {
         val file = File(cacheDir, fileName(lat, lon))
         if (!file.exists()) return Long.MAX_VALUE
-        return runCatching {
-            val cached = cacheAdapter.fromJson(file.readText())
-            if (cached != null) System.currentTimeMillis() - cached.savedAt else Long.MAX_VALUE
-        }.getOrDefault(Long.MAX_VALUE)
+        val lastModified = file.lastModified()
+        if (lastModified <= 0L) return Long.MAX_VALUE
+        return System.currentTimeMillis() - lastModified
     }
 
     private fun fileName(lat: Double, lon: Double): String =
@@ -52,13 +48,4 @@ class WeatherCache(context: Context) {
 
     private fun round(value: Double): String =
         String.format("%.2f", value)
-
-    private val cacheAdapter by lazy {
-        moshi.adapter(CachedWeather::class.java)
-    }
-
-    private data class CachedWeather(
-        val savedAt: Long,
-        val data: WeatherData
-    )
 }
