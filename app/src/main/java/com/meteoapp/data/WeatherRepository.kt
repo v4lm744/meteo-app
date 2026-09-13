@@ -198,10 +198,10 @@ class WeatherRepository(context: android.content.Context) {
             Result.Success(results)
         } catch (e: retrofit2.HttpException) {
             Result.Error(
-                message = if (e.code() == 401 || e.code() == 403) "Clé API invalide" else "Erreur lors de la recherche"
+                message = if (e.code() == 401 || e.code() == 403) "Clé API invalide" else "Erreur serveur (${e.code()})"
             )
         } catch (e: Exception) {
-            Result.Error("Erreur lors de la recherche")
+            Result.Error("Erreur lors de la recherche : ${e.message ?: e.javaClass.simpleName}")
         }
     }
 
