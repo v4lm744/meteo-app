@@ -2,6 +2,7 @@ package com.meteoapp.data
 
 import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
+import com.meteoapp.data.api.OpenWeatherApi
 import com.meteoapp.data.model.CurrentData
 import com.meteoapp.data.model.DailyData
 import com.meteoapp.data.model.GeoLocation
@@ -17,10 +18,13 @@ sealed class WeatherResult<out T> {
     object Loading : WeatherResult<Nothing>()
 }
 
-class WeatherRepository(context: android.content.Context) {
+class WeatherRepository(
+    context: android.content.Context,
+    api: OpenWeatherApi = ApiClient.api
+) {
 
     private val appContext = context.applicationContext
-    private val api = ApiClient.api
+    private val api = api
 
     private val apiKey: String
         get() = ApiKeyStore.getApiKey(appContext)

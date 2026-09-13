@@ -2,18 +2,36 @@ package com.meteoapp.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 
 /**
  * Stockage persistant de la clé API OpenWeatherMap saisie par l'utilisateur.
- * La clé survit aux redémarrages de l'app et du téléphone.
+ * La clé est chiffrée au repos via EncryptedSharedPreferences (AES-256) afin
+ * de ne pas être lisible en clair dans le fichier de préférences.
  */
 object ApiKeyStore {
 
     private const val PREFS_NAME = "meteo_prefs"
     private const val KEY_API_KEY = "open_weather_api_key"
 
-    private fun prefs(context: Context): SharedPreferences =
-        context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private fun prefs(context: Context): SharedPreferences {
+        val appContext = context.applicationContext
+        return try {
+            val masterKey = MasterKey.Builder(appContext)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            EncryptedSharedPreferences.create(
+                appContext,
+                PREFS_NAME,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: Exception) {
+            appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        }
+    }
 
     fun getApiKey(context: Context): String =
         prefs(context).getString(KEY_API_KEY, "").orEmpty()
