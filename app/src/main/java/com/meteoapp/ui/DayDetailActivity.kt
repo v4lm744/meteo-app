@@ -34,7 +34,12 @@ class DayDetailActivity : AppCompatActivity() {
         }
 
         val day: DailyData = try {
-            ApiClient.moshi.adapter(DailyData::class.java).fromJson(json)!!
+            val parsed = ApiClient.moshi.adapter(DailyData::class.java).fromJson(json)
+            if (parsed == null) {
+                finish()
+                return
+            }
+            parsed
         } catch (e: Exception) {
             finish()
             return
