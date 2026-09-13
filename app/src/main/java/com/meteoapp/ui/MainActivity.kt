@@ -204,17 +204,20 @@ class MainActivity : AppCompatActivity() {
 
         val weather = state.weather
         if (weather != null) {
-            showContent(weather, state.city, state.regionCities)
+            showContent(weather, state.city, state.regionCities, state.fromCache)
         }
     }
 
     private fun showContent(
         weather: WeatherData,
         city: GeoLocation?,
-        regionCities: List<RegionCity>
+        regionCities: List<RegionCity>,
+        fromCache: Boolean = false
     ) {
         binding.errorLayout.visibility = View.GONE
         binding.loadingBar.visibility = View.GONE
+
+        binding.cacheBanner.visibility = if (fromCache) View.VISIBLE else View.GONE
 
         val displayName = city?.localNames?.fr
             ?: city?.name
@@ -306,6 +309,7 @@ class MainActivity : AppCompatActivity() {
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
         tintToolbarIcons(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
+        binding.cacheBanner.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
         binding.regionMapTitle.visibility = View.GONE
         binding.regionMapCard.visibility = View.GONE
