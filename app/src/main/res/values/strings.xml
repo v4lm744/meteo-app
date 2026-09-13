@@ -84,6 +84,7 @@
     <string name="error_city_not_found_short">Ville introuvable</string>
     <string name="error_server">Erreur serveur (%1$d)</string>
     <string name="error_network">Vérifiez votre connexion internet</string>
+    <string name="cache_offline_banner">Données hors ligne — vérifiez votre connexion</string>
     <string name="error_search">Erreur lors de la recherche</string>
     <string name="error_region_cities">Erreur villes proches</string>
     <string name="error_reverse_geocode">Erreur lors de la localisation</string>

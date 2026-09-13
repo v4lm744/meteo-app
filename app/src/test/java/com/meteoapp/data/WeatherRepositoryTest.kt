@@ -38,6 +38,7 @@ class WeatherRepositoryTest {
 
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         ApiKeyStore.setApiKey(context, "test-key")
+        context.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
         repository = WeatherRepository(context, api)
     }
 
@@ -124,6 +125,31 @@ class WeatherRepositoryTest {
         assertEquals(1, cities.size)
         assertEquals("Paris", cities.first().name)
         assertEquals("01d", cities.first().weatherIcon)
+    }
+
+    @Test
+    fun getWeather_returnsCachedOnNetworkFailureWhenCacheExists() {
+        server.enqueue(MockResponse().setBody(CURRENT_JSON))
+        server.enqueue(MockResponse().setBody(FORECAST_JSON))
+        val first = runBlocking { repository.getWeather(48.85, 2.35) }
+        assertTrue(first is WeatherResult.Success)
+        assertFalse((first as WeatherResult.Success).fromCache)
+
+        server.shutdown()
+
+        val result = runBlocking { repository.getWeather(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Success)
+        assertTrue((result as WeatherResult.Success).fromCache)
+        assertEquals(18.5, (result as WeatherResult.Success).data.current.temp, 0.001)
+    }
+
+    @Test
+    fun getWeather_returnsErrorOnNetworkFailureWithoutCache() {
+        server.shutdown()
+
+        val result = runBlocking { repository.getWeather(0.0, 0.0) }
+
+        assertTrue(result is WeatherResult.Error)
     }
 
     private fun buildApi(): OpenWeatherApi = Retrofit.Builder()

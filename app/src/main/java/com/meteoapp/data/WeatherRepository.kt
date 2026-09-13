@@ -13,7 +13,7 @@ import kotlinx.coroutines.coroutineScope
 import java.util.Calendar
 
 sealed class WeatherResult<out T> {
-    data class Success<T>(val data: T) : WeatherResult<T>()
+    data class Success<T>(val data: T, val fromCache: Boolean = false) : WeatherResult<T>()
     data class Error(val message: String, val cityNotFound: Boolean = false) : WeatherResult<Nothing>()
     object Loading : WeatherResult<Nothing>()
 }
@@ -25,6 +25,7 @@ class WeatherRepository(
 
     private val appContext = context.applicationContext
     private val api = api
+    private val cache = WeatherCache(appContext)
 
     private val apiKey: String
         get() = ApiKeyStore.getApiKey(appContext)
@@ -75,17 +76,17 @@ class WeatherRepository(
 
                 val daily = buildDailyList(forecast.list, timezoneOffset)
 
-                WeatherResult.Success(
-                    WeatherData(
-                        lat = lat,
-                        lon = lon,
-                        timezone = tz,
-                        timezoneOffset = timezoneOffset,
-                        current = currentData,
-                        hourly = hourly,
-                        daily = daily
-                    )
+                val weatherData = WeatherData(
+                    lat = lat,
+                    lon = lon,
+                    timezone = tz,
+                    timezoneOffset = timezoneOffset,
+                    current = currentData,
+                    hourly = hourly,
+                    daily = daily
                 )
+                cache.save(lat, lon, weatherData)
+                WeatherResult.Success(weatherData)
             }
         } catch (e: retrofit2.HttpException) {
             WeatherResult.Error(
@@ -99,7 +100,12 @@ class WeatherRepository(
                 cityNotFound = e.code() == 404
             )
         } catch (e: Exception) {
-            WeatherResult.Error(appContext.getString(R.string.error_network))
+            val cached = cache.load(lat, lon)
+            if (cached != null) {
+                WeatherResult.Success(cached, fromCache = true)
+            } else {
+                WeatherResult.Error(appContext.getString(R.string.error_network))
+            }
         }
     }
 

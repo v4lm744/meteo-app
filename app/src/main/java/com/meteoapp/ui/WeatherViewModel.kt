@@ -21,7 +21,8 @@ data class UiState(
     val weather: WeatherData? = null,
     val city: GeoLocation? = null,
     val regionCities: List<RegionCity> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val fromCache: Boolean = false
 )
 
 class WeatherViewModel(application: Application) : AndroidViewModel(application) {
@@ -47,7 +48,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         loading = false,
                         weather = result.data,
                         city = city,
-                        error = null
+                        error = null,
+                        fromCache = result.fromCache
                     )
                     loadRegionCities(city.lat, city.lon)
                 }
@@ -74,7 +76,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     _state.value = current.copy(
                         refreshing = false,
                         weather = result.data,
-                        error = null
+                        error = null,
+                        fromCache = result.fromCache
                     )
                     loadRegionCities(lat, lon)
                 }
@@ -131,7 +134,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         loading = false,
                         weather = result.data,
                         city = city,
-                        error = null
+                        error = null,
+                        fromCache = result.fromCache
                     )
                     loadRegionCities(location.latitude, location.longitude)
                 }
