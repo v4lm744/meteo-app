@@ -120,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tutorial_open_site"
-            android:textColor="@color/md_blue_main"
+            android:textColor="@color/dialog_link"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/tutorial_open_keys"
-            android:textColor="@color/md_blue_main"
+            android:textColor="@color/dialog_link"
             android:textSize="14sp"
             android:textStyle="bold" />
     </LinearLayout>

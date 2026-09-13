@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/openweathermap_url"
-            android:textColor="@color/md_blue_main"
+            android:textColor="@color/dialog_link"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -123,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/about_licenses_link"
-            android:textColor="@color/md_blue_main"
+            android:textColor="@color/dialog_link"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -147,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="@string/about_contact"
-            android:textColor="@color/md_blue_main"
+            android:textColor="@color/dialog_link"
             android:textSize="14sp"
             android:textStyle="bold" />
     </LinearLayout>

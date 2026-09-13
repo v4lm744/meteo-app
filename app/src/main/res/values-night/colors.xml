@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Overrides mode sombre : le texte des dialogues (Clé API, Tutoriel,
+         À propos, Recherche) et des résultats de recherche utilise md_text_dark,
+         un noir statique illisible sur le fond sombre du MaterialAlertDialog.
+         On le remplace ici par une couleur claire. Les labels (md_blue_light)
+         sont éclaircis pour rester lisibles. Les couleurs md_blue_main / dégradés
+         ne sont pas touchées (ils doivent rester bleus). -->
+    <color name="md_text_dark">#E8EAEE</color>
+    <color name="md_blue_light">#C6E2FF</color>
+    <color name="dialog_link">#7BB8FF</color>
+</resources>
