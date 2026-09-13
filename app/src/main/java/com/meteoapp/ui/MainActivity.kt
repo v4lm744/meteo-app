@@ -256,7 +256,9 @@ class MainActivity : AppCompatActivity() {
         // Hourly : 24 prochaines heures
         binding.hourlyRecycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.hourlyRecycler.adapter = HourlyAdapter(this, weather.hourly.take(24))
+        binding.hourlyRecycler.adapter = HourlyAdapter(this, weather.hourly.take(24)) { hour ->
+            openHourDetail(hour)
+        }
 
         // Daily : 7 jours
         binding.dailyRecycler.layoutManager = LinearLayoutManager(this)
@@ -326,6 +328,16 @@ class MainActivity : AppCompatActivity() {
             .toJson(day)
         val intent = android.content.Intent(this, DayDetailActivity::class.java).apply {
             putExtra(DayDetailActivity.EXTRA_DAILY_JSON, json)
+        }
+        startActivity(intent)
+    }
+
+    private fun openHourDetail(hour: com.meteoapp.data.model.HourlyData) {
+        val json = com.meteoapp.data.api.ApiClient.moshi
+            .adapter(com.meteoapp.data.model.HourlyData::class.java)
+            .toJson(hour)
+        val intent = android.content.Intent(this, HourDetailActivity::class.java).apply {
+            putExtra(HourDetailActivity.EXTRA_HOURLY_JSON, json)
         }
         startActivity(intent)
     }

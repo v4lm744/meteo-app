@@ -81,6 +81,23 @@ object WeatherColors {
     )
 
     /**
+     * Couleur "haut" pour une heure de pr\u00e9vision (HourlyData), bas\u00e9e sur la
+     * m\u00e9t\u00e9o et l'heure (jour/nuit selon l'heure locale de la pr\u00e9vision).
+     */
+    fun topColor(hour: com.meteoapp.data.model.HourlyData): Int {
+        val hourOfDay = WeatherUtils.formatHour(hour.dt, hour.timezoneOffset)
+            .removeSuffix("h").toIntOrNull() ?: 12
+        val isDay = hourOfDay in 7..19
+        val code = hour.weather.firstOrNull()?.id ?: 800L
+        return colorForCode(code, isDay)
+    }
+
+    fun gradient(hour: com.meteoapp.data.model.HourlyData): Gradient = Gradient(
+        top = topColor(hour),
+        bottom = appBaseColor
+    )
+
+    /**
      * Couleur de contraste (blanc ou noir) selon la luminance de [bgColor],
      * afin que les icônes/contrôles restent lisibles sur n'importe quel fond.
      */
