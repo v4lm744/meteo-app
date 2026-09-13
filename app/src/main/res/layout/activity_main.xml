@@ -240,7 +240,7 @@
                                     style="@style/Widget.MeteoApp.Label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Visibilité" />
+                                    android:text="@string/label_visibility" />
 
                                 <TextView
                                     android:id="@+id/visibilityValue"

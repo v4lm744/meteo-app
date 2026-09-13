@@ -24,20 +24,14 @@ avec un design Material Design moderne inspiré de l'application Météo France.
 
 ## Configuration de la clé API
 
-La clé OpenWeatherMap est chargée via `BuildConfig` depuis le fichier
-`local.properties` (non versionné) pour ne jamais être commitée.
+La clé OpenWeatherMap est saisie directement dans l'application (menu
+« Clé API ») puis stockée de façon persistante et privée sur l'appareil
+(via `SharedPreferences`). Elle n'est jamais intégrée au binaire ni
+versionnée.
 
 1. Créez un compte gratuit sur https://openweathermap.org/api
-2. Récupérez votre clé API (One Call API 3.0 ou API classique)
-3. À la racine du projet, créez/éditez `local.properties` :
-
-```properties
-sdk.dir=/chemin/vers/Android/Sdk
-OPEN_WEATHER_API_KEY=votre_cle_api_ici
-```
-
-> ⚠️ L'API One Call 2.5 (utilisée ici) nécessite une clé valide.
-> N'ajoutez jamais `local.properties` à git (il est dans `.gitignore`).
+2. Récupérez votre clé API (endpoint gratuit `/data/2.5/*`)
+3. Lancez l'app, ouvrez le menu « Clé API » et collez votre clé
 
 ## Endpoints OpenWeather utilisés (tier gratuit)
 
@@ -57,7 +51,7 @@ Les prévisions sur 7 jours sont reconstruites en regroupant par jour les donné
 ## Build
 
 Ouvrez le projet dans Android Studio (Giraffe+ / Hedgehog+) puis lancez
-l'application sur un émulateur ou un appareil (API 24 minimum).
+l'application sur un émulateur ou un appareil (API 26 minimum).
 
 ```bash
 ./gradlew assembleDebug

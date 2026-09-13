@@ -1,5 +1,6 @@
 package com.meteoapp.data
 
+import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.CurrentData
 import com.meteoapp.data.model.DailyData
@@ -10,10 +11,10 @@ import com.meteoapp.data.model.WeatherData
 import kotlinx.coroutines.coroutineScope
 import java.util.Calendar
 
-sealed class Result<out T> {
-    data class Success<T>(val data: T) : Result<T>()
-    data class Error(val message: String, val cityNotFound: Boolean = false) : Result<Nothing>()
-    object Loading : Result<Nothing>()
+sealed class WeatherResult<out T> {
+    data class Success<T>(val data: T) : WeatherResult<T>()
+    data class Error(val message: String, val cityNotFound: Boolean = false) : WeatherResult<Nothing>()
+    object Loading : WeatherResult<Nothing>()
 }
 
 class WeatherRepository(context: android.content.Context) {
@@ -27,9 +28,9 @@ class WeatherRepository(context: android.content.Context) {
     val isApiKeyConfigured: Boolean
         get() = apiKey.isNotBlank()
 
-    suspend fun getWeather(lat: Double, lon: Double): Result<WeatherData> {
+    suspend fun getWeather(lat: Double, lon: Double): WeatherResult<WeatherData> {
         if (!isApiKeyConfigured) {
-            return Result.Error("Clé API non configurée")
+            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
         }
         return try {
             coroutineScope {
@@ -37,7 +38,7 @@ class WeatherRepository(context: android.content.Context) {
                 val forecast = api.getForecast(lat = lat, lon = lon, apiKey = apiKey)
 
                 val timezoneOffset = (forecast.city.timezone ?: current.timezone ?: 0L)
-                val tz = forecast.city.country ?: ""
+                val tz = forecast.city.name ?: current.name ?: ""
 
                 val currentData = CurrentData(
                     dt = current.dt,
@@ -70,7 +71,7 @@ class WeatherRepository(context: android.content.Context) {
 
                 val daily = buildDailyList(forecast.list, timezoneOffset)
 
-                Result.Success(
+                WeatherResult.Success(
                     WeatherData(
                         lat = lat,
                         lon = lon,
@@ -83,18 +84,18 @@ class WeatherRepository(context: android.content.Context) {
                 )
             }
         } catch (e: retrofit2.HttpException) {
-            Result.Error(
+            WeatherResult.Error(
                 message = if (e.code() == 401 || e.code() == 403) {
-                    "Clé API invalide ou non encore activée"
+                    appContext.getString(R.string.error_api_key_invalid)
                 } else if (e.code() == 404) {
-                    "Ville introuvable"
+                    appContext.getString(R.string.error_city_not_found_short)
                 } else {
-                    "Erreur serveur (${e.code()})"
+                    appContext.getString(R.string.error_server, e.code())
                 },
                 cityNotFound = e.code() == 404
             )
         } catch (e: Exception) {
-            Result.Error("Vérifiez votre connexion internet")
+            WeatherResult.Error(appContext.getString(R.string.error_network))
         }
     }
 
@@ -186,28 +187,32 @@ class WeatherRepository(context: android.content.Context) {
         return cal.timeInMillis / 1000L
     }
 
-    suspend fun searchCity(query: String): Result<List<GeoLocation>> {
+    suspend fun searchCity(query: String): WeatherResult<List<GeoLocation>> {
         if (!isApiKeyConfigured) {
-            return Result.Error("Clé API non configurée")
+            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
         }
         if (query.isBlank()) {
-            return Result.Success(emptyList())
+            return WeatherResult.Success(emptyList())
         }
         return try {
             val results = api.geocode(query = query.trim(), apiKey = apiKey)
-            Result.Success(results)
+            WeatherResult.Success(results)
         } catch (e: retrofit2.HttpException) {
-            Result.Error(
-                message = if (e.code() == 401 || e.code() == 403) "Clé API invalide" else "Erreur lors de la recherche"
+            WeatherResult.Error(
+                message = if (e.code() == 401 || e.code() == 403) {
+                    appContext.getString(R.string.error_api_key_invalid_short)
+                } else {
+                    appContext.getString(R.string.error_search)
+                }
             )
         } catch (e: Exception) {
-            Result.Error("Erreur lors de la recherche")
+            WeatherResult.Error(appContext.getString(R.string.error_search))
         }
     }
 
-    suspend fun getRegionCities(lat: Double, lon: Double): Result<List<RegionCity>> {
+    suspend fun getRegionCities(lat: Double, lon: Double): WeatherResult<List<RegionCity>> {
         if (!isApiKeyConfigured) {
-            return Result.Error("Clé API non configurée")
+            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
         }
         return try {
             val response = api.findCities(lat = lat, lon = lon, count = 10, apiKey = apiKey)
@@ -222,29 +227,37 @@ class WeatherRepository(context: android.content.Context) {
                     weatherDescription = item.weather.firstOrNull()?.description ?: ""
                 )
             }
-            Result.Success(cities)
+            WeatherResult.Success(cities)
         } catch (e: retrofit2.HttpException) {
-            Result.Error(
-                message = if (e.code() == 401 || e.code() == 403) "Clé API invalide" else "Erreur villes proches"
+            WeatherResult.Error(
+                message = if (e.code() == 401 || e.code() == 403) {
+                    appContext.getString(R.string.error_api_key_invalid_short)
+                } else {
+                    appContext.getString(R.string.error_region_cities)
+                }
             )
         } catch (e: Exception) {
-            Result.Error("Erreur villes proches")
+            WeatherResult.Error(appContext.getString(R.string.error_region_cities))
         }
     }
 
-    suspend fun reverseGeocode(lat: Double, lon: Double): Result<List<GeoLocation>> {
+    suspend fun reverseGeocode(lat: Double, lon: Double): WeatherResult<List<GeoLocation>> {
         if (!isApiKeyConfigured) {
-            return Result.Error("Clé API non configurée")
+            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
         }
         return try {
             val results = api.reverseGeocode(lat = lat, lon = lon, apiKey = apiKey)
-            Result.Success(results)
+            WeatherResult.Success(results)
         } catch (e: retrofit2.HttpException) {
-            Result.Error(
-                message = if (e.code() == 401 || e.code() == 403) "Clé API invalide" else "Erreur lors de la localisation"
+            WeatherResult.Error(
+                message = if (e.code() == 401 || e.code() == 403) {
+                    appContext.getString(R.string.error_api_key_invalid_short)
+                } else {
+                    appContext.getString(R.string.error_reverse_geocode)
+                }
             )
         } catch (e: Exception) {
-            Result.Error("Erreur lors de la localisation")
+            WeatherResult.Error(appContext.getString(R.string.error_reverse_geocode))
         }
     }
 }
