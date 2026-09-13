@@ -198,11 +198,6 @@ class WeatherRepository(context: android.content.Context) {
             val results = api.geocode(query = query.trim(), apiKey = apiKey)
             WeatherResult.Success(results)
         } catch (e: retrofit2.HttpException) {
-            Result.Error(
-                message = if (e.code() == 401 || e.code() == 403) "Clé API invalide" else "Erreur serveur (${e.code()})"
-            )
-        } catch (e: Exception) {
-            Result.Error("Erreur lors de la recherche : ${e.message ?: e.javaClass.simpleName}")
             WeatherResult.Error(
                 message = if (e.code() == 401 || e.code() == 403) {
                     appContext.getString(R.string.error_api_key_invalid_short)
