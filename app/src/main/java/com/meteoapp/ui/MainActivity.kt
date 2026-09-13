@@ -285,13 +285,9 @@ class MainActivity : AppCompatActivity() {
         toolbar.navigationIcon?.mutate()?.setTint(tint)
         toolbar.setTitleTextColor(tint)
         val isLightBg = tint == 0xFF000000.toInt()
-        window.decorView.systemUiVisibility = if (isLightBg) {
-            window.decorView.systemUiVisibility or android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        } else {
-            window.decorView.systemUiVisibility and android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-        }
+        androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = isLightBg
         toolbarTint = tint
-        invalidateOptionsMenu()
     }
 
     private fun showError(message: String) {
