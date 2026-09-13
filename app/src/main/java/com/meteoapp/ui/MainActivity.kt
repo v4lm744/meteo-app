@@ -173,6 +173,10 @@ class MainActivity : AppCompatActivity() {
                 openApiKeyDialog()
                 true
             }
+            R.id.action_about -> {
+                AboutDialog().show(supportFragmentManager, "about")
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
