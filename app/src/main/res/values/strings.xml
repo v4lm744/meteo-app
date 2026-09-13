@@ -96,4 +96,5 @@
     <string name="cloudiness">Nuages</string>
     <string name="precipitation">Précipitations</string>
     <string name="mm">%.1f mm</string>
+    <string name="splash_tagline">Votre météo, où que vous soyez</string>
 </resources>
