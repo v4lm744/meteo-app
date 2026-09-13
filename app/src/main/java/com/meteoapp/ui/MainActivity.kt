@@ -218,7 +218,9 @@ class MainActivity : AppCompatActivity() {
 
         // Daily : 7 jours
         binding.dailyRecycler.layoutManager = LinearLayoutManager(this)
-        binding.dailyRecycler.adapter = DailyAdapter(this, weather.daily.take(7))
+        binding.dailyRecycler.adapter = DailyAdapter(this, weather.daily.take(7)) { day ->
+            openDayDetail(day)
+        }
 
         // Minimap région : villes proches avec météo
         if (regionCities.isNotEmpty()) {
@@ -254,6 +256,16 @@ class MainActivity : AppCompatActivity() {
         binding.hourlyRecycler.visibility = View.GONE
         binding.dailyRecycler.visibility = View.GONE
         binding.swipeRefresh.isRefreshing = false
+    }
+
+    private fun openDayDetail(day: com.meteoapp.data.model.DailyData) {
+        val json = com.meteoapp.data.api.ApiClient.moshi
+            .adapter(com.meteoapp.data.model.DailyData::class.java)
+            .toJson(day)
+        val intent = android.content.Intent(this, DayDetailActivity::class.java).apply {
+            putExtra(DayDetailActivity.EXTRA_DAILY_JSON, json)
+        }
+        startActivity(intent)
     }
 
     override fun onResume() {

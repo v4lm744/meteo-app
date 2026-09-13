@@ -26,4 +26,11 @@
     <string name="widget_configure_prompt">Choisissez une ville</string>
     <string name="widget_title">Météo</string>
     <string name="widget_confirm">Valider</string>
+    <string name="temperatures">Températures</string>
+    <string name="morning">Matin</string>
+    <string name="day_label">Jour</string>
+    <string name="evening">Soir</string>
+    <string name="night">Nuit</string>
+    <string name="conditions">Conditions</string>
+    <string name="rain_probability">Risque de pluie</string>
 </resources>

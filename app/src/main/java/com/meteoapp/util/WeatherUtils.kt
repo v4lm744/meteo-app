@@ -27,6 +27,25 @@ object WeatherUtils {
         return dayNames[cal.get(Calendar.DAY_OF_WEEK) - 1]
     }
 
+    fun formatFullDayName(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
+        val names = arrayOf(
+            "Dimanche", "Lundi", "Mardi", "Mercredi",
+            "Jeudi", "Vendredi", "Samedi"
+        )
+        val cal = Calendar.getInstance().apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        }
+        return names[cal.get(Calendar.DAY_OF_WEEK) - 1]
+    }
+
+    fun formatDate(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
+        val millis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        val sdf = SimpleDateFormat("d MMM", Locale.FRANCE)
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
+        return sdf.format(Date(millis))
+    }
+
     fun isToday(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): Boolean {
         val target = (timestampSeconds + timezoneOffsetSeconds) * 1000L
         val now = System.currentTimeMillis() + timezoneOffsetSeconds * 1000L
