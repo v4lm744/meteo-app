@@ -49,6 +49,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Plein écran : le fond dégradé s'étend sous la barre d'état
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.meteoToolbar) { v, insets ->
+            val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            v.setPadding(v.paddingLeft, bars.top, v.paddingRight, v.paddingBottom)
+            insets
+        }
+
         setSupportActionBar(findViewById(R.id.meteoToolbar))
 
         binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
