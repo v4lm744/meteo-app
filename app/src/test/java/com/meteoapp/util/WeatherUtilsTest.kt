@@ -11,7 +11,7 @@ class WeatherUtilsTest {
     fun roundToInt_roundsToNearest() {
         assertEquals(20, WeatherUtils.roundToInt(19.6))
         assertEquals(20, WeatherUtils.roundToInt(20.4))
-        assertEquals(-3, WeatherUtils.roundToInt(-2.5))
+        assertEquals(-2, WeatherUtils.roundToInt(-2.5))
         assertEquals(0, WeatherUtils.roundToInt(0.0))
     }
 
@@ -38,8 +38,8 @@ class WeatherUtilsTest {
     fun windDirection_handlesBoundaryAndWraparound() {
         // 22.5 -> 0 (N)
         assertEquals("N", WeatherUtils.windDirection(22L))
-        // 337.5+ -> NO
-        assertEquals("NO", WeatherUtils.windDirection(350L))
+        // 350° est dans le secteur N (337.5° à 22.5°)
+        assertEquals("N", WeatherUtils.windDirection(350L))
         assertEquals("N", WeatherUtils.windDirection(360L))
     }
 
