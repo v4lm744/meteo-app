@@ -3,6 +3,7 @@ package com.meteoapp.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.HourlyData
 import com.meteoapp.databinding.ActivityHourDetailBinding
