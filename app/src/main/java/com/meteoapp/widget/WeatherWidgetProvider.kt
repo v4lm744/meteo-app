@@ -6,22 +6,23 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.widget.RemoteViews
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.AppWidgetTarget
 import com.meteoapp.R
-import com.meteoapp.data.Result
+import com.meteoapp.data.WeatherResult
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.ui.MainActivity
 import com.meteoapp.util.WeatherUtils
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.target.AppWidgetTarget
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@Suppress("unused")
 class WeatherWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(
@@ -64,7 +65,6 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         val city = WidgetPrefs.getCity(context, appWidgetId)
         val views = RemoteViews(context.packageName, R.layout.widget_weather)
 
-        // Intent pour ouvrir l'app au tap
         val openIntent = Intent(context, MainActivity::class.java).apply {
             if (city != null) {
                 putExtra(MainActivity.EXTRA_CITY_NAME, city.localNames?.fr ?: city.name)
@@ -81,7 +81,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
 
         if (city == null) {
             views.setTextViewText(R.id.widgetCity, context.getString(R.string.app_name))
-            views.setTextViewText(R.id.widgetTemp, "—")
+            views.setTextViewText(R.id.widgetTemp, "\u2014")
             views.setTextViewText(R.id.widgetDesc, context.getString(R.string.widget_configure_prompt))
             appWidgetManager.updateAppWidget(appWidgetId, views)
             return
@@ -89,13 +89,18 @@ class WeatherWidgetProvider : AppWidgetProvider() {
 
         val displayName = city.localNames?.fr ?: city.name
         views.setTextViewText(R.id.widgetCity, displayName)
-        views.setTextViewText(R.id.widgetTemp, "…")
+        views.setTextViewText(R.id.widgetTemp, "\u2026")
         views.setTextViewText(R.id.widgetDesc, context.getString(R.string.loading))
         appWidgetManager.updateAppWidget(appWidgetId, views)
 
         fetchWeather(context, appWidgetManager, appWidgetId, views, city)
     }
 
+    /**
+     * Récupère la météo en arrière-plan via goAsync() : le BroadcastReceiver reste actif
+     * (PendingResult) jusqu'à la fin du traitement, ce qui respecte son cycle de vie
+     * au lieu de lancer une coroutine orpheline sur un CoroutineScope non géré.
+     */
     private fun fetchWeather(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -103,76 +108,92 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         views: RemoteViews,
         city: GeoLocation
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val repository = WeatherRepository(context)
-            val result = repository.getWeather(city.lat, city.lon)
-            withContext(Dispatchers.Main) {
-                when (result) {
-                    is Result.Success -> {
-                        val current = result.data.current
-                        views.setTextViewText(R.id.widgetCity, city.localNames?.fr ?: city.name)
-                        views.setTextViewText(
-                            R.id.widgetTemp,
-                            "${WeatherUtils.roundToInt(current.temp)}°"
-                        )
-                        val desc = current.weather.firstOrNull()?.description
-                            ?.replaceFirstChar { it.uppercase() } ?: ""
-                        views.setTextViewText(R.id.widgetDesc, desc)
-
-                        val today = result.data.daily.firstOrNull()
-                        if (today != null) {
-                            views.setTextViewText(
-                                R.id.widgetMinMax,
-                                "Max ${WeatherUtils.roundToInt(today.tempMax)}°  Min ${WeatherUtils.roundToInt(today.tempMin)}°"
-                            )
-                        } else {
-                            views.setTextViewText(R.id.widgetMinMax, "")
-                        }
-
-                        // Fond dégradé dynamique selon météo + heure
-                        try {
-                            val opts = appWidgetManager.getAppWidgetOptions(appWidgetId)
-                            val density = context.resources.displayMetrics.density
-                            var w = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 0)
-                            var h = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
-                            if (w <= 0) w = (250 * density).toInt()
-                            if (h <= 0) h = (70 * density).toInt()
-                            val bg = WidgetGradient.buildBackground(
-                                context.applicationContext, result.data, w, h
-                            )
-                            views.setImageViewBitmap(R.id.widgetBackground, bg)
-                        } catch (_: Exception) {
-                        }
-
-                        val iconCode = current.weather.firstOrNull()?.icon
-                        if (!iconCode.isNullOrEmpty()) {
-                            try {
-                                Glide.with(context.applicationContext)
-                                    .asBitmap()
-                                    .load(WeatherUtils.iconUrl(iconCode))
-                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                    .into(
-                                        AppWidgetTarget(
-                                            context.applicationContext,
-                                            R.id.widgetIcon,
-                                            views,
-                                            appWidgetId
-                                        )
-                                    )
-                            } catch (_: Exception) {
-                            }
-                        }
-                        appWidgetManager.updateAppWidget(appWidgetId, views)
-                    }
-                    is Result.Error -> {
-                        views.setTextViewText(
-                            R.id.widgetDesc, context.getString(R.string.error_generic)
-                        )
-                        appWidgetManager.updateAppWidget(appWidgetId, views)
-                    }
-                    Result.Loading -> {}
+        val pendingResult = goAsync()
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        scope.launch {
+            try {
+                val repository = WeatherRepository(context)
+                val result = repository.getWeather(city.lat, city.lon)
+                withContext(Dispatchers.Main) {
+                    renderResult(context, appWidgetManager, appWidgetId, views, city, result)
                 }
+            } finally {
+                pendingResult.finish()
             }
+        }
+    }
+
+    private fun renderResult(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        views: RemoteViews,
+        city: GeoLocation,
+        result: WeatherResult<com.meteoapp.data.model.WeatherData>
+    ) {
+        when (result) {
+            is WeatherResult.Success -> {
+                val current = result.data.current
+                views.setTextViewText(R.id.widgetCity, city.localNames?.fr ?: city.name)
+                views.setTextViewText(
+                    R.id.widgetTemp,
+                    "${WeatherUtils.roundToInt(current.temp)}\u00b0"
+                )
+                val desc = current.weather.firstOrNull()?.description
+                    ?.replaceFirstChar { it.uppercase() } ?: ""
+                views.setTextViewText(R.id.widgetDesc, desc)
+
+                val today = result.data.daily.firstOrNull()
+                if (today != null) {
+                    views.setTextViewText(
+                        R.id.widgetMinMax,
+                        "Max ${WeatherUtils.roundToInt(today.tempMax)}\u00b0  Min ${WeatherUtils.roundToInt(today.tempMin)}\u00b0"
+                    )
+                } else {
+                    views.setTextViewText(R.id.widgetMinMax, "")
+                }
+
+                try {
+                    val opts: Bundle = appWidgetManager.getAppWidgetOptions(appWidgetId)
+                    val density = context.resources.displayMetrics.density
+                    var w = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 0)
+                    var h = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
+                    if (w <= 0) w = (250 * density).toInt()
+                    if (h <= 0) h = (70 * density).toInt()
+                    val bg = WidgetGradient.buildBackground(
+                        context.applicationContext, result.data, w, h
+                    )
+                    views.setImageViewBitmap(R.id.widgetBackground, bg)
+                } catch (_: Exception) {
+                }
+
+                val iconCode = current.weather.firstOrNull()?.icon
+                if (!iconCode.isNullOrEmpty()) {
+                    try {
+                        Glide.with(context.applicationContext)
+                            .asBitmap()
+                            .load(WeatherUtils.iconUrl(iconCode))
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(
+                                AppWidgetTarget(
+                                    context.applicationContext,
+                                    R.id.widgetIcon,
+                                    views,
+                                    appWidgetId
+                                )
+                            )
+                    } catch (_: Exception) {
+                    }
+                }
+                appWidgetManager.updateAppWidget(appWidgetId, views)
+            }
+            is WeatherResult.Error -> {
+                views.setTextViewText(
+                    R.id.widgetDesc, context.getString(R.string.error_generic)
+                )
+                appWidgetManager.updateAppWidget(appWidgetId, views)
+            }
+            WeatherResult.Loading -> {}
         }
     }
 }

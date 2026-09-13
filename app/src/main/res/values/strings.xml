@@ -57,4 +57,20 @@
     <string name="about_publisher">Éditeur</string>
     <string name="about_publisher_text">Application météo éditée à titre personnel. Le code source est disponible publiquement.</string>
     <string name="about_contact">Contacter l\'éditeur</string>
+    <string name="cancel">Annuler</string>
+    <string name="today_short">Auj.</string>
+    <string name="no_result">Aucun résultat</string>
+    <string name="current_position">Position actuelle</string>
+    <string name="error_api_key_not_configured">Clé API non configurée</string>
+    <string name="error_api_key_invalid">Clé API invalide ou non encore activée</string>
+    <string name="error_api_key_invalid_short">Clé API invalide</string>
+    <string name="error_city_not_found_short">Ville introuvable</string>
+    <string name="error_server">Erreur serveur (%1$d)</string>
+    <string name="error_network">Vérifiez votre connexion internet</string>
+    <string name="error_search">Erreur lors de la recherche</string>
+    <string name="error_region_cities">Erreur villes proches</string>
+    <string name="error_reverse_geocode">Erreur lors de la localisation</string>
+    <string name="error_location_permission">Autorisation de localisation requise</string>
+    <string name="error_location_unavailable">Position indisponible</string>
+    <string name="label_visibility">Visibilité</string>
 </resources>

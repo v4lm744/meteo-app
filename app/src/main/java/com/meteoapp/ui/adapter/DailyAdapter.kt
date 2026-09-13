@@ -29,7 +29,7 @@ class DailyAdapter(
         holder.itemView.setOnClickListener { onItemClick(item) }
         with(holder.binding) {
             dayText.text = if (WeatherUtils.isToday(item.dt, item.timezoneOffset)) {
-                "Auj."
+                context.getString(com.meteoapp.R.string.today_short)
             } else {
                 WeatherUtils.formatDayName(item.dt, item.timezoneOffset)
             }

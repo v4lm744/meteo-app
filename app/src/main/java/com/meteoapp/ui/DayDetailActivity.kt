@@ -3,13 +3,12 @@ package com.meteoapp.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.DailyData
 import com.meteoapp.databinding.ActivityDayDetailBinding
 import com.meteoapp.util.WeatherColors
 import com.meteoapp.util.WeatherUtils
-import com.squareup.moshi.Moshi
 
-@Suppress("unused")
 class DayDetailActivity : AppCompatActivity() {
 
     companion object {
@@ -35,7 +34,7 @@ class DayDetailActivity : AppCompatActivity() {
         }
 
         val day: DailyData = try {
-            Moshi.Builder().build().adapter(DailyData::class.java).fromJson(json)!!
+            ApiClient.moshi.adapter(DailyData::class.java).fromJson(json)!!
         } catch (e: Exception) {
             finish()
             return

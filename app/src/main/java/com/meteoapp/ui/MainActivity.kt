@@ -20,7 +20,6 @@ import com.meteoapp.ui.adapter.DailyAdapter
 import com.meteoapp.ui.adapter.HourlyAdapter
 import com.meteoapp.util.WeatherUtils
 
-@Suppress("unused")
 class MainActivity : AppCompatActivity() {
 
     companion object {
@@ -301,7 +300,7 @@ class MainActivity : AppCompatActivity() {
         binding.errorText.text = message
         binding.loadingBar.visibility = View.GONE
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
-        tintToolbarIcons(getColor(R.color.md_blue_deep))
+        tintToolbarIcons(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
         binding.regionMapTitle.visibility = View.GONE
