@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.MeteoApp.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/md_blue_deep</item>
+        <item name="android:statusBarColor">@color/md_blue_deep</item>
+        <item name="android:navigationBarColor">@color/md_blue_deep</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+    </style>
+
     <style name="Theme.MeteoApp" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/md_blue_main</item>
         <item name="colorPrimaryVariant">@color/md_blue_deep</item>
