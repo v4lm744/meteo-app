@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: WeatherViewModel by viewModels()
 
+    private var toolbarTint: Int = 0xFFFFFFFF.toInt()
+
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -137,6 +139,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val tint = toolbarTint
+        for (i in 0 until menu.size()) {
+            menu.getItem(i).icon?.mutate()?.setTint(tint)
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -261,29 +271,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Teinte les icônes de la barre d'outils (menu dÃ©bordement + items d'action)
+     * Teinte les icônes de la barre d'outils (menu débordement + items d'action)
      * en blanc ou noir selon la luminance du fond, pour rester toujours visible.
      */
+
     private fun tintToolbarIcons(bgColor: Int) {
         val tint = com.meteoapp.util.WeatherColors.contrastColor(bgColor)
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.meteoToolbar)
         toolbar.overflowIcon?.mutate()?.setTint(tint)
         toolbar.navigationIcon?.mutate()?.setTint(tint)
         toolbar.setTitleTextColor(tint)
-        // IcÃ´nes des items d'action visibles dans la barre
-        for (i in 0 until toolbar.childCount) {
-            val child = toolbar.getChildAt(i)
-            if (child is androidx.appcompat.widget.ActionMenuItemView) {
-                child.icon?.mutate()?.setTint(tint)
-            }
-        }
-        // IcÃ´ne clair/sombre de la barre d'Ã©tat pour la lisibilitÃ© des icÃ´nes systÃ¨me
         val isLightBg = tint == 0xFF000000.toInt()
         window.decorView.systemUiVisibility = if (isLightBg) {
             window.decorView.systemUiVisibility or android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         } else {
             window.decorView.systemUiVisibility and android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
         }
+        toolbarTint = tint
+        invalidateOptionsMenu()
     }
 
     private fun showError(message: String) {
