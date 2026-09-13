@@ -22,13 +22,8 @@ class DayDetailActivity : AppCompatActivity() {
         binding = ActivityDayDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Plein écran : le fond dégradé s'étend sous la barre d'état
+        // Plein écran : le fond dégradé remplit l'écran sous la barre d'état
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.dayDetailToolbar) { v, insets ->
-            val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-            v.setPadding(v.paddingLeft, bars.top, v.paddingRight, v.paddingBottom)
-            insets
-        }
 
         binding.dayDetailToolbar.setNavigationOnClickListener { finish() }
 
