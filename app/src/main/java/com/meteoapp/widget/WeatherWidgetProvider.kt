@@ -132,6 +132,19 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         val city = WidgetPrefs.getCity(context, appWidgetId) ?: return
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val views = RemoteViews(context.packageName, R.layout.widget_weather)
+
+        val openIntent = Intent(context, MainActivity::class.java).apply {
+            putExtra(MainActivity.EXTRA_CITY_NAME, city.localNames?.fr ?: city.name)
+            putExtra(MainActivity.EXTRA_CITY_LAT, city.lat)
+            putExtra(MainActivity.EXTRA_CITY_LON, city.lon)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = PendingIntent.getActivity(
+            context, appWidgetId, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        views.setOnClickPendingIntent(R.id.widgetRoot, pi)
+
         withContext(Dispatchers.Main) {
             val displayName = city.localNames?.fr ?: city.name
             views.setTextViewText(R.id.widgetCity, displayName)
