@@ -16,6 +16,11 @@ avec un design Material Design moderne inspiré de l'application Météo France.
 - **Widget d'accueil** : résumé météo du jour (icône, température, description, min/max)
   pour une ville choisie à l'ajout du widget (écran de configuration avec recherche) ;
   fond en dégradé dynamique selon la météo et l'heure (jour/nuit, soleil, nuages, pluie, neige…)
+- **Synchronisation automatique des widgets** : mise à jour régulière de la météo des
+  widgets en arrière-plan (WorkManager), même quand l'application est fermée ;
+  l'intervalle (15 min, 30 min, 1 h, 3 h ou désactivé) se règle dans le menu
+  « Paramètres ». Sans cela, les widgets ne se rafraîchissaient qu'à la fréquence
+  minimale imposée par le système (≈30 min) et de façon peu fiable.
 - Rafraîchissement par « pull-to-refresh »
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
 - **Fond dynamique de l'app** : dégradé vertical en haut selon la météo et l'heure
@@ -61,9 +66,10 @@ l'application sur un émulateur ou un appareil (API 26 minimum).
 
 - `data/` : modèles, API Retrofit, repository
 - `location/` : géolocalisation (FusedLocationProvider)
-- `widget/` : `WeatherWidgetProvider`, `WeatherWidgetConfigureActivity`, `WidgetPrefs`
+- `widget/` : `WeatherWidgetProvider`, `WeatherWidgetConfigureActivity`, `WidgetPrefs`,
+  `SyncPrefs`, `WidgetSyncScheduler`, `WidgetSyncWorker` (synchro auto WorkManager)
 - `ui/` : MainActivity, ViewModel, adapters, dialog de recherche
 - `util/` : formatage des dates/températures
 
-Technologies : Kotlin, Coroutines, Retrofit + Moshi, Glide, Material 3,
+Technologies : Kotlin, Coroutines, WorkManager (synchro widget), Retrofit + Moshi, Glide, Material 3,
 ViewBinding, LiveData, FusedLocationProvider, osmdroid (cartes OpenStreetMap).

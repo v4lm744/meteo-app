@@ -2,9 +2,20 @@ package com.meteoapp
 
 import android.app.Application
 import org.osmdroid.config.Configuration
+import com.meteoapp.widget.WidgetSyncScheduler
 import java.io.File
 
-class MeteoApp : Application() {
+class MeteoApp : Application(), androidx.work.Configuration.Provider {
+
+    /**
+     * Configuration de WorkManager fournie à la demande (on-demand initialization).
+     * On retire l'auto-initialisation par défaut (manifeste) afin que getInstance()
+     * s'initialise via ce provider, y compris sous Robolectric où androidx.startup
+     * n'est pas exécuté.
+     */
+    override val workManagerConfiguration: androidx.work.Configuration
+        get() = androidx.work.Configuration.Builder().build()
+
     override fun onCreate() {
         super.onCreate()
         val baseDir = getExternalFilesDir(null) ?: filesDir
@@ -14,5 +25,6 @@ class MeteoApp : Application() {
             osmdroidTileCache = File(baseDir, "osmdroid")
             load(this@MeteoApp, androidx.preference.PreferenceManager.getDefaultSharedPreferences(this@MeteoApp))
         }
+        WidgetSyncScheduler.reschedule(this)
     }
 }
