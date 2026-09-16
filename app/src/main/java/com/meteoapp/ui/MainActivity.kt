@@ -177,6 +177,10 @@ class MainActivity : AppCompatActivity() {
                 openApiKeyDialog()
                 true
             }
+            R.id.action_settings -> {
+                SettingsDialog().show(supportFragmentManager, "settings")
+                true
+            }
             R.id.action_tutorial -> {
                 TutorialDialog().show(supportFragmentManager, "tutorial")
                 true

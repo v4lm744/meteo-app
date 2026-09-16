@@ -19,6 +19,11 @@
         android:title="@string/action_api_key"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_tutorial"
         android:icon="@drawable/ic_tutorial"
         android:title="@string/action_tutorial"

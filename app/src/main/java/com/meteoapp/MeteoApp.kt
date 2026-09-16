@@ -2,6 +2,7 @@ package com.meteoapp
 
 import android.app.Application
 import org.osmdroid.config.Configuration
+import com.meteoapp.widget.WidgetSyncScheduler
 import java.io.File
 
 class MeteoApp : Application() {
@@ -14,5 +15,6 @@ class MeteoApp : Application() {
             osmdroidTileCache = File(baseDir, "osmdroid")
             load(this@MeteoApp, androidx.preference.PreferenceManager.getDefaultSharedPreferences(this@MeteoApp))
         }
+        WidgetSyncScheduler.reschedule(this)
     }
 }

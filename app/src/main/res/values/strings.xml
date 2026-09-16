@@ -6,6 +6,14 @@
     <string name="action_api_key">Clé API</string>
     <string name="action_about">À propos</string>
     <string name="action_tutorial">Tutoriel clé API</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="settings_sync_title">Synchronisation automatique des widgets</string>
+    <string name="settings_sync_interval_label">Fréquence de mise à jour</string>
+    <string name="settings_sync_disabled">Désactivée</string>
+    <string name="settings_sync_minutes">Toutes les %1$d minutes</string>
+    <string name="settings_sync_hourly">Toutes les heures</string>
+    <string name="settings_sync_3h">Toutes les 3 heures</string>
+    <string name="settings_sync_hint">Les widgets d'accueil affichent une météo plus récente grâce à une mise à jour régulière en arrière-plan, même quand l'application est fermée.</string>
     <string name="tutorial_title">Récupérer et configurer une clé API</string>
     <string name="tutorial_intro">Cette application utilise l\'API gratuite d\'OpenWeatherMap pour afficher la météo. Suivez ces étapes pour obtenir une clé et la configurer.</string>
     <string name="tutorial_step1_title">1. Créer un compte OpenWeatherMap</string>

@@ -123,6 +123,29 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    /**
+     * Met à jour un widget avec la météo de la ville associée, sans passer par le
+     * cycle BroadcastReceiver. Réutilisé par la synchro automatique en arrière-plan
+     * ([WidgetSyncWorker]) et conserve le même rendu que [onUpdate].
+     */
+    suspend fun syncOne(context: Context, appWidgetId: Int) {
+        val city = WidgetPrefs.getCity(context, appWidgetId) ?: return
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val views = RemoteViews(context.packageName, R.layout.widget_weather)
+        withContext(Dispatchers.Main) {
+            val displayName = city.localNames?.fr ?: city.name
+            views.setTextViewText(R.id.widgetCity, displayName)
+            views.setTextViewText(R.id.widgetTemp, "\u2026")
+            views.setTextViewText(R.id.widgetDesc, context.getString(R.string.loading))
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+        val repository = WeatherRepository(context)
+        val result = repository.getWeather(city.lat, city.lon)
+        withContext(Dispatchers.Main) {
+            renderResult(context, appWidgetManager, appWidgetId, views, city, result)
+        }
+    }
+
     private fun renderResult(
         context: Context,
         appWidgetManager: AppWidgetManager,
