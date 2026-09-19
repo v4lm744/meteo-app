@@ -106,13 +106,30 @@ object WeatherUtils {
     fun roundToInt(value: Double): Int = Math.round(value).toInt()
 
     /**
+     * Formate une valeur numérique selon la précision choisie dans les
+     * Paramètres : entier (« 17 ») ou une décimale (« 16,8 ») avec le
+     * séparateur décimal de la locale.
+     */
+    fun formatValue(context: Context, value: Double): String =
+        when (UnitPrefs.getValuePrecision(context)) {
+            UnitPrefs.ValuePrecision.WHOLE ->
+                Math.round(value).toString()
+            UnitPrefs.ValuePrecision.ONE_DECIMAL ->
+                String.format(
+                    java.util.Locale.getDefault(),
+                    "%.1f",
+                    value
+                )
+        }
+
+    /**
      * Convertit et formate une température (toujours fournie en °C par l'API)
      * selon l'unité choisie dans les Paramètres.
      */
     fun formatTemp(context: Context, celsius: Double): String {
         val value = when (UnitPrefs.getTempUnit(context)) {
-            TempUnit.CELSIUS -> roundToInt(celsius)
-            TempUnit.FAHRENHEIT -> roundToInt(celsius * 9.0 / 5.0 + 32.0)
+            TempUnit.CELSIUS -> formatValue(context, celsius)
+            TempUnit.FAHRENHEIT -> formatValue(context, celsius * 9.0 / 5.0 + 32.0)
         }
         return "$value°"
     }
@@ -120,8 +137,14 @@ object WeatherUtils {
     /** Formate une vitesse du vent selon l'unité choisie dans les Paramètres. */
     fun formatWindSpeed(context: Context, speedMs: Double): String =
         when (UnitPrefs.getWindUnit(context)) {
-            WindUnit.KMH -> context.getString(R.string.kmh, kmh(speedMs))
-            WindUnit.MPH -> context.getString(R.string.mph, mph(speedMs))
+            WindUnit.KMH -> context.getString(
+                R.string.kmh_format,
+                formatValue(context, speedMs * 3.6)
+            )
+            WindUnit.MPH -> context.getString(
+                R.string.mph_format,
+                formatValue(context, speedMs * 2.23694)
+            )
         }
 
     /** Formate une pression (fournée en hPa par l'API) selon l'unité choisie. */
