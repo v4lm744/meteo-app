@@ -45,10 +45,10 @@ class HourDetailActivity : AppCompatActivity() {
 
     private fun render(hour: HourlyData) {
         binding.hourDetailToolbar.title = getString(R.string.hour_detail_title)
-        binding.hourTitle.text = WeatherUtils.formatFullDayNameTime(hour.dt, hour.timezoneOffset)
+        binding.hourTitle.text = WeatherUtils.formatFullDayNameTime(this, hour.dt, hour.timezoneOffset)
         binding.hourDate.text = WeatherUtils.formatDate(hour.dt, hour.timezoneOffset)
-        binding.hourTemp.text = "${WeatherUtils.roundToInt(hour.temp)}\u00b0"
-        binding.hourFeelsLike.text = "${WeatherUtils.roundToInt(hour.feelsLike)}\u00b0"
+        binding.hourTemp.text = WeatherUtils.formatTemp(this, hour.temp)
+        binding.hourFeelsLike.text = WeatherUtils.formatTemp(this, hour.feelsLike)
         binding.hourDescription.text =
             hour.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
         val iconCode = hour.weather.firstOrNull()?.icon
@@ -57,11 +57,11 @@ class HourDetailActivity : AppCompatActivity() {
                 .load(WeatherUtils.iconUrl(iconCode))
                 .into(binding.hourIcon)
         }
-        binding.feelsLikeValue.text = "${WeatherUtils.roundToInt(hour.feelsLike)}\u00b0"
+        binding.feelsLikeValue.text = WeatherUtils.formatTemp(this, hour.feelsLike)
         binding.humidityValue.text = "${hour.humidity} %"
         binding.windValue.text =
-            "${WeatherUtils.kmh(hour.windSpeed)} km/h ${WeatherUtils.windDirection(hour.windDeg)}"
-        binding.pressureValue.text = "${hour.pressure} hPa"
+            "${WeatherUtils.formatWindSpeed(this, hour.windSpeed)} ${WeatherUtils.windDirection(hour.windDeg)}"
+        binding.pressureValue.text = WeatherUtils.formatPressure(this, hour.pressure)
         val pop = hour.pop ?: 0.0
         binding.popValue.text = "${(pop * 100).toInt()} %"
         binding.cloudinessValue.text = "${hour.cloudiness} %"

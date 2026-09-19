@@ -33,8 +33,8 @@ class DailyAdapter(
             } else {
                 WeatherUtils.formatDayName(item.dt, item.timezoneOffset)
             }
-            dayMin.text = "${WeatherUtils.roundToInt(item.tempMin)}°"
-            dayMax.text = "${WeatherUtils.roundToInt(item.tempMax)}°"
+            dayMin.text = WeatherUtils.formatTemp(context, item.tempMin)
+            dayMax.text = WeatherUtils.formatTemp(context, item.tempMax)
             dayDesc.text = item.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() }
                 ?: ""
             val iconCode = item.weather.firstOrNull()?.icon

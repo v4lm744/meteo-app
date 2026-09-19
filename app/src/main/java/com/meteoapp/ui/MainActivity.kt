@@ -237,25 +237,29 @@ class MainActivity : AppCompatActivity() {
         binding.dailyRecycler.visibility = View.VISIBLE
 
         val current = weather.current
-        binding.temperature.text = "${WeatherUtils.roundToInt(current.temp)}°"
+        binding.temperature.text = WeatherUtils.formatTemp(this, current.temp)
         binding.weatherDescription.text =
             current.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
-        binding.feelsLike.text = getString(R.string.feels_like, WeatherUtils.roundToInt(current.feelsLike))
+        binding.feelsLike.text = getString(R.string.feels_like_value, WeatherUtils.formatTemp(this, current.feelsLike))
 
         val today = weather.daily.firstOrNull()
         if (today != null) {
-            binding.minMax.text = "Max ${WeatherUtils.roundToInt(today.tempMax)}°  Min ${WeatherUtils.roundToInt(today.tempMin)}°"
+            binding.minMax.text = getString(
+                R.string.min_max_format,
+                WeatherUtils.formatTemp(this, today.tempMax),
+                WeatherUtils.formatTemp(this, today.tempMin)
+            )
         } else {
             binding.minMax.text = ""
         }
 
         binding.humidityValue.text = "${current.humidity} %"
-        binding.windValue.text = "${WeatherUtils.kmh(current.windSpeed)} km/h ${WeatherUtils.windDirection(current.windDeg)}"
-        binding.pressureValue.text = "${current.pressure} hPa"
-        binding.visibilityValue.text = "${(current.visibility ?: 0L) / 1000} km"
+        binding.windValue.text = "${WeatherUtils.formatWindSpeed(this, current.windSpeed)} ${WeatherUtils.windDirection(current.windDeg)}"
+        binding.pressureValue.text = WeatherUtils.formatPressure(this, current.pressure)
+        binding.visibilityValue.text = WeatherUtils.formatVisibility(this, current.visibility)
 
-        current.sunrise?.let { binding.sunriseValue.text = WeatherUtils.formatTime(it, weather.timezoneOffset) }
-        current.sunset?.let { binding.sunsetValue.text = WeatherUtils.formatTime(it, weather.timezoneOffset) }
+        current.sunrise?.let { binding.sunriseValue.text = WeatherUtils.formatTime(this, it, weather.timezoneOffset) }
+        current.sunset?.let { binding.sunsetValue.text = WeatherUtils.formatTime(this, it, weather.timezoneOffset) }
 
         // Hourly : 24 prochaines heures
         binding.hourlyRecycler.layoutManager =

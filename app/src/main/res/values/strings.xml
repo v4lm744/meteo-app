@@ -105,4 +105,24 @@
     <string name="precipitation">Précipitations</string>
     <string name="mm">%.1f mm</string>
     <string name="splash_tagline">Votre météo, où que vous soyez</string>
+    <string name="settings_units_title">Unités et formats</string>
+    <string name="settings_units_hint">Choisissez les unités d\'affichage des mesures. Le changement est appliqué au prochain rafraîchissement de l\'écran.</string>
+    <string name="settings_unit_temp">Température</string>
+    <string name="settings_unit_temp_celsius">Celsius (°C)</string>
+    <string name="settings_unit_temp_fahrenheit">Fahrenheit (°F)</string>
+    <string name="settings_unit_wind">Vent</string>
+    <string name="settings_unit_wind_kmh">km/h</string>
+    <string name="settings_unit_wind_mph">mph</string>
+    <string name="settings_unit_pressure">Pression</string>
+    <string name="settings_unit_pressure_hpa">hPa</string>
+    <string name="settings_unit_pressure_inhg">inHg</string>
+    <string name="settings_unit_time">Format de l\'heure</string>
+    <string name="settings_unit_time_24h">24 h</string>
+    <string name="settings_unit_time_12h">12 h (AM/PM)</string>
+    <string name="mph">%1$d mph</string>
+    <string name="inhg">%1$s inHg</string>
+    <string name="km">%1$d km</string>
+    <string name="miles">%1$d mi</string>
+    <string name="feels_like_value">Ressenti %1$s</string>
+    <string name="min_max_format">Max %1$s  Min %2$s</string>
 </resources>
