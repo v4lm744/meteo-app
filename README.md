@@ -3,6 +3,12 @@
 Application Android (Kotlin) affichant la météo via l'API OpenWeatherMap,
 avec un design Material Design moderne inspiré de l'application Météo France.
 
+## Installation
+
+Téléchargez l'APK de la dernière version sur la page
+[Releases](https://github.com/v4lm744/meteo-app/releases) et installez-le sur
+votre appareil (autorisez « Installer des applications inconnues » si demandé).
+
 ## Fonctionnalités
 
 - Météo actuelle (température, ressenti, min/max, description)
@@ -21,6 +27,10 @@ avec un design Material Design moderne inspiré de l'application Météo France.
   l'intervalle (15 min, 30 min, 1 h, 3 h ou désactivé) se règle dans le menu
   « Paramètres ». Sans cela, les widgets ne se rafraîchissaient qu'à la fréquence
   minimale imposée par le système (≈30 min) et de façon peu fiable.
+- **Unités réglables** (menu « Paramètres ») : température (°C/°F), vent (km/h/mph,
+  la visibilité suit en km/miles), pression (hPa/inHg) et format de l'heure
+  (24 h ou 12 h AM/PM). Les choix sont persistés et appliqués immédiatement
+  sur tous les écrans et les widgets.
 - Rafraîchissement par « pull-to-refresh »
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
 - **Fond dynamique de l'app** : dégradé vertical en haut selon la météo et l'heure
@@ -90,8 +100,17 @@ Puis la valeur base64 est enregistrée dans le secret
 `DEBUG_KEYSTORE_BASE64` du dépôt (Settings → Secrets and variables →
 Actions). **Ce keystore ne doit plus jamais changer** : chaque APK de release
 signé avec une clé différente empêchera la mise à jour des installations
-existantes. Sans le secret, le build retombe sur la clé debug locale (non
-reproductible, à éviter pour les releases).
+existantes.
+
+Tant que le secret n'est pas configuré, le workflow publie l'APK signé avec
+la clé debug générée par le runner : installable, mais **non mis à jour
+par-dessus une installation existante** (désinstallation/réinstallation
+requise, avec perte de la clé API et des préférences). Dès que le secret est
+ajouté, les releases repassent automatiquement sur la clé partagée, sans
+aucune modification du workflow.
+
+Les installations antérieures à la première release signée avec la clé
+partagée devront être réinstallées une dernière fois.
 
 ## Architecture
 
@@ -99,8 +118,9 @@ reproductible, à éviter pour les releases).
 - `location/` : géolocalisation (FusedLocationProvider)
 - `widget/` : `WeatherWidgetProvider`, `WeatherWidgetConfigureActivity`, `WidgetPrefs`,
   `SyncPrefs`, `WidgetSyncScheduler`, `WidgetSyncWorker` (synchro auto WorkManager)
-- `ui/` : MainActivity, ViewModel, adapters, dialog de recherche
-- `util/` : formatage des dates/températures
+- `ui/` : MainActivity, ViewModel, adapters, dialogs (recherche, paramètres, à propos…)
+- `util/` : formatage des dates/températures/vent/pression, préférences d'unités
+  (`UnitPrefs`), couleurs dynamiques (`WeatherColors`)
 
 Technologies : Kotlin, Coroutines, WorkManager (synchro widget), Retrofit + Moshi, Glide, Material 3,
 ViewBinding, LiveData, FusedLocationProvider, osmdroid (cartes OpenStreetMap).
