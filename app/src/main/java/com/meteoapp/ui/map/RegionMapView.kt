@@ -110,7 +110,7 @@ class RegionMapView @JvmOverloads constructor(
                             .load(WeatherUtils.iconUrl(city.weatherIcon))
                             .into(icon)
                     }
-                    temp.text = "${WeatherUtils.roundToInt(city.temp)}°"
+                    temp.text = WeatherUtils.formatTemp(mapView.context, city.temp)
                     name.text = city.name
                 }
 

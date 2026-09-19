@@ -17,8 +17,7 @@ object WeatherColors {
         if (sunrise != null && sunset != null) {
             return now >= sunrise && now < sunset
         }
-        val hour = WeatherUtils.formatHour(weather.current.dt, weather.timezoneOffset)
-            .removeSuffix("h").toIntOrNull() ?: 12
+        val hour = hourOfDayUtc(weather.current.dt, weather.timezoneOffset)
         return hour in 7..19
     }
 
@@ -66,8 +65,7 @@ object WeatherColors {
             if (sunrise != null && sunset != null) {
                 now >= sunrise && now < sunset
             } else {
-                val hour = WeatherUtils.formatHour(day.dt, day.timezoneOffset)
-                    .removeSuffix("h").toIntOrNull() ?: 12
+                val hour = hourOfDayUtc(day.dt, day.timezoneOffset)
                 hour in 7..19
             }
         }
@@ -85,8 +83,7 @@ object WeatherColors {
      * m\u00e9t\u00e9o et l'heure (jour/nuit selon l'heure locale de la pr\u00e9vision).
      */
     fun topColor(hour: com.meteoapp.data.model.HourlyData): Int {
-        val hourOfDay = WeatherUtils.formatHour(hour.dt, hour.timezoneOffset)
-            .removeSuffix("h").toIntOrNull() ?: 12
+        val hourOfDay = hourOfDayUtc(hour.dt, hour.timezoneOffset)
         val isDay = hourOfDay in 7..19
         val code = hour.weather.firstOrNull()?.id ?: 800L
         return colorForCode(code, isDay)
@@ -108,6 +105,15 @@ object WeatherColors {
         // luminance perçue (rec. 709)
         val luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0
         return if (luminance > 0.6) 0xFF000000.toInt() else 0xFFFFFFFF.toInt()
+    }
+
+    /** Heure du jour (0-23) en temps UTC décalé, sans formatage dépendant des préférences. */
+    private fun hourOfDayUtc(timestampSeconds: Long, timezoneOffsetSeconds: Long): Int {
+        val cal = java.util.Calendar.getInstance().apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
+            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        }
+        return cal.get(java.util.Calendar.HOUR_OF_DAY)
     }
 
     private fun colorForCode(code: Long, isDay: Boolean): Int {

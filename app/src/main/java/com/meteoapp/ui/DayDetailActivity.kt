@@ -53,8 +53,8 @@ class DayDetailActivity : AppCompatActivity() {
 
         binding.dayTitle.text = WeatherUtils.formatFullDayName(day.dt, day.timezoneOffset)
         binding.dayDate.text = WeatherUtils.formatDate(day.dt, day.timezoneOffset)
-        binding.dayTempMax.text = "${WeatherUtils.roundToInt(day.tempMax)}\u00b0"
-        binding.dayTempMin.text = "${WeatherUtils.roundToInt(day.tempMin)}\u00b0"
+        binding.dayTempMax.text = WeatherUtils.formatTemp(this, day.tempMax)
+        binding.dayTempMin.text = WeatherUtils.formatTemp(this, day.tempMin)
         binding.dayDescription.text =
             day.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
 
@@ -65,16 +65,16 @@ class DayDetailActivity : AppCompatActivity() {
                 .into(binding.dayIcon)
         }
 
-        binding.morningTemp.text = "${WeatherUtils.roundToInt(day.morningTemp)}\u00b0"
-        binding.dayTemp.text = "${WeatherUtils.roundToInt(day.dayTemp)}\u00b0"
-        binding.eveningTemp.text = "${WeatherUtils.roundToInt(day.eveningTemp)}\u00b0"
-        binding.nightTemp.text = "${WeatherUtils.roundToInt(day.nightTemp)}\u00b0"
-        binding.feelsLike.text = "${WeatherUtils.roundToInt(day.feelsLikeDay)}\u00b0"
+        binding.morningTemp.text = WeatherUtils.formatTemp(this, day.morningTemp)
+        binding.dayTemp.text = WeatherUtils.formatTemp(this, day.dayTemp)
+        binding.eveningTemp.text = WeatherUtils.formatTemp(this, day.eveningTemp)
+        binding.nightTemp.text = WeatherUtils.formatTemp(this, day.nightTemp)
+        binding.feelsLike.text = WeatherUtils.formatTemp(this, day.feelsLikeDay)
 
         binding.humidityValue.text = "${day.humidity} %"
         binding.windValue.text =
-            "${WeatherUtils.kmh(day.windSpeed)} km/h ${WeatherUtils.windDirection(day.windDeg)}"
-        binding.pressureValue.text = "${day.pressure} hPa"
+            "${WeatherUtils.formatWindSpeed(this, day.windSpeed)} ${WeatherUtils.windDirection(day.windDeg)}"
+        binding.pressureValue.text = WeatherUtils.formatPressure(this, day.pressure)
         val pop = day.pop ?: 0.0
         binding.popValue.text = "${(pop * 100).toInt()} %"
 

@@ -173,7 +173,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.widgetCity, city.localNames?.fr ?: city.name)
                 views.setTextViewText(
                     R.id.widgetTemp,
-                    "${WeatherUtils.roundToInt(current.temp)}\u00b0"
+                    WeatherUtils.formatTemp(context, current.temp)
                 )
                 val desc = current.weather.firstOrNull()?.description
                     ?.replaceFirstChar { it.uppercase() } ?: ""
@@ -183,7 +183,11 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                 if (today != null) {
                     views.setTextViewText(
                         R.id.widgetMinMax,
-                        "Max ${WeatherUtils.roundToInt(today.tempMax)}\u00b0  Min ${WeatherUtils.roundToInt(today.tempMin)}\u00b0"
+                        context.getString(
+                            R.string.min_max_format,
+                            WeatherUtils.formatTemp(context, today.tempMax),
+                            WeatherUtils.formatTemp(context, today.tempMin)
+                        )
                     )
                 } else {
                     views.setTextViewText(R.id.widgetMinMax, "")

@@ -1,11 +1,20 @@
 package com.meteoapp.util
 
+import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33])
 class WeatherUtilsTest {
+
+    private val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+
 
     @Test
     fun roundToInt_roundsToNearest() {
@@ -53,8 +62,51 @@ class WeatherUtilsTest {
 
     @Test
     fun formatHour_appendsHSuffix() {
-        // 0 offset : 00:00 UTC -> "00h"
-        assertEquals("00h", WeatherUtils.formatHour(0L, 0))
+        // 0 offset : 00:00 UTC -> "00h" (format 24 h par défaut)
+        assertEquals("00h", WeatherUtils.formatHour(context, 0L, 0))
+    }
+
+    @Test
+    fun formatHour_12hFormatUsesAmPm() {
+        UnitPrefs.setTimeFormat(context, UnitPrefs.TimeFormat.FORMAT_12H)
+        // 13:00 UTC -> "1 PM"
+        assertEquals(
+            "1 PM",
+            WeatherUtils.formatHour(context, 13L * 3600, 0)
+        )
+        UnitPrefs.setTimeFormat(context, UnitPrefs.TimeFormat.FORMAT_24H)
+    }
+
+    @Test
+    fun formatTemp_fahrenheitConvertsCelsius() {
+        UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.FAHRENHEIT)
+        assertEquals("68°", WeatherUtils.formatTemp(context, 20.0))
+        UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.CELSIUS)
+        assertEquals("20°", WeatherUtils.formatTemp(context, 20.0))
+    }
+
+    @Test
+    fun formatWindSpeed_mphConvertsMetersPerSecond() {
+        UnitPrefs.setWindUnit(context, UnitPrefs.WindUnit.MPH)
+        assertEquals("22 mph", WeatherUtils.formatWindSpeed(context, 10.0))
+        UnitPrefs.setWindUnit(context, UnitPrefs.WindUnit.KMH)
+        assertEquals("36 km/h", WeatherUtils.formatWindSpeed(context, 10.0))
+    }
+
+    @Test
+    fun formatPressure_inhgConvertsHpa() {
+        UnitPrefs.setPressureUnit(context, UnitPrefs.PressureUnit.INHG)
+        assertEquals("29.53 inHg", WeatherUtils.formatPressure(context, 1000L))
+        UnitPrefs.setPressureUnit(context, UnitPrefs.PressureUnit.HPA)
+        assertEquals("1000 hPa", WeatherUtils.formatPressure(context, 1000L))
+    }
+
+    @Test
+    fun formatVisibility_milesWhenMphSelected() {
+        UnitPrefs.setWindUnit(context, UnitPrefs.WindUnit.MPH)
+        assertEquals("6 mi", WeatherUtils.formatVisibility(context, 10000L))
+        UnitPrefs.setWindUnit(context, UnitPrefs.WindUnit.KMH)
+        assertEquals("10 km", WeatherUtils.formatVisibility(context, 10000L))
     }
 
     @Test

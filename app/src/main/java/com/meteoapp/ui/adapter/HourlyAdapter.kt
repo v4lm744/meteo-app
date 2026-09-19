@@ -32,8 +32,8 @@ class HourlyAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         with(holder.binding) {
-            hourText.text = WeatherUtils.formatHour(item.dt, item.timezoneOffset)
-            hourTemp.text = "${WeatherUtils.roundToInt(item.temp)}\u00b0"
+            hourText.text = WeatherUtils.formatHour(context, item.dt, item.timezoneOffset)
+            hourTemp.text = WeatherUtils.formatTemp(context, item.temp)
             val iconCode = item.weather.firstOrNull()?.icon
             if (!iconCode.isNullOrEmpty()) {
                 Glide.with(context)
