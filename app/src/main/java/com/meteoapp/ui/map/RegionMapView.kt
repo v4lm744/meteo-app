@@ -5,9 +5,9 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.LinearLayout
-import com.bumptech.glide.Glide
 import com.meteoapp.R
 import com.meteoapp.data.model.RegionCity
+import com.meteoapp.util.WeatherIcons
 import com.meteoapp.util.WeatherUtils
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -106,9 +106,17 @@ class RegionMapView @JvmOverloads constructor(
                     val temp = view.findViewById<android.widget.TextView>(R.id.markerTemp)
                     val name = view.findViewById<android.widget.TextView>(R.id.markerName)
                     if (city.weatherIcon.isNotEmpty()) {
-                        Glide.with(mapView.context)
-                            .load(WeatherUtils.iconUrl(city.weatherIcon))
-                            .into(icon)
+                        val name = WeatherIcons.forIconCode(city.weatherIcon)
+                        if (name != null) {
+                            val idRes = mapView.context.resources.getIdentifier(
+                                name, "drawable", mapView.context.packageName
+                            )
+                            if (idRes != 0) {
+                                val drawable = mapView.context.getDrawable(idRes)
+                                icon.setImageDrawable(drawable)
+                                (drawable as? android.graphics.drawable.Animatable)?.start()
+                            }
+                        }
                     }
                     temp.text = WeatherUtils.formatTemp(mapView.context, city.temp)
                     name.text = city.name

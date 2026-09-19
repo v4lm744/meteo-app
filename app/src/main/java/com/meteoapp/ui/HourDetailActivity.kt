@@ -2,13 +2,13 @@ package com.meteoapp.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.HourlyData
 import com.meteoapp.databinding.ActivityHourDetailBinding
 import com.meteoapp.util.WeatherColors
 import com.meteoapp.util.WeatherUtils
+import com.meteoapp.util.WeatherIcons
 
 class HourDetailActivity : AppCompatActivity() {
     companion object {
@@ -51,11 +51,8 @@ class HourDetailActivity : AppCompatActivity() {
         binding.hourFeelsLike.text = WeatherUtils.formatTemp(this, hour.feelsLike)
         binding.hourDescription.text =
             hour.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
-        val iconCode = hour.weather.firstOrNull()?.icon
-        if (!iconCode.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(WeatherUtils.iconUrl(iconCode))
-                .into(binding.hourIcon)
+        hour.weather.firstOrNull()?.let { cond ->
+            WeatherIcons.bind(binding.hourIcon, cond.id, isDaytime = !cond.icon.endsWith("n"))
         }
         binding.feelsLikeValue.text = WeatherUtils.formatTemp(this, hour.feelsLike)
         binding.humidityValue.text = "${hour.humidity} %"

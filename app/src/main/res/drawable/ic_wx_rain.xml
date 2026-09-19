@@ -1,0 +1,88 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="48dp"
+            android:height="48dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <group android:name="cloudGroup">
+                <path
+                    android:name="cloud"
+                    android:fillColor="#CFD8DC"
+                    android:pathData="M7,14.5 C4.51,14.5 2.5,12.49 2.5,10 C2.5,7.51 4.51,5.5 7,5.5 C7.26,5.5 7.51,5.53 7.76,5.58 C8.55,3.97 10.2,2.86 12.12,2.86 C14.78,2.86 16.94,5.02 16.94,7.68 C16.94,7.79 16.94,7.9 16.93,8.01 C18.36,8.18 19.47,9.4 19.47,10.88 C19.47,12.48 18.17,13.77 16.57,13.77 L7,13.77 Z" />
+            </group>
+            <group android:name="rain">
+                <path
+                    android:name="drop1"
+                    android:strokeColor="#4FC3F7"
+                    android:strokeWidth="1.8"
+                    android:strokeLineCap="round"
+                    android:pathData="M8,17 L7.2,20" />
+                <path
+                    android:name="drop2"
+                    android:strokeColor="#4FC3F7"
+                    android:strokeWidth="1.8"
+                    android:strokeLineCap="round"
+                    android:pathData="M12,17 L11.2,20" />
+                <path
+                    android:name="drop3"
+                    android:strokeColor="#4FC3F7"
+                    android:strokeWidth="1.8"
+                    android:strokeLineCap="round"
+                    android:pathData="M16,17 L15.2,20" />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="cloudGroup">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateX"
+                android:duration="3600"
+                android:repeatCount="-1"
+                android:repeatMode="reverse"
+                android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+                android:valueFrom="-0.5"
+                android:valueTo="0.5"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="drop1">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateY"
+                android:duration="1000"
+                android:repeatCount="-1"
+                android:interpolator="@android:anim/linear_interpolator"
+                android:valueFrom="-1.5"
+                android:valueTo="3"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="drop2">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateY"
+                android:duration="1000"
+                android:startOffset="330"
+                android:repeatCount="-1"
+                android:interpolator="@android:anim/linear_interpolator"
+                android:valueFrom="-1.5"
+                android:valueTo="3"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="drop3">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateY"
+                android:duration="1000"
+                android:startOffset="660"
+                android:repeatCount="-1"
+                android:interpolator="@android:anim/linear_interpolator"
+                android:valueFrom="-1.5"
+                android:valueTo="3"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

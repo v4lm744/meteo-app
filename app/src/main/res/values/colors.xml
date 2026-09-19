@@ -11,7 +11,8 @@
     <color name="md_grey_light">#F2F4F7</color>
     <color name="md_text_dark">#1A1A2E</color>
     <color name="md_text_light">#F2F4F7</color>
-    <color name="md_card_overlay">#33FFFFFF</color>
+    <color name="md_card_overlay">#2EFFFFFF</color>
+    <color name="md_card_stroke">#40FFFFFF</color>
     <color name="dialog_link">#2364AA</color>
 
     <color name="black">#FF000000</color>

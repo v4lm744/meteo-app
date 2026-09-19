@@ -1,0 +1,88 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="48dp"
+            android:height="48dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <group android:name="cloudGroup">
+                <path
+                    android:name="cloud"
+                    android:fillColor="#ECEFF1"
+                    android:pathData="M7,14.5 C4.51,14.5 2.5,12.49 2.5,10 C2.5,7.51 4.51,5.5 7,5.5 C7.26,5.5 7.51,5.53 7.76,5.58 C8.55,3.97 10.2,2.86 12.12,2.86 C14.78,2.86 16.94,5.02 16.94,7.68 C16.94,7.79 16.94,7.9 16.93,8.01 C18.36,8.18 19.47,9.4 19.47,10.88 C19.47,12.48 18.17,13.77 16.57,13.77 L7,13.77 Z" />
+            </group>
+            <group android:name="snow">
+                <path
+                    android:name="flake1"
+                    android:strokeColor="#B3E5FC"
+                    android:strokeWidth="1.6"
+                    android:strokeLineCap="round"
+                    android:pathData="M8,17.5 L8,20.5 M6.9,18.1 L9.1,19.9 M9.1,18.1 L6.9,19.9" />
+                <path
+                    android:name="flake2"
+                    android:strokeColor="#B3E5FC"
+                    android:strokeWidth="1.6"
+                    android:strokeLineCap="round"
+                    android:pathData="M12,17.5 L12,20.5 M10.9,18.1 L13.1,19.9 M13.1,18.1 L10.9,19.9" />
+                <path
+                    android:name="flake3"
+                    android:strokeColor="#B3E5FC"
+                    android:strokeWidth="1.6"
+                    android:strokeLineCap="round"
+                    android:pathData="M16,17.5 L16,20.5 M14.9,18.1 L17.1,19.9 M17.1,18.1 L14.9,19.9" />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="cloudGroup">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateX"
+                android:duration="3600"
+                android:repeatCount="-1"
+                android:repeatMode="reverse"
+                android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+                android:valueFrom="-0.5"
+                android:valueTo="0.5"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="flake1">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateY"
+                android:duration="1600"
+                android:repeatCount="-1"
+                android:interpolator="@android:anim/linear_interpolator"
+                android:valueFrom="-1"
+                android:valueTo="2.5"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="flake2">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateY"
+                android:duration="1600"
+                android:startOffset="530"
+                android:repeatCount="-1"
+                android:interpolator="@android:anim/linear_interpolator"
+                android:valueFrom="-1"
+                android:valueTo="2.5"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="flake3">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="translateY"
+                android:duration="1600"
+                android:startOffset="1060"
+                android:repeatCount="-1"
+                android:interpolator="@android:anim/linear_interpolator"
+                android:valueFrom="-1"
+                android:valueTo="2.5"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

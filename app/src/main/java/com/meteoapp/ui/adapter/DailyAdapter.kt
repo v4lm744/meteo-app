@@ -4,10 +4,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.meteoapp.data.model.DailyData
 import com.meteoapp.databinding.ItemDailyBinding
 import com.meteoapp.util.WeatherUtils
+import com.meteoapp.util.WeatherIcons
 
 class DailyAdapter(
     private val context: Context,
@@ -37,11 +37,9 @@ class DailyAdapter(
             dayMax.text = WeatherUtils.formatTemp(context, item.tempMax)
             dayDesc.text = item.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() }
                 ?: ""
-            val iconCode = item.weather.firstOrNull()?.icon
-            if (!iconCode.isNullOrEmpty()) {
-                Glide.with(context)
-                    .load(WeatherUtils.iconUrl(iconCode))
-                    .into(dayIcon)
+            val cond = item.weather.firstOrNull()
+            if (cond != null) {
+                WeatherIcons.bind(dayIcon, cond.id, isDaytime = true)
             }
             val pop = item.pop ?: 0.0
             if (pop >= 0.05) {
