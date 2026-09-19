@@ -7,10 +7,12 @@
             android:viewportWidth="24"
             android:viewportHeight="24">
             <group android:name="moonGroup">
-                <path
-                    android:name="moon"
-                    android:fillColor="#FFF59D"
-                    android:pathData="M14.5,3.2 C15.5,3.2 16.4,3.5 17.2,4 C13.9,4.6 11.4,7.5 11.4,11 C11.4,14.5 13.9,17.4 17.2,18 C16.4,18.5 15.5,18.8 14.5,18.8 C10.4,18.8 7,15.4 7,11 C7,6.6 10.4,3.2 14.5,3.2 Z" />
+                <group android:name="moonPathGroup">
+                    <path
+                        android:name="moon"
+                        android:fillColor="#FFF59D"
+                        android:pathData="M14.5,3.2 C15.5,3.2 16.4,3.5 17.2,4 C13.9,4.6 11.4,7.5 11.4,11 C11.4,14.5 13.9,17.4 17.2,18 C16.4,18.5 15.5,18.8 14.5,18.8 C10.4,18.8 7,15.4 7,11 C7,6.6 10.4,3.2 14.5,3.2 Z" />
+                </group>
                 <path
                     android:name="star1"
                     android:fillColor="#FFF59D"
@@ -22,7 +24,7 @@
             </group>
         </vector>
     </aapt:attr>
-    <target android:name="moon">
+    <target android:name="moonPathGroup">
         <aapt:attr name="android:animation">
             <objectAnimator
                 android:propertyName="translateY"

@@ -39,6 +39,9 @@ class TempRangeBar @JvmOverloads constructor(
         color = Color.WHITE
     }
 
+    private var shaderStartX = -1f
+    private var shaderEndX = -1f
+
     fun update(
         valueMin: Double,
         valueMax: Double,
@@ -51,6 +54,8 @@ class TempRangeBar @JvmOverloads constructor(
         this.weekMin = weekMin
         this.weekMax = weekMax
         this.currentTemp = currentTemp
+        shaderStartX = -1f
+        shaderEndX = -1f
         invalidate()
     }
 
@@ -73,10 +78,14 @@ class TempRangeBar @JvmOverloads constructor(
 
         val startX = startFraction * w
         val endX = endFraction * w
-        barPaint.shader = LinearGradient(
-            startX, 0f, endX, 0f,
-            colorFor(valueMin), colorFor(valueMax), Shader.TileMode.CLAMP
-        )
+        if (shaderStartX != startX || shaderEndX != endX) {
+            shaderStartX = startX
+            shaderEndX = endX
+            barPaint.shader = LinearGradient(
+                startX, 0f, endX, 0f,
+                colorFor(valueMin), colorFor(valueMax), Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawRoundRect(startX, top, endX, bottom, radius, radius, barPaint)
 
         currentTemp?.let { temp ->
