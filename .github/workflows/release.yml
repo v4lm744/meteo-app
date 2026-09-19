@@ -52,6 +52,16 @@ jobs:
       - name: Build release APK (signed with the shared key)
         run: ./gradlew assembleRelease --stacktrace
 
+      - name: Verify APK is signed
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk)
+          if grep -q "APK Sig Block 42" "$APK"; then
+            echo "APK signé : $APK"
+          else
+            echo "::error::L'APK $APK n'est pas signé — Android refusera son installation."
+            exit 1
+          fi
+
       - name: Rename APK to include version tag
         run: |
           TAG=${GITHUB_REF_NAME}

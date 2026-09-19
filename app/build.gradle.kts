@@ -12,8 +12,8 @@ android {
         applicationId = "com.meteoapp"
         minSdk = 26
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.6"
+        versionCode = 8
+        versionName = "1.6.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -45,6 +45,8 @@ android {
             isMinifyEnabled = false
             if (debugKeystorePath != null) {
                 signingConfig = signingConfigs.getByName("sharedDebug")
+            } else {
+                signingConfig = signingConfigs.getByName("debug")
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

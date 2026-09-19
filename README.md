@@ -119,6 +119,12 @@ requise, avec perte de la clé API et des préférences). Dès que le secret est
 ajouté, les releases repassent automatiquement sur la clé partagée, sans
 aucune modification du workflow.
 
+> ⚠️ Les APK des releases v1.4 à v1.6 ont été publiés **non signés** (repli
+de signature manquant dans le build de release) : Android refusait leur
+installation. Corrigé en v1.6.1 : le buildType `release` retombe désormais
+sur la clé debug du runner tant que `DEBUG_KEYSTORE_BASE64` n'est pas
+défini, et le workflow vérifie que l'APK publié est bien signé.
+
 Les installations antérieures à la première release signée avec la clé
 partagée devront être réinstallées une dernière fois.
 
