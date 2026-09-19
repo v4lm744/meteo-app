@@ -35,6 +35,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Restore shared signing key (if configured)
+        run: |
+          if [ -n "$DEBUG_KEYSTORE_BASE64" ]; then
+            echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > shared-debug.keystore
+            echo "DEBUG_KEYSTORE_PATH=$PWD/shared-debug.keystore" >> "$GITHUB_ENV"
+          fi
+        env:
+          DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 

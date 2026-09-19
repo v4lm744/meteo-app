@@ -62,6 +62,37 @@ l'application sur un émulateur ou un appareil (API 26 minimum).
 ./gradlew assembleDebug
 ```
 
+## Signature des APK (mises à jour sans désinstallation)
+
+Android refuse d'installer un APK signé avec une clé différente de celle de
+l'application déjà installée. Les APK publiés dans les GitHub Releases doivent
+don tous être signés avec la **même** clé, sinon la mise à jour échoue avec
+« une erreur est survenue » et il faut désinstaller puis réinstaller (en
+perdant la clé API et les préférences).
+
+Pour garantir une signature constante, le workflow `release.yml` signe les
+APK avec un keystore versionné dans le secret GitHub
+`DEBUG_KEYSTORE_BASE64` (keystore en base64, mot de passe « android »,
+alias « androiddebugkey », mot de passe de clé « android »). Ce keystore est
+généré une seule fois avec :
+
+```bash
+keytool -genkeypair -v \
+  -keystore shared-debug.keystore \
+  -storepass android -keypass android \
+  -alias androiddebugkey -dname "CN=Android Debug,O=Android,C=US" \
+  -keyalg RSA -keysize 2048 -validity 10000
+
+base64 -w0 shared-debug.keystore
+```
+
+Puis la valeur base64 est enregistrée dans le secret
+`DEBUG_KEYSTORE_BASE64` du dépôt (Settings → Secrets and variables →
+Actions). **Ce keystore ne doit plus jamais changer** : chaque APK de release
+signé avec une clé différente empêchera la mise à jour des installations
+existantes. Sans le secret, le build retombe sur la clé debug locale (non
+reproductible, à éviter pour les releases).
+
 ## Architecture
 
 - `data/` : modèles, API Retrofit, repository
