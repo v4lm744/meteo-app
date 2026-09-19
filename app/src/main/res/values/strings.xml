@@ -10,7 +10,10 @@
     <string name="settings_sync_title">Synchronisation automatique des widgets</string>
     <string name="settings_sync_interval_label">Fréquence de mise à jour</string>
     <string name="settings_sync_disabled">Désactivée</string>
-    <string name="settings_sync_minutes">Toutes les %1$d minutes</string>
+    <plurals name="settings_sync_minutes">
+        <item quantity="one">Toutes les %1$d minute</item>
+        <item quantity="other">Toutes les %1$d minutes</item>
+    </plurals>
     <string name="settings_sync_hourly">Toutes les heures</string>
     <string name="settings_sync_3h">Toutes les 3 heures</string>
     <string name="settings_sync_hint">Les widgets d\'accueil affichent une météo plus récente grâce à une mise à jour régulière en arrière-plan, même quand l\'application est fermée.</string>
@@ -35,7 +38,6 @@
     <string name="hint_api_key">Clé API OpenWeatherMap</string>
     <string name="api_key_hint">Clé stockée sur l’appareil. Obtenez une clé gratuite sur openweathermap.org.</string>
     <string name="hint_city">Saisissez une ville…</string>
-    <string name="current_weather">Aujourd\'hui</string>
     <string name="hourly_forecast">Prévisions par heure</string>
     <string name="daily_forecast">Prévisions sur 7 jours</string>
     <string name="region_map">Météo de la région</string>
@@ -48,15 +50,12 @@
     <string name="sunset">Coucher du soleil</string>
     <string name="error_no_api_key">Clé API OpenWeather non configurée. Renseignez-la via le menu « Clé API ».</string>
     <string name="error_generic">Une erreur est survenue. Vérifiez votre connexion.</string>
-    <string name="error_city_not_found">Ville introuvable.</string>
     <string name="permission_required">Autorisation de localisation requise.</string>
     <string name="loading">Chargement…</string>
     <string name="retry">Réessayer</string>
     <string name="hpa">%1$d hPa</string>
-    <string name="percent">%1$d %%</string>
     <string name="widget_configure_prompt">Choisissez une ville</string>
     <string name="widget_title">Météo</string>
-    <string name="widget_confirm">Valider</string>
     <string name="temperatures">Températures</string>
     <string name="morning">Matin</string>
     <string name="day_label">Jour</string>
@@ -129,4 +128,6 @@
     <string name="settings_unit_precision_decimal">1 décimale (16,8°, 35,9 km/h)</string>
     <string name="feels_like_value">Ressenti %1$s</string>
     <string name="min_max_format">Max %1$s  Min %2$s</string>
+    <string name="format_percent">%1$d %%</string>
+    <string name="format_wind">%1$s %2$s</string>
 </resources>

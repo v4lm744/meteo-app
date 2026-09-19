@@ -2,6 +2,7 @@ package com.meteoapp.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.DailyData
 import com.meteoapp.databinding.ActivityDayDetailBinding
@@ -68,12 +69,15 @@ class DayDetailActivity : AppCompatActivity() {
         binding.nightTemp.text = WeatherUtils.formatTemp(this, day.nightTemp)
         binding.feelsLike.text = WeatherUtils.formatTemp(this, day.feelsLikeDay)
 
-        binding.humidityValue.text = "${day.humidity} %"
-        binding.windValue.text =
-            "${WeatherUtils.formatWindSpeed(this, day.windSpeed)} ${WeatherUtils.windDirection(day.windDeg)}"
+        binding.humidityValue.text = getString(R.string.format_percent, day.humidity)
+        binding.windValue.text = getString(
+            R.string.format_wind,
+            WeatherUtils.formatWindSpeed(this, day.windSpeed),
+            WeatherUtils.windDirection(day.windDeg)
+        )
         binding.pressureValue.text = WeatherUtils.formatPressure(this, day.pressure)
         val pop = day.pop ?: 0.0
-        binding.popValue.text = "${(pop * 100).toInt()} %"
+        binding.popValue.text = getString(R.string.format_percent, (pop * 100).toInt())
 
         applyDynamicBackground(day)
     }

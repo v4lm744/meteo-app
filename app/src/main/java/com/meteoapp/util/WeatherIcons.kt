@@ -2,8 +2,8 @@ package com.meteoapp.util
 
 import android.content.Context
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import com.meteoapp.R
 
 /**
  * Icônes météo vectorielles animées maison, en remplacement des PNG
@@ -14,7 +14,7 @@ import android.widget.ImageView
  */
 object WeatherIcons {
 
-    private const val FALLBACK_ICON = "ic_wx_partly"
+    private val FALLBACK_ICON_RES = R.drawable.ic_wx_partly
 
     /**
      * Retourne l'identifiant du drawable animé correspondant au code
@@ -23,13 +23,20 @@ object WeatherIcons {
      * partielle (nuages), jamais sur un `getIdentifier(null)` qui planterait.
      */
     fun forCondition(context: Context, code: Long, isDay: Boolean): Int {
-        val name = nameFor(code, isDay) ?: FALLBACK_ICON
-        val id = context.resources.getIdentifier(name, "drawable", context.packageName)
-        return if (id != 0) id else fallbackId(context)
+        return nameFor(code, isDay) ?: FALLBACK_ICON_RES
     }
 
-    private fun fallbackId(context: Context): Int {
-        return context.resources.getIdentifier(FALLBACK_ICON, "drawable", context.packageName)
+    private fun iconResFor(code: Long, isDay: Boolean): Int? = when (code) {
+        in 200..232 -> R.drawable.ic_wx_storm
+        in 300..321 -> R.drawable.ic_wx_rain
+        in 500..501 -> R.drawable.ic_wx_rain
+        in 502..531 -> R.drawable.ic_wx_rain
+        in 600..622 -> R.drawable.ic_wx_snow
+        in 701..781 -> R.drawable.ic_wx_haze
+        800L -> if (isDay) R.drawable.ic_wx_sun else R.drawable.ic_wx_night
+        801L -> if (isDay) R.drawable.ic_wx_partly else R.drawable.ic_wx_night
+        in 802..804 -> R.drawable.ic_wx_partly
+        else -> null
     }
 
     /**
@@ -45,11 +52,10 @@ object WeatherIcons {
     }
 
     /**
-     * Nom de ressource drawable dérivé du code icône OpenWeather
-     * (ex. « 10d », « 02n ») : le préfixe numérique identifie le groupe
-     * de conditions, le suffixe `d`/`n` le jour ou la nuit.
+     * Identifiant du drawable animé pour un code icône OpenWeather
+     * (ex. « 10d », « 02n »), ou `null` si inconnu.
      */
-    fun forIconCode(iconCode: String, isDayOverride: Boolean? = null): String? {
+    fun forIconCode(iconCode: String, isDayOverride: Boolean? = null): Int? {
         if (iconCode.length < 2) return null
         val isDay = isDayOverride ?: iconCode.endsWith("d")
         val group = iconCode.substring(0, 2).toIntOrNull() ?: return null
@@ -57,19 +63,8 @@ object WeatherIcons {
     }
 
     /**
-     * Nom de ressource drawable pour un code condition et jour/nuit, ou
-     * `null` si inconnu (l'appelant garde alors son icône précédente).
+     * Icône drawable pour un code condition et jour/nuit, ou `null` si
+     * inconnu (l'appelant garde alors son icône précédente).
      */
-    fun nameFor(code: Long, isDay: Boolean): String? = when (code) {
-        in 200..232 -> "ic_wx_storm"
-        in 300..321 -> "ic_wx_rain"
-        in 500..501 -> "ic_wx_rain"
-        in 502..531 -> "ic_wx_rain"
-        in 600..622 -> "ic_wx_snow"
-        in 701..781 -> "ic_wx_haze"
-        800L -> if (isDay) "ic_wx_sun" else "ic_wx_night"
-        801L -> if (isDay) "ic_wx_partly" else "ic_wx_night"
-        in 802..804 -> "ic_wx_partly"
-        else -> null
-    }
+    fun nameFor(code: Long, isDay: Boolean): Int? = iconResFor(code, isDay)
 }

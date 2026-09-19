@@ -73,9 +73,8 @@ class DashboardRenderingTest {
             600L, 622L, 701L, 781L, 800L, 801L, 802L, 804L
         )
         for (code in known) {
-            val name = WeatherIcons.nameFor(code, isDay = true)
-            val id = context.resources.getIdentifier(name, "drawable", context.packageName)
-            check(id != 0) { "Icône manquante pour le code $code : $name" }
+            val id = WeatherIcons.forCondition(context, code, isDay = true)
+            check(id != 0) { "Icône manquante pour le code $code" }
         }
     }
 

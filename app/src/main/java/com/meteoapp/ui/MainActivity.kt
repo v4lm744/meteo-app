@@ -267,8 +267,12 @@ class MainActivity : AppCompatActivity() {
             binding.minMax.text = ""
         }
 
-        binding.humidityValue.text = "${current.humidity} %"
-        binding.windValue.text = "${WeatherUtils.formatWindSpeed(this, current.windSpeed)} ${WeatherUtils.windDirection(current.windDeg)}"
+        binding.humidityValue.text = getString(R.string.format_percent, current.humidity)
+        binding.windValue.text = getString(
+            R.string.format_wind,
+            WeatherUtils.formatWindSpeed(this, current.windSpeed),
+            WeatherUtils.windDirection(current.windDeg)
+        )
         binding.pressureValue.text = WeatherUtils.formatPressure(this, current.pressure)
         binding.visibilityValue.text = WeatherUtils.formatVisibility(this, current.visibility)
 

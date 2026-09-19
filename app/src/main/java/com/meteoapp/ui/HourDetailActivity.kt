@@ -55,13 +55,16 @@ class HourDetailActivity : AppCompatActivity() {
             WeatherIcons.bind(binding.hourIcon, cond.id, isDay = !cond.icon.endsWith("n"))
         }
         binding.feelsLikeValue.text = WeatherUtils.formatTemp(this, hour.feelsLike)
-        binding.humidityValue.text = "${hour.humidity} %"
-        binding.windValue.text =
-            "${WeatherUtils.formatWindSpeed(this, hour.windSpeed)} ${WeatherUtils.windDirection(hour.windDeg)}"
+        binding.humidityValue.text = getString(R.string.format_percent, hour.humidity)
+        binding.windValue.text = getString(
+            R.string.format_wind,
+            WeatherUtils.formatWindSpeed(this, hour.windSpeed),
+            WeatherUtils.windDirection(hour.windDeg)
+        )
         binding.pressureValue.text = WeatherUtils.formatPressure(this, hour.pressure)
         val pop = hour.pop ?: 0.0
-        binding.popValue.text = "${(pop * 100).toInt()} %"
-        binding.cloudinessValue.text = "${hour.cloudiness} %"
+        binding.popValue.text = getString(R.string.format_percent, (pop * 100).toInt())
+        binding.cloudinessValue.text = getString(R.string.format_percent, hour.cloudiness)
         val precip = hour.rainVolume + hour.snowVolume
         binding.precipValue.text = getString(R.string.mm, precip)
         applyDynamicBackground(hour)

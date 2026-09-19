@@ -156,7 +156,8 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/ic_humidity" />
+                                android:src="@drawable/ic_humidity"
+                                android:contentDescription="@null" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -189,7 +190,8 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/ic_wind" />
+                                android:src="@drawable/ic_wind"
+                                android:contentDescription="@null" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -222,7 +224,8 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/ic_pressure" />
+                                android:src="@drawable/ic_pressure"
+                                android:contentDescription="@null" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -255,7 +258,8 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/ic_weather_placeholder" />
+                                android:src="@drawable/ic_weather_placeholder"
+                                android:contentDescription="@null" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -288,7 +292,8 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/ic_sunrise" />
+                                android:src="@drawable/ic_sunrise"
+                                android:contentDescription="@null" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -321,7 +326,8 @@
                             <ImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
-                                android:src="@drawable/ic_sunset" />
+                                android:src="@drawable/ic_sunset"
+                                android:contentDescription="@null" />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -384,7 +390,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:baselineAligned="false">
 
                             <LinearLayout
                                 android:layout_width="0dp"

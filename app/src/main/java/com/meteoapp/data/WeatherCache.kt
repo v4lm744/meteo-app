@@ -47,5 +47,5 @@ class WeatherCache(context: Context) {
         "weather_${round(lat)}_${round(lon)}.json"
 
     private fun round(value: Double): String =
-        String.format("%.2f", value)
+        String.format(java.util.Locale.US, "%.2f", value)
 }
