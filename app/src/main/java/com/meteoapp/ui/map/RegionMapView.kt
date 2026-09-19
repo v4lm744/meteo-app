@@ -106,13 +106,12 @@ class RegionMapView @JvmOverloads constructor(
                     val temp = view.findViewById<android.widget.TextView>(R.id.markerTemp)
                     val name = view.findViewById<android.widget.TextView>(R.id.markerName)
                     if (city.weatherIcon.isNotEmpty()) {
-                        val name = WeatherIcons.forIconCode(city.weatherIcon)
-                        if (name != null) {
-                            val idRes = mapView.context.resources.getIdentifier(
-                                name, "drawable", mapView.context.packageName
+                        val iconRes = WeatherIcons.forIconCode(city.weatherIcon)
+                        if (iconRes != null) {
+                            val drawable = androidx.core.content.ContextCompat.getDrawable(
+                                mapView.context, iconRes
                             )
-                            if (idRes != 0) {
-                                val drawable = mapView.context.getDrawable(idRes)
+                            if (drawable != null) {
                                 icon.setImageDrawable(drawable)
                                 (drawable as? android.graphics.drawable.Animatable)?.start()
                             }

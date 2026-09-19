@@ -163,7 +163,7 @@ class SettingsDialog(
         SyncPrefs.SYNC_DISABLED -> getString(R.string.settings_sync_disabled)
         60 -> getString(R.string.settings_sync_hourly)
         180 -> getString(R.string.settings_sync_3h)
-        else -> getString(R.string.settings_sync_minutes, minutes)
+        else -> resources.getQuantityString(R.plurals.settings_sync_minutes, minutes, minutes)
     }
 
     private fun tempLabelFor(unit: UnitPrefs.TempUnit): Int = when (unit) {

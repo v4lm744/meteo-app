@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.meteoapp.data.model.HourlyData
+import com.meteoapp.R
 import com.meteoapp.databinding.ItemHourlyBinding
 import com.meteoapp.util.WeatherUtils
 import com.meteoapp.util.WeatherIcons
@@ -45,7 +46,7 @@ class HourlyAdapter(
             val pop = item.pop ?: 0.0
             if (pop >= 0.05) {
                 hourPop.visibility = android.view.View.VISIBLE
-                hourPop.text = "${(pop * 100).toInt()}%"
+                hourPop.text = context.getString(R.string.format_percent, (pop * 100).toInt())
             } else {
                 hourPop.visibility = android.view.View.GONE
             }

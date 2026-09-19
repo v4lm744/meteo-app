@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.meteoapp.data.model.DailyData
+import com.meteoapp.R
 import com.meteoapp.databinding.ItemDailyBinding
 import com.meteoapp.util.WeatherUtils
 import com.meteoapp.util.WeatherIcons
@@ -45,7 +46,7 @@ class DailyAdapter(
             val pop = item.pop ?: 0.0
             if (pop >= 0.05) {
                 dayPop.visibility = android.view.View.VISIBLE
-                dayPop.text = "${(pop * 100).toInt()}%"
+                dayPop.text = context.getString(R.string.format_percent, (pop * 100).toInt())
             } else {
                 dayPop.visibility = android.view.View.GONE
             }
