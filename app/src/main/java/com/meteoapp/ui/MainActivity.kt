@@ -275,6 +275,17 @@ class MainActivity : AppCompatActivity() {
         current.sunrise?.let { binding.sunriseValue.text = WeatherUtils.formatTime(this, it, weather.timezoneOffset) }
         current.sunset?.let { binding.sunsetValue.text = WeatherUtils.formatTime(this, it, weather.timezoneOffset) }
 
+        val sunrise = current.sunrise
+        val sunset = current.sunset
+        if (sunrise != null && sunset != null) {
+            binding.arcSunriseValue.text = WeatherUtils.formatTime(this, sunrise, weather.timezoneOffset)
+            binding.arcSunsetValue.text = WeatherUtils.formatTime(this, sunset, weather.timezoneOffset)
+            binding.sunArcView.setSunTimes(sunrise, sunset, current.dt)
+            binding.sunArcCard.visibility = View.VISIBLE
+        } else {
+            binding.sunArcCard.visibility = View.GONE
+        }
+
         // Hourly : 24 prochaines heures
         binding.hourlyRecycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -284,7 +295,7 @@ class MainActivity : AppCompatActivity() {
 
         // Daily : 7 jours
         binding.dailyRecycler.layoutManager = LinearLayoutManager(this)
-        binding.dailyRecycler.adapter = DailyAdapter(this, weather.daily.take(7)) { day ->
+        binding.dailyRecycler.adapter = DailyAdapter(this, weather.daily.take(7), current.temp) { day ->
             openDayDetail(day)
         }
 
@@ -299,6 +310,7 @@ class MainActivity : AppCompatActivity() {
         EntranceAnimator.cascade(
             binding.headerLayout,
             binding.detailsCard,
+            binding.sunArcCard,
             binding.regionMapTitle,
             binding.regionMapCard,
             binding.hourlyTitle,
@@ -316,6 +328,7 @@ class MainActivity : AppCompatActivity() {
         )
         binding.root.background = drawable
         window.statusBarColor = grad.top
+        binding.swipeRefresh.setColorSchemeColors(grad.top)
         tintToolbarIcons(grad.top)
     }
 
@@ -341,10 +354,12 @@ class MainActivity : AppCompatActivity() {
         binding.errorText.text = message
         binding.loadingBar.visibility = View.GONE
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
+        binding.swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.md_blue_sky))
         tintToolbarIcons(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
         binding.cacheBanner.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
+        binding.sunArcCard.visibility = View.GONE
         binding.regionMapTitle.visibility = View.GONE
         binding.regionMapCard.visibility = View.GONE
         binding.hourlyTitle.visibility = View.GONE

@@ -68,6 +68,13 @@
             android:textSize="15sp"
             tools:text="12°" />
 
+        <com.meteoapp.ui.widget.TempRangeBar
+            android:id="@+id/dayTempBar"
+            android:layout_width="0dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1" />
+
         <TextView
             android:id="@+id/dayMax"
             android:layout_width="wrap_content"

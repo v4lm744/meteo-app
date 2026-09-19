@@ -39,6 +39,7 @@
     <string name="hourly_forecast">Prévisions par heure</string>
     <string name="daily_forecast">Prévisions sur 7 jours</string>
     <string name="region_map">Météo de la région</string>
+    <string name="sun_arc_title">Course du soleil</string>
     <string name="feels_like">Ressenti</string>
     <string name="humidity">Humidité</string>
     <string name="wind">Vent</string>

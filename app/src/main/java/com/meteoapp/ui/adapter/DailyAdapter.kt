@@ -12,6 +12,7 @@ import com.meteoapp.util.WeatherIcons
 class DailyAdapter(
     private val context: Context,
     private val items: List<DailyData>,
+    private val currentTemp: Double? = null,
     private val onItemClick: (DailyData) -> Unit = {}
 ) : RecyclerView.Adapter<DailyAdapter.ViewHolder>() {
 
@@ -48,8 +49,19 @@ class DailyAdapter(
             } else {
                 dayPop.visibility = android.view.View.GONE
             }
+            val isToday = WeatherUtils.isToday(item.dt, item.timezoneOffset)
+            dayTempBar.update(
+                valueMin = item.tempMin,
+                valueMax = item.tempMax,
+                weekMin = weekMin,
+                weekMax = weekMax,
+                currentTemp = if (isToday) currentTemp else null
+            )
         }
     }
 
     override fun getItemCount(): Int = items.size
+
+    private val weekMin: Double = items.minOfOrNull { it.tempMin } ?: 0.0
+    private val weekMax: Double = items.maxOfOrNull { it.tempMax } ?: 1.0
 }
