@@ -2,11 +2,11 @@ package com.meteoapp.ui
 
 import android.app.Dialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.meteoapp.databinding.DialogTutorialBinding
+import androidx.core.net.toUri
 
 @Suppress("unused")
 class TutorialDialog : DialogFragment() {
@@ -29,7 +29,7 @@ class TutorialDialog : DialogFragment() {
 
     private fun openUrl(url: String) {
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
         } catch (_: Exception) {
         }
     }

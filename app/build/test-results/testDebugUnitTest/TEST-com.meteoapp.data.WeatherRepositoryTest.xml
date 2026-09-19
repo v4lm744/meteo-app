@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.meteoapp.data.WeatherRepositoryTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-09-19T19:41:35.342Z" hostname="6d8a292a" time="1.998">
+  <properties/>
+  <testcase name="getWeather_returnsCachedOnNetworkFailureWhenCacheExists" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.833"/>
+  <testcase name="getWeather_returnsSuccessAndMapsCurrentAndDaily" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.423"/>
+  <testcase name="searchCity_returnsResults" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.125"/>
+  <testcase name="searchCity_returnsEmptyForBlankQuery" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.13"/>
+  <testcase name="getWeather_returnsErrorWhenApiKeyMissing" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.091"/>
+  <testcase name="getRegionCities_mapsResponse" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.155"/>
+  <testcase name="getWeather_returnsErrorOnHttp404" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.087"/>
+  <testcase name="isApiKeyConfigured_trueWhenKeySet" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.053"/>
+  <testcase name="getWeather_returnsErrorOnNetworkFailureWithoutCache" classname="com.meteoapp.data.WeatherRepositoryTest" time="0.087"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

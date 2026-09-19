@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import com.meteoapp.R
 import kotlin.math.cos
 import kotlin.math.sin
+import androidx.core.graphics.withScale
 
 /**
  * Écran de lancement animé sur le thème météo : dégradé de ciel, soleil qui se
@@ -218,13 +219,12 @@ class SplashAnimationView @JvmOverloads constructor(
         val alpha = (255 * easeOut(titleP)).toInt().coerceIn(0, 255)
         val scale = 0.85f + 0.15f * easeOut(titleP)
         val cy = h * 0.62f
-        canvas.save()
-        canvas.scale(scale, scale, w * 0.5f, cy)
-        textPaint.color = withAlpha(colorWhite, alpha)
+        canvas.withScale(scale, scale, w * 0.5f, cy) {
+            textPaint.color = withAlpha(colorWhite, alpha)
         canvas.drawText(resources.getString(R.string.app_name), w * 0.5f, cy, textPaint)
         textSubPaint.color = withAlpha(colorWhite, (alpha * 0.7f).toInt().coerceIn(0, 255))
         canvas.drawText(resources.getString(R.string.splash_tagline), w * 0.5f, cy + textPaint.textSize * 0.55f, textSubPaint)
-        canvas.restore()
+        }
     }
 
     private fun easeOut(t: Float): Float {

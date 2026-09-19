@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.meteoapp.data.model.WeatherModelsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-19T19:41:37.343Z" hostname="6d8a292a" time="0.054">
+  <properties/>
+  <testcase name="currentWeatherResponse_parsesFromJson" classname="com.meteoapp.data.model.WeatherModelsTest" time="0.04"/>
+  <testcase name="geoLocation_parsesLocalNames" classname="com.meteoapp.data.model.WeatherModelsTest" time="0.004"/>
+  <testcase name="currentWeatherResponse_handlesNullablesWhenMissing" classname="com.meteoapp.data.model.WeatherModelsTest" time="0.001"/>
+  <testcase name="forecastResponse_parsesListAndCity" classname="com.meteoapp.data.model.WeatherModelsTest" time="0.008"/>
+  <testcase name="dailyData_roundTripsThroughJson" classname="com.meteoapp.data.model.WeatherModelsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -2,6 +2,7 @@ package com.meteoapp.widget
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 /**
  * Stockage persistant de l'intervalle de synchronisation automatique des widgets.
@@ -36,7 +37,7 @@ object SyncPrefs {
         prefs(context).getInt(KEY_INTERVAL_MINUTES, 30)
 
     fun setIntervalMinutes(context: Context, minutes: Int) {
-        prefs(context).edit().putInt(KEY_INTERVAL_MINUTES, minutes).apply()
+        prefs(context).edit { putInt(KEY_INTERVAL_MINUTES, minutes) }
     }
 
     fun isAutoSyncEnabled(context: Context): Boolean =

@@ -2,11 +2,11 @@ package com.meteoapp.ui
 
 import android.app.Dialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.meteoapp.databinding.DialogAboutBinding
+import androidx.core.net.toUri
 
 /**
  * Boîte de dialogue "À propos" : informations légales obligatoires
@@ -37,7 +37,7 @@ class AboutDialog : DialogFragment() {
         }
         binding.aboutContactLink.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:")
+                data = "mailto:".toUri()
                 putExtra(Intent.EXTRA_SUBJECT, getString(com.meteoapp.R.string.app_name))
             }
             try {
@@ -55,7 +55,7 @@ class AboutDialog : DialogFragment() {
 
     private fun openUrl(url: String) {
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
         } catch (_: Exception) {
         }
     }
