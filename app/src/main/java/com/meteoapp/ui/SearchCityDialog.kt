@@ -29,6 +29,7 @@ class SearchCityDialog(
 
     private val repository by lazy { WeatherRepository(requireContext()) }
     private var searchJob: Job? = null
+    private var searchSequence = 0
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogSearchBinding.inflate(layoutInflater)
@@ -71,9 +72,11 @@ class SearchCityDialog(
         }
         binding.searchProgress.visibility = View.VISIBLE
         binding.searchHint.visibility = View.GONE
+        val searchId = ++searchSequence
         lifecycleScope.launch {
             when (val result = repository.searchCity(query)) {
                 is WeatherResult.Success -> {
+                    if (searchId != searchSequence) return@launch
                     binding.searchProgress.visibility = View.GONE
                     val results = result.data.deduplicate()
                     if (results.isEmpty()) {
@@ -88,6 +91,7 @@ class SearchCityDialog(
                     }
                 }
                 is WeatherResult.Error -> {
+                    if (searchId != searchSequence) return@launch
                     binding.searchProgress.visibility = View.GONE
                     binding.searchHint.visibility = View.VISIBLE
                     binding.searchHint.text = result.message

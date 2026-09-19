@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Météo</string>
+    <string name="app_name">Cirrus</string>
+    <string name="app_full_name">Cirrus Skynap</string>
     <string name="action_search">Rechercher une ville</string>
     <string name="action_locate">Ma position</string>
     <string name="action_api_key">Clé API</string>
@@ -55,7 +56,7 @@
     <string name="retry">Réessayer</string>
     <string name="hpa">%1$d hPa</string>
     <string name="widget_configure_prompt">Choisissez une ville</string>
-    <string name="widget_title">Météo</string>
+    <string name="widget_title">Cirrus Skynap</string>
     <string name="temperatures">Températures</string>
     <string name="morning">Matin</string>
     <string name="day_label">Jour</string>
@@ -104,6 +105,7 @@
     <string name="precipitation">Précipitations</string>
     <string name="mm">%.1f mm</string>
     <string name="splash_tagline">Votre météo, où que vous soyez</string>
+    <string name="visibility_unavailable">—</string>
     <string name="settings_units_title">Unités et formats</string>
     <string name="settings_units_hint">Choisissez les unités d\'affichage des mesures. Le changement est appliqué au prochain rafraîchissement de l\'écran.</string>
     <string name="settings_unit_temp">Température</string>
@@ -130,4 +132,5 @@
     <string name="min_max_format">Max %1$s  Min %2$s</string>
     <string name="format_percent">%1$d %%</string>
     <string name="format_wind">%1$s %2$s</string>
+    <string name="about_description">Cirrus Skynap affiche la météo actuelle, les prévisions par heure et sur 7 jours, la course du soleil et la météo des villes voisines sur une carte de la région.</string>
 </resources>

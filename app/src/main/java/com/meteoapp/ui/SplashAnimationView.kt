@@ -101,8 +101,8 @@ class SplashAnimationView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        textPaint.textSize = w * 0.10f
-        textSubPaint.textSize = w * 0.035f
+        textPaint.textSize = (w * 0.10f).coerceAtMost(64f * resources.displayMetrics.density)
+        textSubPaint.textSize = (w * 0.035f).coerceAtMost(22f * resources.displayMetrics.density)
     }
 
     override fun onDraw(canvas: Canvas) {

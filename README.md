@@ -1,7 +1,8 @@
-# Meteo App
+# Cirrus Skynap
 
-Application Android (Kotlin) affichant la météo via l'API OpenWeatherMap,
-avec un design Material Design moderne inspiré de l'application Météo de Google.
+**Cirrus Skynap** (label d'icône : « Cirrus ») — application Android (Kotlin)
+affichant la météo via l'API OpenWeatherMap, avec un design Material Design
+moderne inspiré de l'application Météo de Google.
 
 ## Installation
 

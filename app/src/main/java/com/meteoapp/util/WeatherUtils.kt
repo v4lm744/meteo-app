@@ -159,10 +159,12 @@ object WeatherUtils {
 
     /** Formate une visibilité (fournée en mètres par l'API) selon l'unité de vent. */
     fun formatVisibility(context: Context, visibilityMeters: Long?): String {
-        val meters = visibilityMeters ?: 0L
+        if (visibilityMeters == null) {
+            return context.getString(R.string.visibility_unavailable)
+        }
         return when (UnitPrefs.getWindUnit(context)) {
-            WindUnit.KMH -> context.getString(R.string.km, (meters / 1000).toInt())
-            WindUnit.MPH -> context.getString(R.string.miles, kmToMiles(meters / 1000.0).toInt())
+            WindUnit.KMH -> context.getString(R.string.km, (visibilityMeters / 1000).toInt())
+            WindUnit.MPH -> context.getString(R.string.miles, kmToMiles(visibilityMeters / 1000.0).toInt())
         }
     }
 
