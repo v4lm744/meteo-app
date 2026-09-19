@@ -18,12 +18,34 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val debugStorePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD") ?: "android"
+    val debugKeyAlias = System.getenv("DEBUG_KEY_ALIAS") ?: "androiddebugkey"
+    val debugKeyPassword = System.getenv("DEBUG_KEY_PASSWORD") ?: "android"
+    val debugKeystorePath = System.getenv("DEBUG_KEYSTORE_PATH")
+
+    signingConfigs {
+        create("sharedDebug") {
+            if (debugKeystorePath != null) {
+                storeFile = file(debugKeystorePath)
+                storePassword = debugStorePassword
+                keyAlias = debugKeyAlias
+                keyPassword = debugKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
+            if (debugKeystorePath != null) {
+                signingConfig = signingConfigs.getByName("sharedDebug")
+            }
         }
         release {
             isMinifyEnabled = false
+            if (debugKeystorePath != null) {
+                signingConfig = signingConfigs.getByName("sharedDebug")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
