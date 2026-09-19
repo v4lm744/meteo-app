@@ -95,23 +95,35 @@ class WeatherUtilsTest {
 
     @Test
     fun formatTemp_oneDecimalRoundsToTenth() {
-        UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.ONE_DECIMAL)
-        UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.CELSIUS)
-        assertEquals("16,8°", WeatherUtils.formatTemp(context, 16.76))
-        UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.FAHRENHEIT)
-        assertEquals("62,2°", WeatherUtils.formatTemp(context, 16.78))
-        UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.WHOLE)
-        UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.CELSIUS)
-        assertEquals("17°", WeatherUtils.formatTemp(context, 16.76))
+        val original = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.FRANCE)
+        try {
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.ONE_DECIMAL)
+            UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.CELSIUS)
+            assertEquals("16,8°", WeatherUtils.formatTemp(context, 16.76))
+            UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.FAHRENHEIT)
+            assertEquals("62,2°", WeatherUtils.formatTemp(context, 16.78))
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.WHOLE)
+            UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.CELSIUS)
+            assertEquals("17°", WeatherUtils.formatTemp(context, 16.76))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
     }
 
     @Test
     fun formatWindSpeed_oneDecimal() {
-        UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.ONE_DECIMAL)
-        UnitPrefs.setWindUnit(context, UnitPrefs.WindUnit.KMH)
-        assertEquals("35,9 km/h", WeatherUtils.formatWindSpeed(context, 9.97))
-        UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.WHOLE)
-        assertEquals("36 km/h", WeatherUtils.formatWindSpeed(context, 9.97))
+        val original = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.FRANCE)
+        try {
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.ONE_DECIMAL)
+            UnitPrefs.setWindUnit(context, UnitPrefs.WindUnit.KMH)
+            assertEquals("35,9 km/h", WeatherUtils.formatWindSpeed(context, 9.97))
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.WHOLE)
+            assertEquals("36 km/h", WeatherUtils.formatWindSpeed(context, 9.97))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
     }
 
     @Test
