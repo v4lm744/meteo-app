@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.meteoapp-mergeDebugResources-55:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/home/appuser/.gradle/caches/9.7.1/transforms/70cec34b5499dcf4dbc3f1e44470df13/transformed/appcompat-1.8.0/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}

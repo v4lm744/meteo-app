@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.meteoapp.widget.SyncPrefsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-09-19T19:41:43.216Z" hostname="6d8a292a" time="0.197">
+  <properties/>
+  <testcase name="intervalOptions_areAllAtLeast15Minutes" classname="com.meteoapp.widget.SyncPrefsTest" time="0.051"/>
+  <testcase name="setInterval_persistsValue" classname="com.meteoapp.widget.SyncPrefsTest" time="0.046"/>
+  <testcase name="disabledValue_disablesAutoSync" classname="com.meteoapp.widget.SyncPrefsTest" time="0.05"/>
+  <testcase name="defaultInterval_is30Minutes" classname="com.meteoapp.widget.SyncPrefsTest" time="0.048"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

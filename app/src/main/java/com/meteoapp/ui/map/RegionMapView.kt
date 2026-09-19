@@ -11,7 +11,7 @@ import com.meteoapp.util.WeatherIcons
 import com.meteoapp.util.WeatherUtils
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
+import org.osmdroid.views.MapView as OsmdroidMapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 
@@ -21,7 +21,7 @@ class RegionMapView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val mapView: MapView
+    private val mapView: ClickableMapView
     private val markersHolder = mutableListOf<Marker>()
 
     var onCitySelected: ((RegionCity) -> Unit)? = null
@@ -94,7 +94,7 @@ class RegionMapView @JvmOverloads constructor(
     }
 
     private class WeatherMarker(
-        private val mapView: MapView,
+        private val mapView: OsmdroidMapView,
         private val city: RegionCity,
         private val onSelect: (RegionCity) -> Unit
     ) : Marker(mapView) {
@@ -131,5 +131,16 @@ class RegionMapView @JvmOverloads constructor(
                 true
             }
         }
+    }
+}
+
+class ClickableMapView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : OsmdroidMapView(context, attrs) {
+
+    override fun performClick(): Boolean {
+        super.performClick()
+        return true
     }
 }
