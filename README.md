@@ -1,7 +1,7 @@
 # Meteo App
 
 Application Android (Kotlin) affichant la météo via l'API OpenWeatherMap,
-avec un design Material Design moderne inspiré de l'application Météo France.
+avec un design Material Design moderne inspiré de l'application Météo de Google.
 
 ## Installation
 
@@ -13,7 +13,13 @@ votre appareil (autorisez « Installer des applications inconnues » si demandé
 
 - Météo actuelle (température, ressenti, min/max, description)
 - Prévisions par heure (24 h)
-- Prévisions sur 7 jours
+- Prévisions sur 7 jours avec **barres de plage de température** : chaque jour
+  affiche une barre en dégradé (bleu froid → doré → rouge chaud) située entre le
+  min et le max de la semaine, avec un point blanc marquant la température
+  actuelle sur la ligne du jour
+- **Arc solaire** : carte « Course du soleil » montrant la progression de la
+  journée entre lever et coucher (balayage animé, soleil positionné à l'heure
+  actuelle, heures de lever/coucher affichées)
 - **Minimap de la région** de la ville sélectionnée (osmdroid / OpenStreetMap) avec
   les principales villes voisines, leur icône météo et leur température ;
   tap sur une ville voisine charge sa météo, et le pull-to-refresh rafraîchit les marqueurs
@@ -32,8 +38,11 @@ votre appareil (autorisez « Installer des applications inconnues » si demandé
   (24 h ou 12 h AM/PM) et précision des valeurs (entier ou 1 décimale).
   Les choix sont persistés et appliqués immédiatement sur tous les écrans
   et les widgets.
-- Rafraîchissement par « pull-to-refresh »
+- Rafraîchissement par « pull-to-refresh » (indicateur teinté à la couleur
+  dynamique du fond)
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
+- **Design Google Météo** : icônes météo vectorielles animées (soleil, pluie, neige,
+  orage, brume, nuit…), cartes en verre dépoli, animations d'entrée en cascade
 - **Fond dynamique de l'app** : dégradé vertical en haut selon la météo et l'heure
   (jour/nuit, soleil, nuages, pluie, neige…), se fondant vers le bleu de l'app
   à mesure qu'on descend
