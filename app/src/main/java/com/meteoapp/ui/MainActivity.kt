@@ -19,6 +19,8 @@ import com.meteoapp.databinding.ActivityMainBinding
 import com.meteoapp.ui.adapter.DailyAdapter
 import com.meteoapp.ui.adapter.HourlyAdapter
 import com.meteoapp.util.WeatherUtils
+import com.meteoapp.util.EntranceAnimator
+import com.meteoapp.util.WeatherIcons
 
 class MainActivity : AppCompatActivity() {
 
@@ -243,6 +245,13 @@ class MainActivity : AppCompatActivity() {
 
         val current = weather.current
         binding.temperature.text = WeatherUtils.formatTemp(this, current.temp)
+        current.weather.firstOrNull()?.let { cond ->
+            WeatherIcons.bind(
+                binding.heroIcon,
+                cond.id,
+                isDay = !cond.icon.endsWith("n")
+            )
+        }
         binding.weatherDescription.text =
             current.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
         binding.feelsLike.text = getString(R.string.feels_like_value, WeatherUtils.formatTemp(this, current.feelsLike))
@@ -287,6 +296,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         applyDynamicBackground(weather)
+        EntranceAnimator.cascade(
+            binding.headerLayout,
+            binding.detailsCard,
+            binding.regionMapTitle,
+            binding.regionMapCard,
+            binding.hourlyTitle,
+            binding.hourlyRecycler,
+            binding.dailyTitle,
+            binding.dailyRecycler
+        )
     }
 
     private fun applyDynamicBackground(weather: WeatherData) {

@@ -2,12 +2,12 @@ package com.meteoapp.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.DailyData
 import com.meteoapp.databinding.ActivityDayDetailBinding
 import com.meteoapp.util.WeatherColors
 import com.meteoapp.util.WeatherUtils
+import com.meteoapp.util.WeatherIcons
 
 class DayDetailActivity : AppCompatActivity() {
 
@@ -58,11 +58,8 @@ class DayDetailActivity : AppCompatActivity() {
         binding.dayDescription.text =
             day.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
 
-        val iconCode = day.weather.firstOrNull()?.icon
-        if (!iconCode.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(WeatherUtils.iconUrl(iconCode))
-                .into(binding.dayIcon)
+        day.weather.firstOrNull()?.let { cond ->
+            WeatherIcons.bind(binding.dayIcon, cond.id, isDay = true)
         }
 
         binding.morningTemp.text = WeatherUtils.formatTemp(this, day.morningTemp)
