@@ -178,7 +178,8 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_settings -> {
-                SettingsDialog().show(supportFragmentManager, "settings")
+                SettingsDialog { rerenderCurrentState() }
+                    .show(supportFragmentManager, "settings")
                 true
             }
             R.id.action_tutorial -> {
@@ -191,6 +192,10 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun rerenderCurrentState() {
+        viewModel.state.value?.let { render(it) }
     }
 
     private fun render(state: UiState) {

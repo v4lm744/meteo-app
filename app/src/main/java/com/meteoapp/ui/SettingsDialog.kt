@@ -18,7 +18,9 @@ import com.meteoapp.widget.WidgetSyncScheduler
  * d'accueil. Les choix sont persistés dans [UnitPrefs] et [SyncPrefs] ; le
  * travail périodique est (re)planifié immédiatement via [WidgetSyncScheduler].
  */
-class SettingsDialog : DialogFragment() {
+class SettingsDialog(
+    private val onSettingsApplied: () -> Unit = {}
+) : DialogFragment() {
 
     private var _binding: DialogSettingsBinding? = null
     private val binding get() = _binding!!
@@ -53,6 +55,7 @@ class SettingsDialog : DialogFragment() {
                 UnitPrefs.setTimeFormat(context, selectedTimeFormat)
                 SyncPrefs.setIntervalMinutes(context, selectedMinutes)
                 WidgetSyncScheduler.schedule(context, selectedMinutes)
+                onSettingsApplied()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()
