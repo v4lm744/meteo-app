@@ -26,13 +26,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Restore shared signing key
+      - name: Restore shared signing key (if configured)
         run: |
           if [ -z "${DEBUG_KEYSTORE_BASE64:-}" ]; then
-            echo "::error::Le secret DEBUG_KEYSTORE_BASE64 est vide ou absent. "
-            echo "::error::Générez un keystore (commande keytool dans le README) et "
-            echo "::error::enregistrez son contenu base64 dans le secret DEBUG_KEYSTORE_BASE64."
-            exit 1
+            echo "Secret DEBUG_KEYSTORE_BASE64 absent : signature avec la clé debug"
+            echo "générée par le runner (mise à jour impossible par-dessus une install"
+            echo "existante — voir README « Signature des APK »)."
+            exit 0
           fi
           echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > shared-debug.keystore
           # Convertit le keystore en JKS : les PKCS12 générés par les keytool
