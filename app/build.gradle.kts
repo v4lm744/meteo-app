@@ -1,17 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.meteoapp"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.meteoapp"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 9
         versionName = "1.6.2"
 
@@ -60,9 +59,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 
     buildFeatures {
         viewBinding = true

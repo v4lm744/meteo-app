@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Exceptions lint justifiees :
+    - CustomSplashScreen : le splash meteo anime est une fonctionnalite
+      assumee (SplashAnimationView), pas un simple lanceur.
+    - UseCompoundDrawables : l'icone hero du tableau de bord est un
+      AnimatedVectorDrawable charge par code ; un compound drawable
+      ne peut pas porter l'animation.
+    - VectorPath : icone d'engrenage detaillee, rendue une seule fois
+      (menu), l'impact est negligeable.
+-->
+<lint>
+    <issue id="CustomSplashScreen" severity="ignore" />
+    <issue id="UseCompoundDrawables">
+        <ignore path="res/layout/activity_main.xml" />
+    </issue>
+    <issue id="VectorPath">
+        <ignore path="res/drawable/ic_settings.xml" />
+    </issue>
+</lint>

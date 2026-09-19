@@ -1,0 +1,8 @@
+com.meteoapp-pngs-0 /workspace/github__v4lm744__meteo-app/app/build/generated/res/pngs/debug
+com.meteoapp-updated_navigation_xml-1 /workspace/github__v4lm744__meteo-app/app/build/generated/updated_navigation_xml/debug
+com.meteoapp-packageDebugResources-2 /workspace/github__v4lm744__meteo-app/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.meteoapp-packageDebugResources-3 /workspace/github__v4lm744__meteo-app/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.meteoapp-debug-4 /workspace/github__v4lm744__meteo-app/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.meteoapp-debug-5 /workspace/github__v4lm744__meteo-app/app/src/debug/res
+com.meteoapp-main-6 /workspace/github__v4lm744__meteo-app/app/src/main/res
+gradleHome-0 /home/appuser/.gradle

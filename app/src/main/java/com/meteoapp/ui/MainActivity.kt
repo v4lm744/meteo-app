@@ -21,6 +21,7 @@ import com.meteoapp.ui.adapter.HourlyAdapter
 import com.meteoapp.util.WeatherUtils
 import com.meteoapp.util.EntranceAnimator
 import com.meteoapp.util.WeatherIcons
+import androidx.core.view.iterator
 
 class MainActivity : AppCompatActivity() {
 
@@ -149,8 +150,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val tint = toolbarTint
-        for (i in 0 until menu.size()) {
-            menu.getItem(i).icon?.mutate()?.setTint(tint)
+        for (item in menu) {
+            item.icon?.mutate()?.setTint(tint)
         }
         return super.onPrepareOptionsMenu(menu)
     }

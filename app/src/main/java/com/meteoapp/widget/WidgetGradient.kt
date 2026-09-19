@@ -10,6 +10,7 @@ import android.graphics.RectF
 import android.graphics.Shader
 import com.meteoapp.data.model.WeatherData
 import com.meteoapp.util.WeatherColors
+import androidx.core.graphics.createBitmap
 
 /**
  * Génère le dégradé de fond du widget en fonction de la météo et de l'heure.
@@ -26,7 +27,7 @@ object WidgetGradient {
         val start = WeatherColors.topColor(weather)
         val end = widgetEndColor(code, isDay)
 
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val paint = Paint().apply {
             isAntiAlias = true

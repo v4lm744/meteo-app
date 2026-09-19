@@ -1,0 +1,62 @@
+[
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/dialog_tutorial.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/dialog_tutorial.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/activity_hour_detail.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/activity_hour_detail.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/view_region_map.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/view_region_map.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/item_hourly.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/item_hourly.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/dialog_about.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/dialog_about.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/dialog_search.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/dialog_search.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/activity_main.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/item_daily.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/item_daily.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/widget_weather.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/widget_weather.xml"
+    },
+    {
+        "merged": "com.meteoapp-mergeDebugResources-56:/layout/view_region_map.xml",
+        "source": "com.meteoapp-main-59:/layout/view_region_map.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/dialog_settings.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/dialog_settings.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/item_search_result.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/item_search_result.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/activity_day_detail.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/activity_day_detail.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/dialog_api_key.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/dialog_api_key.xml"
+    },
+    {
+        "merged": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-mergeDebugResources-56:/layout/marker_weather.xml",
+        "source": "/home/appuser/.gradle/daemon/9.7.1/com.meteoapp-main-59:/layout/marker_weather.xml"
+    }
+]
