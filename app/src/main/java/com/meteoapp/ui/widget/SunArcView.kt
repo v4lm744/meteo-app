@@ -30,6 +30,8 @@ class SunArcView @JvmOverloads constructor(
 
     private var targetProgress = -1f
     private var animatedProgress = 0f
+    private var isNight = false
+    private var animator: ValueAnimator? = null
 
     private val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0x4DFFFFFF
@@ -57,14 +59,17 @@ class SunArcView @JvmOverloads constructor(
         } else {
             0f
         }
-        val animator = ValueAnimator.ofFloat(0f, targetProgress)
-        animator.duration = 800L
-        animator.interpolator = DecelerateInterpolator()
-        animator.addUpdateListener { animation ->
+        isNight = nowSeconds < sunriseSeconds || nowSeconds >= sunsetSeconds
+        animator?.cancel()
+        val newAnimator = ValueAnimator.ofFloat(0f, targetProgress)
+        newAnimator.duration = 800L
+        newAnimator.interpolator = DecelerateInterpolator()
+        newAnimator.addUpdateListener { animation ->
             animatedProgress = animation.animatedValue as Float
             invalidate()
         }
-        animator.start()
+        newAnimator.start()
+        animator = newAnimator
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -85,6 +90,7 @@ class SunArcView @JvmOverloads constructor(
             canvas.drawArc(arcRect, 180f, 180f * animatedProgress, false, progressPaint)
         }
 
+        if (isNight) return
         val angle = Math.toRadians(180.0 + 180.0 * animatedProgress)
         val sx = cx + radius * cos(angle).toFloat()
         val sy = baseY + radius * sin(angle).toFloat()
