@@ -29,9 +29,19 @@ jobs:
       - name: Restore shared signing key
         run: |
           echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > shared-debug.keystore
-          echo "DEBUG_KEYSTORE_PATH=$PWD/shared-debug.keystore" >> "$GITHUB_ENV"
+          # Convertit le keystore en JKS : les PKCS12 générés par les keytool
+          # récents utilisent des algorithmes que le lecteur de signature AGP
+          # ne parse pas (« Tag number over 30 is not supported »).
+          keytool -importkeystore \
+            -srckeystore shared-debug.keystore -srcstorepass "$DEBUG_KEYSTORE_PASSWORD" -srcalias "$DEBUG_KEY_ALIAS" \
+            -destkeystore signing.keystore -deststoretype JKS \
+            -deststorepass "$DEBUG_KEYSTORE_PASSWORD" -destkeypass "$DEBUG_KEY_PASSWORD" -destalias "$DEBUG_KEY_ALIAS" -noprompt
+          echo "DEBUG_KEYSTORE_PATH=$PWD/signing.keystore" >> "$GITHUB_ENV"
         env:
           DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+          DEBUG_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD || 'android' }}
+          DEBUG_KEY_ALIAS: ${{ secrets.DEBUG_KEY_ALIAS || 'androiddebugkey' }}
+          DEBUG_KEY_PASSWORD: ${{ secrets.DEBUG_KEY_PASSWORD || 'android' }}
 
       - name: Build release APK (signed with the shared key)
         run: ./gradlew assembleRelease --stacktrace
