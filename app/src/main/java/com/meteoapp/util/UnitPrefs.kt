@@ -19,6 +19,7 @@ object UnitPrefs {
     private const val KEY_WIND_UNIT = "wind_unit"
     private const val KEY_PRESSURE_UNIT = "pressure_unit"
     private const val KEY_TIME_FORMAT = "time_format"
+    private const val KEY_VALUE_PRECISION = "value_precision"
 
     /** Unité de température. */
     enum class TempUnit { CELSIUS, FAHRENHEIT }
@@ -31,6 +32,9 @@ object UnitPrefs {
 
     /** Format de l'heure. */
     enum class TimeFormat { FORMAT_24H, FORMAT_12H }
+
+    /** Précision des valeurs numériques (température, vent). */
+    enum class ValuePrecision { WHOLE, ONE_DECIMAL }
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -73,6 +77,16 @@ object UnitPrefs {
 
     fun setTimeFormat(context: Context, format: TimeFormat) {
         prefs(context).edit().putString(KEY_TIME_FORMAT, format.name).apply()
+    }
+
+    fun getValuePrecision(context: Context): ValuePrecision =
+        enumValueOfSafe(
+            prefs(context).getString(KEY_VALUE_PRECISION, null),
+            ValuePrecision.WHOLE
+        )
+
+    fun setValuePrecision(context: Context, precision: ValuePrecision) {
+        prefs(context).edit().putString(KEY_VALUE_PRECISION, precision.name).apply()
     }
 
     private inline fun <reified T : Enum<T>> enumValueOfSafe(value: String?, default: T): T =

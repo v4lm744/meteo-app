@@ -31,6 +31,7 @@ class SettingsDialog(
     private var selectedWindUnit: UnitPrefs.WindUnit = UnitPrefs.WindUnit.KMH
     private var selectedPressureUnit: UnitPrefs.PressureUnit = UnitPrefs.PressureUnit.HPA
     private var selectedTimeFormat: UnitPrefs.TimeFormat = UnitPrefs.TimeFormat.FORMAT_24H
+    private var selectedPrecision: UnitPrefs.ValuePrecision = UnitPrefs.ValuePrecision.WHOLE
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogSettingsBinding.inflate(layoutInflater)
@@ -43,6 +44,7 @@ class SettingsDialog(
         selectedWindUnit = UnitPrefs.getWindUnit(context)
         selectedPressureUnit = UnitPrefs.getPressureUnit(context)
         selectedTimeFormat = UnitPrefs.getTimeFormat(context)
+        selectedPrecision = UnitPrefs.getValuePrecision(context)
         buildUnitOptions(context)
 
         return MaterialAlertDialogBuilder(context)
@@ -53,6 +55,7 @@ class SettingsDialog(
                 UnitPrefs.setWindUnit(context, selectedWindUnit)
                 UnitPrefs.setPressureUnit(context, selectedPressureUnit)
                 UnitPrefs.setTimeFormat(context, selectedTimeFormat)
+                UnitPrefs.setValuePrecision(context, selectedPrecision)
                 SyncPrefs.setIntervalMinutes(context, selectedMinutes)
                 WidgetSyncScheduler.schedule(context, selectedMinutes)
                 onSettingsApplied()
@@ -88,6 +91,7 @@ class SettingsDialog(
         val windGroup: RadioGroup = binding.windUnitGroup
         val pressureGroup: RadioGroup = binding.pressureUnitGroup
         val timeGroup: RadioGroup = binding.timeFormatGroup
+        val precisionGroup: RadioGroup = binding.precisionGroup
         tempGroup.removeAllViews()
         windGroup.removeAllViews()
         pressureGroup.removeAllViews()
@@ -140,6 +144,19 @@ class SettingsDialog(
         timeGroup.setOnCheckedChangeListener { _, checkedId ->
             selectedTimeFormat = UnitPrefs.TimeFormat.entries[checkedId]
         }
+
+        precisionGroup.removeAllViews()
+        UnitPrefs.ValuePrecision.entries.forEach { precision ->
+            val radio = RadioButton(context).apply {
+                text = getString(precisionLabelFor(precision))
+                id = precision.ordinal
+                isChecked = precision == selectedPrecision
+            }
+            precisionGroup.addView(radio)
+        }
+        precisionGroup.setOnCheckedChangeListener { _, checkedId ->
+            selectedPrecision = UnitPrefs.ValuePrecision.entries[checkedId]
+        }
     }
 
     private fun syncLabelFor(minutes: Int): String = when (minutes) {
@@ -167,6 +184,11 @@ class SettingsDialog(
     private fun timeLabelFor(format: UnitPrefs.TimeFormat): Int = when (format) {
         UnitPrefs.TimeFormat.FORMAT_24H -> R.string.settings_unit_time_24h
         UnitPrefs.TimeFormat.FORMAT_12H -> R.string.settings_unit_time_12h
+    }
+
+    private fun precisionLabelFor(precision: UnitPrefs.ValuePrecision): Int = when (precision) {
+        UnitPrefs.ValuePrecision.WHOLE -> R.string.settings_unit_precision_whole
+        UnitPrefs.ValuePrecision.ONE_DECIMAL -> R.string.settings_unit_precision_decimal
     }
 
     override fun onDestroyView() {

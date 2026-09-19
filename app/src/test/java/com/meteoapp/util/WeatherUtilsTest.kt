@@ -94,6 +94,39 @@ class WeatherUtilsTest {
     }
 
     @Test
+    fun formatTemp_oneDecimalRoundsToTenth() {
+        val original = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.FRANCE)
+        try {
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.ONE_DECIMAL)
+            UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.CELSIUS)
+            assertEquals("16,8°", WeatherUtils.formatTemp(context, 16.76))
+            UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.FAHRENHEIT)
+            assertEquals("62,2°", WeatherUtils.formatTemp(context, 16.78))
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.WHOLE)
+            UnitPrefs.setTempUnit(context, UnitPrefs.TempUnit.CELSIUS)
+            assertEquals("17°", WeatherUtils.formatTemp(context, 16.76))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
+    }
+
+    @Test
+    fun formatWindSpeed_oneDecimal() {
+        val original = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.FRANCE)
+        try {
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.ONE_DECIMAL)
+            UnitPrefs.setWindUnit(context, UnitPrefs.WindUnit.KMH)
+            assertEquals("35,9 km/h", WeatherUtils.formatWindSpeed(context, 9.97))
+            UnitPrefs.setValuePrecision(context, UnitPrefs.ValuePrecision.WHOLE)
+            assertEquals("36 km/h", WeatherUtils.formatWindSpeed(context, 9.97))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
+    }
+
+    @Test
     fun formatPressure_inhgConvertsHpa() {
         UnitPrefs.setPressureUnit(context, UnitPrefs.PressureUnit.INHG)
         assertEquals("29.53 inHg", WeatherUtils.formatPressure(context, 1000L))

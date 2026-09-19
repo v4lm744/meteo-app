@@ -51,7 +51,6 @@
     <string name="permission_required">Autorisation de localisation requise.</string>
     <string name="loading">Chargement…</string>
     <string name="retry">Réessayer</string>
-    <string name="kmh">%1$d km/h</string>
     <string name="hpa">%1$d hPa</string>
     <string name="percent">%1$d %%</string>
     <string name="widget_configure_prompt">Choisissez une ville</string>
@@ -119,10 +118,14 @@
     <string name="settings_unit_time">Format de l\'heure</string>
     <string name="settings_unit_time_24h">24 h</string>
     <string name="settings_unit_time_12h">12 h (AM/PM)</string>
-    <string name="mph">%1$d mph</string>
     <string name="inhg">%1$s inHg</string>
     <string name="km">%1$d km</string>
     <string name="miles">%1$d mi</string>
+    <string name="kmh_format">%1$s km/h</string>
+    <string name="mph_format">%1$s mph</string>
+    <string name="settings_unit_precision">Précision des valeurs</string>
+    <string name="settings_unit_precision_whole">Entier (17°, 36 km/h)</string>
+    <string name="settings_unit_precision_decimal">1 décimale (16,8°, 35,9 km/h)</string>
     <string name="feels_like_value">Ressenti %1$s</string>
     <string name="min_max_format">Max %1$s  Min %2$s</string>
 </resources>
