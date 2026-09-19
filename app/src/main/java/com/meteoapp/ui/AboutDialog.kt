@@ -28,6 +28,7 @@ class AboutDialog : DialogFragment() {
             ""
         }
         binding.aboutVersion.text = getString(com.meteoapp.R.string.about_version_format, versionName)
+        binding.aboutAppName.text = getString(com.meteoapp.R.string.app_full_name)
 
         binding.aboutOpenWeatherLink.setOnClickListener {
             openUrl("https://openweathermap.org")

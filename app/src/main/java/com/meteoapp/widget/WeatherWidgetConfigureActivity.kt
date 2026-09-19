@@ -24,6 +24,7 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
     private lateinit var binding: DialogSearchBinding
     private val repository by lazy { WeatherRepository(this) }
     private var searchJob: Job? = null
+    private var searchSequence = 0
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,9 +77,11 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
         }
         binding.searchProgress.visibility = View.VISIBLE
         binding.searchHint.visibility = View.GONE
+        val searchId = ++searchSequence
         lifecycleScope.launch {
             when (val result = repository.searchCity(query)) {
                 is WeatherResult.Success -> {
+                    if (searchId != searchSequence) return@launch
                     binding.searchProgress.visibility = View.GONE
                     val results = deduplicate(result.data)
                     if (results.isEmpty()) {
@@ -92,6 +95,7 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
                     }
                 }
                 is WeatherResult.Error -> {
+                    if (searchId != searchSequence) return@launch
                     binding.searchProgress.visibility = View.GONE
                     binding.searchHint.visibility = View.VISIBLE
                     binding.searchHint.text = result.message

@@ -127,8 +127,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun retryLast() {
-        if (viewModel.isApiKeyConfigured) {
-            requestLocationAndLoad()
+        if (!viewModel.isApiKeyConfigured) {
+            openApiKeyDialog()
+            return
+        }
+        if (hasLocationPermission()) {
+            viewModel.loadForCurrentLocation()
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         }
     }
 
