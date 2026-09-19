@@ -52,7 +52,7 @@ class HourDetailActivity : AppCompatActivity() {
         binding.hourDescription.text =
             hour.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
         hour.weather.firstOrNull()?.let { cond ->
-            WeatherIcons.bind(binding.hourIcon, cond.id, isDaytime = !cond.icon.endsWith("n"))
+            WeatherIcons.bind(binding.hourIcon, cond.id, isDay = !cond.icon.endsWith("n"))
         }
         binding.feelsLikeValue.text = WeatherUtils.formatTemp(this, hour.feelsLike)
         binding.humidityValue.text = "${hour.humidity} %"

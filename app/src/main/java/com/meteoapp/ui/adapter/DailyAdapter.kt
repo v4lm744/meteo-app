@@ -39,7 +39,7 @@ class DailyAdapter(
                 ?: ""
             val cond = item.weather.firstOrNull()
             if (cond != null) {
-                WeatherIcons.bind(dayIcon, cond.id, isDaytime = true)
+                WeatherIcons.bind(dayIcon, cond.id, isDay = true)
             }
             val pop = item.pop ?: 0.0
             if (pop >= 0.05) {

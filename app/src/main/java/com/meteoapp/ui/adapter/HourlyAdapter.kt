@@ -39,7 +39,7 @@ class HourlyAdapter(
                 WeatherIcons.bind(
                     hourIcon,
                     cond.id,
-                    isDaytime = !cond.icon.endsWith("n")
+                    isDay = !cond.icon.endsWith("n")
                 )
             }
             val pop = item.pop ?: 0.0

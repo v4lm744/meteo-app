@@ -59,7 +59,7 @@ class DayDetailActivity : AppCompatActivity() {
             day.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
 
         day.weather.firstOrNull()?.let { cond ->
-            WeatherIcons.bind(binding.dayIcon, cond.id, isDaytime = true)
+            WeatherIcons.bind(binding.dayIcon, cond.id, isDay = true)
         }
 
         binding.morningTemp.text = WeatherUtils.formatTemp(this, day.morningTemp)

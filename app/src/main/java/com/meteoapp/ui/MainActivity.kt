@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
             WeatherIcons.bind(
                 binding.heroIcon,
                 cond.id,
-                isDaytime = !cond.icon.endsWith("n")
+                isDay = !cond.icon.endsWith("n")
             )
         }
         binding.weatherDescription.text =
