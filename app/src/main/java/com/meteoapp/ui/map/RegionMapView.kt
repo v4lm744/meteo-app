@@ -41,7 +41,7 @@ class RegionMapView @JvmOverloads constructor(
         mapView.controller.setZoom(9.0)
         mapView.overlays.clear()
 
-        mapView.setOnTouchListener { _, event ->
+        mapView.setOnTouchListener { view, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN,
                 MotionEvent.ACTION_POINTER_DOWN -> {
@@ -51,6 +51,7 @@ class RegionMapView @JvmOverloads constructor(
                 MotionEvent.ACTION_POINTER_UP,
                 MotionEvent.ACTION_CANCEL -> {
                     parent?.requestDisallowInterceptTouchEvent(false)
+                    view.performClick()
                 }
             }
             false

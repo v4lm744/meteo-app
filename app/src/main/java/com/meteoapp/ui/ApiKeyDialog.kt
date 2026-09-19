@@ -2,12 +2,12 @@ package com.meteoapp.ui
 
 import android.app.Dialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.meteoapp.data.ApiKeyStore
 import com.meteoapp.databinding.DialogApiKeyBinding
+import androidx.core.net.toUri
 
 /**
  * Dialogue de saisie de la clé API OpenWeatherMap.
@@ -30,7 +30,7 @@ class ApiKeyDialog(
         binding.getKeyButton.setOnClickListener {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("https://home.openweathermap.org/api_keys")
+                "https://home.openweathermap.org/api_keys".toUri()
             )
             startActivity(intent)
         }

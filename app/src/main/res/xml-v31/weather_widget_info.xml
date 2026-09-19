@@ -4,8 +4,11 @@
     android:initialKeyguardLayout="@layout/widget_weather"
     android:minWidth="250dp"
     android:minHeight="70dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
     android:configure="com.meteoapp.widget.WeatherWidgetConfigureActivity"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen"
+    android:previewLayout="@layout/widget_weather"
     android:description="@string/widget_title" />

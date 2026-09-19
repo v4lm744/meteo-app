@@ -2,6 +2,7 @@ package com.meteoapp.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 /**
  * Unités d'affichage choisies dans le menu « Paramètres ».
@@ -46,7 +47,7 @@ object UnitPrefs {
         )
 
     fun setTempUnit(context: Context, unit: TempUnit) {
-        prefs(context).edit().putString(KEY_TEMP_UNIT, unit.name).apply()
+        prefs(context).edit { putString(KEY_TEMP_UNIT, unit.name) }
     }
 
     fun getWindUnit(context: Context): WindUnit =
@@ -56,7 +57,7 @@ object UnitPrefs {
         )
 
     fun setWindUnit(context: Context, unit: WindUnit) {
-        prefs(context).edit().putString(KEY_WIND_UNIT, unit.name).apply()
+        prefs(context).edit { putString(KEY_WIND_UNIT, unit.name) }
     }
 
     fun getPressureUnit(context: Context): PressureUnit =
@@ -66,7 +67,7 @@ object UnitPrefs {
         )
 
     fun setPressureUnit(context: Context, unit: PressureUnit) {
-        prefs(context).edit().putString(KEY_PRESSURE_UNIT, unit.name).apply()
+        prefs(context).edit { putString(KEY_PRESSURE_UNIT, unit.name) }
     }
 
     fun getTimeFormat(context: Context): TimeFormat =
@@ -76,7 +77,7 @@ object UnitPrefs {
         )
 
     fun setTimeFormat(context: Context, format: TimeFormat) {
-        prefs(context).edit().putString(KEY_TIME_FORMAT, format.name).apply()
+        prefs(context).edit { putString(KEY_TIME_FORMAT, format.name) }
     }
 
     fun getValuePrecision(context: Context): ValuePrecision =
@@ -86,7 +87,7 @@ object UnitPrefs {
         )
 
     fun setValuePrecision(context: Context, precision: ValuePrecision) {
-        prefs(context).edit().putString(KEY_VALUE_PRECISION, precision.name).apply()
+        prefs(context).edit { putString(KEY_VALUE_PRECISION, precision.name) }
     }
 
     private inline fun <reified T : Enum<T>> enumValueOfSafe(value: String?, default: T): T =
