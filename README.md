@@ -28,9 +28,10 @@ votre appareil (autorisez « Installer des applications inconnues » si demandé
   « Paramètres ». Sans cela, les widgets ne se rafraîchissaient qu'à la fréquence
   minimale imposée par le système (≈30 min) et de façon peu fiable.
 - **Unités réglables** (menu « Paramètres ») : température (°C/°F), vent (km/h/mph,
-  la visibilité suit en km/miles), pression (hPa/inHg) et format de l'heure
-  (24 h ou 12 h AM/PM). Les choix sont persistés et appliqués immédiatement
-  sur tous les écrans et les widgets.
+  la visibilité suit en km/miles), pression (hPa/inHg), format de l'heure
+  (24 h ou 12 h AM/PM) et précision des valeurs (entier ou 1 décimale).
+  Les choix sont persistés et appliqués immédiatement sur tous les écrans
+  et les widgets.
 - Rafraîchissement par « pull-to-refresh »
 - Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
 - **Fond dynamique de l'app** : dégradé vertical en haut selon la météo et l'heure
