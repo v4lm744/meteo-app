@@ -28,6 +28,12 @@ jobs:
 
       - name: Restore shared signing key
         run: |
+          if [ -z "${DEBUG_KEYSTORE_BASE64:-}" ]; then
+            echo "::error::Le secret DEBUG_KEYSTORE_BASE64 est vide ou absent. "
+            echo "::error::Générez un keystore (commande keytool dans le README) et "
+            echo "::error::enregistrez son contenu base64 dans le secret DEBUG_KEYSTORE_BASE64."
+            exit 1
+          fi
           echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > shared-debug.keystore
           # Convertit le keystore en JKS : les PKCS12 générés par les keytool
           # récents utilisent des algorithmes que le lecteur de signature AGP
