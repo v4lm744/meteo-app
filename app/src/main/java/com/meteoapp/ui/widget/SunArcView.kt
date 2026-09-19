@@ -52,6 +52,23 @@ class SunArcView @JvmOverloads constructor(
         color = 0xFFFFB703.toInt()
     }
 
+    /** Réutilisé à chaque frame pour éviter toute allocation dans onDraw. */
+    private val arcRect = RectF()
+
+    /** Rayon et centre recalculés seulement quand la taille change. */
+    private var arcRadius = 0f
+    private var centerX = 0f
+    private var baseYPos = 0f
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val wf = w.toFloat()
+        val hf = h.toFloat()
+        baseYPos = hf - haloRadiusPx
+        arcRadius = (min(wf / 2f, hf) - strokePx - haloRadiusPx).coerceAtLeast(0f)
+        centerX = wf / 2f
+    }
+
     fun setSunTimes(sunriseSeconds: Long, sunsetSeconds: Long, nowSeconds: Long) {
         targetProgress = if (sunsetSeconds > sunriseSeconds) {
             (((nowSeconds - sunriseSeconds).toFloat()) / (sunsetSeconds - sunriseSeconds))
@@ -75,16 +92,12 @@ class SunArcView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (targetProgress < 0f) return
-        val w = width.toFloat()
-        val h = height.toFloat()
-        if (w <= 0f || h <= 0f) return
-
-        val baseY = h - haloRadiusPx
-        val radius = (min(w / 2f, h) - strokePx - haloRadiusPx).coerceAtLeast(0f)
+        val radius = arcRadius
         if (radius <= 0f) return
-        val cx = w / 2f
+        val cx = centerX
+        val baseY = baseYPos
 
-        val arcRect = RectF(cx - radius, baseY - radius, cx + radius, baseY + radius)
+        arcRect.set(cx - radius, baseY - radius, cx + radius, baseY + radius)
         canvas.drawArc(arcRect, 180f, 180f, false, arcPaint)
         if (animatedProgress > 0f) {
             canvas.drawArc(arcRect, 180f, 180f * animatedProgress, false, progressPaint)

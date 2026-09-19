@@ -14,28 +14,34 @@ import android.widget.ImageView
  */
 object WeatherIcons {
 
+    private const val FALLBACK_ICON = "ic_wx_partly"
+
     /**
      * Retourne l'identifiant du drawable animé correspondant au code
      * condition OpenWeather et au suffixe jour (`true`) / nuit (`false`).
+     * Toujours non nul : les conditions inconnues retombent sur l'icône
+     * partielle (nuages), jamais sur un `getIdentifier(null)` qui planterait.
      */
     fun forCondition(context: Context, code: Long, isDay: Boolean): Int {
-        val res = context.packageName
-        return context.resources.getIdentifier(nameFor(code, isDay), "drawable", res)
+        val name = nameFor(code, isDay) ?: FALLBACK_ICON
+        val id = context.resources.getIdentifier(name, "drawable", context.packageName)
+        return if (id != 0) id else fallbackId(context)
+    }
+
+    private fun fallbackId(context: Context): Int {
+        return context.resources.getIdentifier(FALLBACK_ICON, "drawable", context.packageName)
     }
 
     /**
      * Charge l'icône dans l'[ImageView] et démarre l'animation le cas échéant
-     * (AnimatedVectorDrawable).
-     * tag du code.
+     * (AnimatedVectorDrawable). Ne change rien si le drawable est introuvable.
      */
     fun bind(view: ImageView, code: Long, isDay: Boolean) {
-        val context = view.context
-        val id = forCondition(context, code, isDay)
-        if (id != 0) {
-            val drawable = context.getDrawable(id)
-            view.setImageDrawable(drawable)
-            (drawable as? Animatable)?.start()
-        }
+        val id = forCondition(view.context, code, isDay)
+        if (id == 0) return
+        val drawable = androidx.core.content.ContextCompat.getDrawable(view.context, id) ?: return
+        view.setImageDrawable(drawable)
+        (drawable as? Animatable)?.start()
     }
 
     /**
