@@ -1,13 +1,21 @@
 package com.meteoapp.ui
 
+import android.Manifest
 import android.app.Dialog
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.meteoapp.R
 import com.meteoapp.databinding.DialogSettingsBinding
+import com.meteoapp.notifications.NotificationPrefs
+import com.meteoapp.notifications.WeatherNotificationScheduler
 import com.meteoapp.util.UnitPrefs
 import com.meteoapp.widget.SyncPrefs
 import com.meteoapp.widget.WidgetSyncScheduler
@@ -22,10 +30,14 @@ class SettingsDialog(
     private val onSettingsApplied: () -> Unit = {}
 ) : DialogFragment() {
 
+    private val notifHourOptions = listOf(6, 7, 8, 9, 12, 18)
+
     private var _binding: DialogSettingsBinding? = null
     private val binding get() = _binding!!
 
     private var selectedMinutes: Int = SyncPrefs.SYNC_DISABLED
+    private var notificationsEnabled: Boolean = false
+    private var notificationHour: Int = NotificationPrefs.DEFAULT_HOUR
 
     private var selectedTempUnit: UnitPrefs.TempUnit = UnitPrefs.TempUnit.CELSIUS
     private var selectedWindUnit: UnitPrefs.WindUnit = UnitPrefs.WindUnit.KMH
@@ -39,6 +51,10 @@ class SettingsDialog(
         val context = requireContext()
         selectedMinutes = SyncPrefs.getIntervalMinutes(context)
         buildSyncOptions(selectedMinutes)
+
+        notificationsEnabled = NotificationPrefs.isEnabled(context)
+        notificationHour = NotificationPrefs.getHour(context)
+        buildNotificationOptions()
 
         selectedTempUnit = UnitPrefs.getTempUnit(context)
         selectedWindUnit = UnitPrefs.getWindUnit(context)
@@ -58,6 +74,9 @@ class SettingsDialog(
                 UnitPrefs.setValuePrecision(context, selectedPrecision)
                 SyncPrefs.setIntervalMinutes(context, selectedMinutes)
                 WidgetSyncScheduler.schedule(context, selectedMinutes)
+                NotificationPrefs.setEnabled(context, notificationsEnabled)
+                NotificationPrefs.setHour(context, notificationHour)
+                WeatherNotificationScheduler.reschedule(context)
                 onSettingsApplied()
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -158,6 +177,65 @@ class SettingsDialog(
             selectedPrecision = UnitPrefs.ValuePrecision.entries[checkedId]
         }
     }
+
+    private fun buildNotificationOptions() {
+        val switch: MaterialSwitch = binding.notificationSwitch
+        switch.isChecked = notificationsEnabled
+        switch.setOnCheckedChangeListener { _, checked ->
+            if (checked) requestNotificationPermissionIfNeeded()
+            notificationsEnabled = checked
+            updateNotificationSectionVisibility()
+        }
+        updateNotificationSectionVisibility()
+        binding.notificationHourGroup.visibility =
+            if (notificationsEnabled) android.view.View.VISIBLE else android.view.View.GONE
+        binding.notificationHourLabel.visibility =
+            if (notificationsEnabled) android.view.View.VISIBLE else android.view.View.GONE
+
+        val group: RadioGroup = binding.notificationHourGroup
+        group.removeAllViews()
+        for (hour in notifHourOptions) {
+            val radio = RadioButton(requireContext()).apply {
+                text = getString(R.string.settings_notifications_hour_format, hour)
+                id = hour
+                isChecked = hour == notificationHour
+            }
+            group.addView(radio)
+        }
+        group.setOnCheckedChangeListener { _, checkedId ->
+            notificationHour = checkedId
+        }
+    }
+
+    private fun updateNotificationSectionVisibility() {
+        val visibility =
+            if (notificationsEnabled) android.view.View.VISIBLE else android.view.View.GONE
+        binding.notificationHourGroup.visibility = visibility
+        binding.notificationHourLabel.visibility = visibility
+        binding.notificationPermHint.visibility =
+            if (notificationsEnabled && !hasNotificationPermission())
+                android.view.View.VISIBLE else android.view.View.GONE
+    }
+
+    private fun hasNotificationPermission(): Boolean =
+        Build.VERSION.SDK_INT < 33 ||
+            ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
 
     private fun syncLabelFor(minutes: Int): String = when (minutes) {
         SyncPrefs.SYNC_DISABLED -> getString(R.string.settings_sync_disabled)

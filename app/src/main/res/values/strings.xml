@@ -44,6 +44,15 @@
     <string name="radar_toggle_off">Radar de pluie</string>
     <string name="radar_toggle_on">Radar activé</string>
     <string name="radar_source_note">Précipitations : RainViewer</string>
+    <string name="notification_channel_name">Météo du jour</string>
+    <string name="notification_channel_desc">Résumé météo quotidien de votre ville</string>
+    <string name="notification_title">Météo à %1$s</string>
+    <string name="settings_notifications_title">Notifications météo</string>
+    <string name="settings_notifications_hint">Recevez chaque jour un résumé de la météo de votre ville (condition, température, min/max du jour).</string>
+    <string name="settings_notifications_enable">Activer la notification quotidienne</string>
+    <string name="settings_notifications_hour">Heure de remise</string>
+    <string name="settings_notifications_hour_format">%1$02d:00</string>
+    <string name="notification_permission_needed">Autorisez les notifications dans les paramètres Android pour recevoir la météo du jour.</string>
     <string name="sun_arc_title">Course du soleil</string>
     <string name="feels_like">Ressenti</string>
     <string name="humidity">Humidité</string>

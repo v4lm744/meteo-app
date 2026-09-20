@@ -1,0 +1,58 @@
+package com.meteoapp.notifications
+
+import android.content.Context
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
+
+/**
+ * Planification de la notification météo quotidienne : un travail
+ * périodique de 24 h, initial delay calculé pour déclencher vers l'heure
+ * choisie dans les Paramètres. [reschedule] est appelé après chaque
+ * changement de configuration et au démarrage de l'application.
+ */
+object WeatherNotificationScheduler {
+
+    private const val WORK_NAME = "weather_daily_notification"
+
+    fun reschedule(context: Context) {
+        if (!NotificationPrefs.isEnabled(context)) {
+            WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+            return
+        }
+        val delay = delayUntilNextRun(NotificationPrefs.getHour(context))
+        val request = PeriodicWorkRequestBuilder<WeatherNotificationWorker>(
+            24, TimeUnit.HOURS
+        )
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .build()
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            WORK_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+    }
+
+    fun cancel(context: Context) {
+        WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+    }
+
+    /**
+     * Millisecondes jusqu'au prochain passage à [hour]:00 de l'heure locale.
+     */
+    fun delayUntilNextRun(hour: Int, nowMillis: Long = System.currentTimeMillis()): Long {
+        val now = Calendar.getInstance().apply { timeInMillis = nowMillis }
+        val target = (now.clone() as Calendar).apply {
+            set(Calendar.HOUR_OF_DAY, hour.coerceIn(0, 23))
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        if (target.timeInMillis <= now.timeInMillis) {
+            target.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        return target.timeInMillis - now.timeInMillis
+    }
+}
