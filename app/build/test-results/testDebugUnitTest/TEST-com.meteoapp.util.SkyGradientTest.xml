@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.meteoapp.util.SkyGradientTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-20T12:41:00.451Z" hostname="6d8a292a" time="0.032">
+  <properties/>
+  <testcase name="la pluie assombrit le ciel du jour" classname="com.meteoapp.util.SkyGradientTest" time="0.006"/>
+  <testcase name="plein jour entre lever et coucher" classname="com.meteoapp.util.SkyGradientTest" time="0.0"/>
+  <testcase name="aube interpole entre nuit et lever" classname="com.meteoapp.util.SkyGradientTest" time="0.0"/>
+  <testcase name="transitions continues sans saut de couleur" classname="com.meteoapp.util.SkyGradientTest" time="0.021"/>
+  <testcase name="sans lever coucher on utilise 7h 19h" classname="com.meteoapp.util.SkyGradientTest" time="0.0"/>
+  <testcase name="crepuscule interpole vers la nuit" classname="com.meteoapp.util.SkyGradientTest" time="0.001"/>
+  <testcase name="nuit profonde avant l'aube" classname="com.meteoapp.util.SkyGradientTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

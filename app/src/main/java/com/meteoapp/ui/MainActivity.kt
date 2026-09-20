@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: WeatherViewModel by viewModels()
 
     private var toolbarTint: Int = 0xFFFFFFFF.toInt()
+    private var currentBgTop: Int = -1
+    private var currentBgBottom: Int = -1
+    private var bgAnimator: android.animation.ValueAnimator? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -326,15 +329,56 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyDynamicBackground(weather: WeatherData) {
-        val grad = com.meteoapp.util.WeatherColors.gradient(weather)
-        val drawable = android.graphics.drawable.GradientDrawable(
+        val stop = com.meteoapp.util.SkyGradient.stopFor(weather)
+        animateBackgroundTo(stop.top, stop.bottom)
+        binding.swipeRefresh.setColorSchemeColors(stop.top)
+        tintToolbarIcons(stop.top)
+    }
+
+    /**
+     * Transition douce du dégradé de fond vers les nouvelles couleurs :
+     * interpolation ARGB sur 800 ms à chaque changement d'heure ou de ville.
+     */
+    private fun animateBackgroundTo(targetTop: Int, targetBottom: Int) {
+        if (currentBgTop < 0 || currentBgBottom < 0) {
+            currentBgTop = targetTop
+            currentBgBottom = targetBottom
+            window.statusBarColor = targetTop
+            binding.root.background = gradientDrawable(targetTop, targetBottom)
+            return
+        }
+        if (currentBgTop == targetTop && currentBgBottom == targetBottom) return
+
+        val fromTop = currentBgTop
+        val fromBottom = currentBgBottom
+        currentBgTop = targetTop
+        currentBgBottom = targetBottom
+
+        bgAnimator?.cancel()
+        bgAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 800L
+            addUpdateListener { anim ->
+                val fraction = anim.animatedValue as Float
+                val top = argbBlend(fromTop, targetTop, fraction)
+                val bottom = argbBlend(fromBottom, targetBottom, fraction)
+                window.statusBarColor = top
+                binding.root.background = gradientDrawable(top, bottom)
+            }
+            start()
+        }
+    }
+
+    private fun gradientDrawable(top: Int, bottom: Int): android.graphics.drawable.GradientDrawable =
+        android.graphics.drawable.GradientDrawable(
             android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(grad.top, grad.bottom)
+            intArrayOf(top, bottom)
         )
-        binding.root.background = drawable
-        window.statusBarColor = grad.top
-        binding.swipeRefresh.setColorSchemeColors(grad.top)
-        tintToolbarIcons(grad.top)
+
+    private fun argbBlend(from: Int, to: Int, fraction: Float): Int {
+        val inv = 1f - fraction
+        fun channel(shift: Int): Int =
+            (((from shr shift) and 0xFF) * inv + ((to shr shift) and 0xFF) * fraction).toInt()
+        return 0xFF shl 24 or (channel(16) shl 16) or (channel(8) shl 8) or channel(0)
     }
 
     /**
@@ -358,7 +402,11 @@ class MainActivity : AppCompatActivity() {
         binding.errorLayout.visibility = View.VISIBLE
         binding.errorText.text = message
         binding.loadingBar.visibility = View.GONE
+        currentBgTop = -1
+        currentBgBottom = -1
+        bgAnimator?.cancel()
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.md_blue_deep)
         binding.swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.md_blue_sky))
         tintToolbarIcons(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
@@ -397,6 +445,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.regionMapView.onResume()
+        viewModel.state.value?.weather?.let { applyDynamicBackground(it) }
     }
 
     override fun onPause() {
