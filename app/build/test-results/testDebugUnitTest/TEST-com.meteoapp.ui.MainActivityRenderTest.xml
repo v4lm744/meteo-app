@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.meteoapp.ui.MainActivityRenderTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-19T19:41:41.309Z" hostname="6d8a292a" time="1.26">
-  <properties/>
-  <testcase name="rendersFullDashboardWithoutCrash" classname="com.meteoapp.ui.MainActivityRenderTest" time="0.832"/>
-  <testcase name="rendersErrorStateWithoutCrash" classname="com.meteoapp.ui.MainActivityRenderTest" time="0.421"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

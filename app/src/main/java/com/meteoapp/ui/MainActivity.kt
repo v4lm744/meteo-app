@@ -35,6 +35,10 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: WeatherViewModel by viewModels()
 
     private var toolbarTint: Int = 0xFFFFFFFF.toInt()
+    private lateinit var cityChipsAdapter: com.meteoapp.ui.adapter.CityChipsAdapter
+    private var currentBgTop: Int = -1
+    private var currentBgBottom: Int = -1
+    private var bgAnimator: android.animation.ValueAnimator? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -61,6 +65,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
         binding.retryButton.setOnClickListener { retryLast() }
+
+        cityChipsAdapter = com.meteoapp.ui.adapter.CityChipsAdapter(
+            onCityClick = { city -> viewModel.loadWeatherForCity(city) },
+            onCityLongClick = { city -> removeFavoriteCity(city) }
+        )
+        binding.cityChips.layoutManager =
+            androidx.recyclerview.widget.LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
+        binding.cityChips.adapter = cityChipsAdapter
 
         binding.regionMapView.onCitySelected = { regionCity ->
             val city = com.meteoapp.data.model.GeoLocation(
@@ -95,7 +107,12 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             } else {
-                requestLocationAndLoad()
+                val savedCity = com.meteoapp.city.FavoriteCitiesStore.getCurrentCity(this)
+                if (savedCity != null) {
+                    viewModel.loadWeatherForCity(savedCity)
+                } else {
+                    requestLocationAndLoad()
+                }
             }
         }
     }
@@ -164,6 +181,14 @@ class MainActivity : AppCompatActivity() {
         for (item in menu) {
             item.icon?.mutate()?.setTint(tint)
         }
+        val current = viewModel.state.value?.city
+        if (current != null) {
+            menu.findItem(R.id.action_favorite)?.setIcon(
+                if (com.meteoapp.city.FavoriteCitiesStore.isFavorite(this, current))
+                    R.drawable.ic_star_filled
+                else R.drawable.ic_star_outline
+            )?.icon?.mutate()?.setTint(tint)
+        }
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -172,6 +197,10 @@ class MainActivity : AppCompatActivity() {
             R.id.action_search -> {
                 SearchCityDialog { city -> viewModel.loadWeatherForCity(city) }
                     .show(supportFragmentManager, "search")
+                true
+            }
+            R.id.action_favorite -> {
+                toggleFavoriteCurrentCity()
                 true
             }
             R.id.action_locate -> {
@@ -212,6 +241,55 @@ class MainActivity : AppCompatActivity() {
         viewModel.state.value?.let { render(it) }
     }
 
+    private fun toggleFavoriteCurrentCity() {
+        val city = viewModel.state.value?.city ?: return
+        val store = com.meteoapp.city.FavoriteCitiesStore
+        val displayName = city.localNames?.fr ?: city.name
+        if (store.isFavorite(this, city)) {
+            store.removeFavorite(this, city)
+            showSnackbar(getString(R.string.favorite_removed, displayName))
+        } else {
+            store.addFavorite(this, city)
+            showSnackbar(getString(R.string.favorite_added, displayName))
+        }
+        refreshCityChips()
+        invalidateOptionsMenu()
+    }
+
+    private fun removeFavoriteCity(city: com.meteoapp.data.model.GeoLocation) {
+        com.meteoapp.city.FavoriteCitiesStore.removeFavorite(this, city)
+        showSnackbar(
+            getString(
+                R.string.favorite_removed,
+                city.localNames?.fr ?: city.name
+            )
+        )
+        refreshCityChips()
+        invalidateOptionsMenu()
+    }
+
+    private fun refreshCityChips() {
+        val favorites = com.meteoapp.city.FavoriteCitiesStore.getFavorites(this)
+        val current = viewModel.state.value?.city
+        cityChipsAdapter.submitList(favorites, current)
+        binding.cityChips.visibility =
+            if (favorites.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    @androidx.annotation.VisibleForTesting
+    fun refreshCityChipsPublic() = refreshCityChips()
+
+    @androidx.annotation.VisibleForTesting
+    fun bindingCityChipsVisibility(): Int = binding.cityChips.visibility
+
+    private fun showSnackbar(message: String) {
+        com.google.android.material.snackbar.Snackbar.make(
+            binding.swipeRefresh,
+            message,
+            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+        ).show()
+    }
+
     private fun render(state: UiState) {
         binding.swipeRefresh.isRefreshing = state.refreshing
         binding.loadingBar.visibility = if (state.loading) View.VISIBLE else View.GONE
@@ -246,6 +324,7 @@ class MainActivity : AppCompatActivity() {
             ?: city?.name
             ?: ""
         binding.cityName.text = displayName
+        refreshCityChips()
         binding.headerLayout.visibility = View.VISIBLE
         binding.detailsCard.visibility = View.VISIBLE
         binding.regionMapTitle.visibility = View.VISIBLE
@@ -256,7 +335,16 @@ class MainActivity : AppCompatActivity() {
         binding.dailyRecycler.visibility = View.VISIBLE
 
         val current = weather.current
-        binding.temperature.text = WeatherUtils.formatTemp(this, current.temp)
+        val cond = current.weather.firstOrNull()
+        binding.swipeRefresh.setWeatherCondition(
+            cond?.id ?: 800L,
+            cond?.icon?.endsWith("n") == false
+        )
+        com.meteoapp.util.WeatherTransition.animateTemperature(
+            binding.temperature,
+            { value -> WeatherUtils.formatTemp(this, value) },
+            current.temp
+        )
         current.weather.firstOrNull()?.let { cond ->
             WeatherIcons.bind(
                 binding.heroIcon,
@@ -337,15 +425,56 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyDynamicBackground(weather: WeatherData) {
-        val grad = com.meteoapp.util.WeatherColors.gradient(weather)
-        val drawable = android.graphics.drawable.GradientDrawable(
+        val stop = com.meteoapp.util.SkyGradient.stopFor(weather)
+        animateBackgroundTo(stop.top, stop.bottom)
+        binding.swipeRefresh.setColorSchemeColors(stop.top)
+        tintToolbarIcons(stop.top)
+    }
+
+    /**
+     * Transition douce du dégradé de fond vers les nouvelles couleurs :
+     * interpolation ARGB sur 800 ms à chaque changement d'heure ou de ville.
+     */
+    private fun animateBackgroundTo(targetTop: Int, targetBottom: Int) {
+        if (currentBgTop < 0 || currentBgBottom < 0) {
+            currentBgTop = targetTop
+            currentBgBottom = targetBottom
+            window.statusBarColor = targetTop
+            binding.root.background = gradientDrawable(targetTop, targetBottom)
+            return
+        }
+        if (currentBgTop == targetTop && currentBgBottom == targetBottom) return
+
+        val fromTop = currentBgTop
+        val fromBottom = currentBgBottom
+        currentBgTop = targetTop
+        currentBgBottom = targetBottom
+
+        bgAnimator?.cancel()
+        bgAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 800L
+            addUpdateListener { anim ->
+                val fraction = anim.animatedValue as Float
+                val top = argbBlend(fromTop, targetTop, fraction)
+                val bottom = argbBlend(fromBottom, targetBottom, fraction)
+                window.statusBarColor = top
+                binding.root.background = gradientDrawable(top, bottom)
+            }
+            start()
+        }
+    }
+
+    private fun gradientDrawable(top: Int, bottom: Int): android.graphics.drawable.GradientDrawable =
+        android.graphics.drawable.GradientDrawable(
             android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(grad.top, grad.bottom)
+            intArrayOf(top, bottom)
         )
-        binding.root.background = drawable
-        window.statusBarColor = grad.top
-        binding.swipeRefresh.setColorSchemeColors(grad.top)
-        tintToolbarIcons(grad.top)
+
+    private fun argbBlend(from: Int, to: Int, fraction: Float): Int {
+        val inv = 1f - fraction
+        fun channel(shift: Int): Int =
+            (((from shr shift) and 0xFF) * inv + ((to shr shift) and 0xFF) * fraction).toInt()
+        return 0xFF shl 24 or (channel(16) shl 16) or (channel(8) shl 8) or channel(0)
     }
 
     /**
@@ -369,8 +498,12 @@ class MainActivity : AppCompatActivity() {
         binding.errorLayout.visibility = View.VISIBLE
         binding.errorText.text = message
         binding.loadingBar.visibility = View.GONE
+        currentBgTop = -1
+        currentBgBottom = -1
+        bgAnimator?.cancel()
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
-        binding.swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.md_blue_sky))
+        window.statusBarColor = ContextCompat.getColor(this, R.color.md_blue_deep)
+        binding.swipeRefresh.setWeatherCondition(800L, isDay = true)
         tintToolbarIcons(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
         binding.cacheBanner.visibility = View.GONE
@@ -408,6 +541,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.regionMapView.onResume()
+        viewModel.state.value?.weather?.let { applyDynamicBackground(it) }
     }
 
     override fun onPause() {

@@ -14,6 +14,11 @@
         android:title="@string/action_search"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_favorite"
+        android:icon="@drawable/ic_star_outline"
+        android:title="@string/action_favorite"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_api_key"
         android:icon="@drawable/ic_key"
         android:title="@string/action_api_key"

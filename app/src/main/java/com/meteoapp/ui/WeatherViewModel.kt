@@ -40,6 +40,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
 
     fun loadWeatherForCity(city: GeoLocation) {
         weatherJob?.cancel()
+        com.meteoapp.city.FavoriteCitiesStore.setCurrentCity(getApplication(), city)
         weatherJob = viewModelScope.launch {
             _state.value = _state.value?.copy(loading = true, error = null, city = city)
             when (val result = repository.getWeather(city.lat, city.lon)) {
@@ -127,6 +128,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                     country = "",
                     state = null
                 )
+            com.meteoapp.city.FavoriteCitiesStore.setCurrentCity(getApplication(), city)
 
             when (val result = repository.getWeather(location.latitude, location.longitude)) {
                 is WeatherResult.Success -> {
