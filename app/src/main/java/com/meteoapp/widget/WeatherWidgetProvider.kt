@@ -38,6 +38,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         for (id in appWidgetIds) {
             WidgetPrefs.remove(context, id)
+            WidgetThemePrefs.remove(context, id)
         }
     }
 
@@ -200,9 +201,14 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                     var h = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
                     if (w <= 0) w = (250 * density).toInt()
                     if (h <= 0) h = (70 * density).toInt()
-                    val bg = WidgetGradient.buildBackground(
-                        context.applicationContext, result.data, w, h
-                    )
+                    val bg =
+                        if (WidgetThemePrefs.getTheme(context, appWidgetId) == WidgetThemePrefs.Theme.DARK) {
+                            WidgetGradient.buildDarkBackground(context.applicationContext, w, h)
+                        } else {
+                            WidgetGradient.buildBackground(
+                                context.applicationContext, result.data, w, h
+                            )
+                        }
                     views.setImageViewBitmap(R.id.widgetBackground, bg)
                 } catch (_: Exception) {
                 }

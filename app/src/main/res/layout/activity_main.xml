@@ -362,6 +362,19 @@
                     </GridLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <include
+                    android:id="@+id/airQualityCard"
+                    layout="@layout/view_air_quality_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/detailsCard" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/sunArcCard"
                     style="@style/Widget.MeteoApp.Card"
@@ -373,7 +386,7 @@
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/detailsCard">
+                    app:layout_constraintTop_toBottomOf="@id/airQualityCard">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -448,6 +461,19 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <include
+                    android:id="@+id/historyCard"
+                    layout="@layout/view_history_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sunArcCard" />
+
                 <TextView
                     android:id="@+id/regionMapTitle"
                     style="@style/Widget.MeteoApp.Label"
@@ -459,7 +485,7 @@
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/sunArcCard" />
+                    app:layout_constraintTop_toBottomOf="@id/historyCard" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/regionMapCard"

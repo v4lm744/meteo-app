@@ -46,6 +46,29 @@ object WidgetGradient {
         return bitmap
     }
 
+    fun buildDarkBackground(context: Context, width: Int, height: Int): Bitmap {
+        val w = if (width <= 0) 1 else width
+        val h = if (height <= 0) 1 else height
+
+        val bitmap = createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+            isAntiAlias = true
+            shader = LinearGradient(
+                0f, 0f, 0f, h.toFloat(),
+                0xFF1B1B1F.toInt(), 0xFF2D2D33.toInt(),
+                Shader.TileMode.CLAMP
+            )
+        }
+        val radius = 0.08f * minOf(w, h)
+        val path = Path().apply {
+            addRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), radius, radius, Path.Direction.CW)
+        }
+        canvas.clipPath(path)
+        canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), paint)
+        return bitmap
+    }
+
     private fun widgetEndColor(code: Long, isDay: Boolean): Int = when {
         code == 800L && isDay -> 0xFFFFC857.toInt() // soleil -> jaune
         code == 800L -> 0xFF13294B.toInt()         // nuit
