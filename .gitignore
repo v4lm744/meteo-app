@@ -13,3 +13,4 @@ local.properties
 *.ap_
 *.dex
 keystore.properties
+app/build/
