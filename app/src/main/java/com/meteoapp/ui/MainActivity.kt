@@ -248,6 +248,11 @@ class MainActivity : AppCompatActivity() {
         binding.dailyRecycler.visibility = View.VISIBLE
 
         val current = weather.current
+        val cond = current.weather.firstOrNull()
+        binding.swipeRefresh.setWeatherCondition(
+            cond?.id ?: 800L,
+            cond?.icon?.endsWith("n") == false
+        )
         com.meteoapp.util.WeatherTransition.animateTemperature(
             binding.temperature,
             { value -> WeatherUtils.formatTemp(this, value) },
@@ -411,7 +416,7 @@ class MainActivity : AppCompatActivity() {
         bgAnimator?.cancel()
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
         window.statusBarColor = ContextCompat.getColor(this, R.color.md_blue_deep)
-        binding.swipeRefresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.md_blue_sky))
+        binding.swipeRefresh.setWeatherCondition(800L, isDay = true)
         tintToolbarIcons(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
         binding.cacheBanner.visibility = View.GONE
