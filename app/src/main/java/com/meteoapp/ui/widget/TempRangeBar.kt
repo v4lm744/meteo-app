@@ -42,6 +42,9 @@ class TempRangeBar @JvmOverloads constructor(
     private var shaderStartX = -1f
     private var shaderEndX = -1f
 
+    private var dotAnimator: android.animation.ValueAnimator? = null
+    private var animatedCurrentTemp: Double? = null
+
     fun update(
         valueMin: Double,
         valueMax: Double,
@@ -53,10 +56,31 @@ class TempRangeBar @JvmOverloads constructor(
         this.valueMax = valueMax
         this.weekMin = weekMin
         this.weekMax = weekMax
-        this.currentTemp = currentTemp
         shaderStartX = -1f
         shaderEndX = -1f
+
+        val previous = animatedCurrentTemp ?: currentTemp
+        animatedCurrentTemp = currentTemp
+        if (currentTemp == null || previous == null || previous == currentTemp) {
+            invalidate()
+            return
+        }
+        dotAnimator?.cancel()
+        dotAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 700L
+            addUpdateListener { anim ->
+                val fraction = anim.animatedValue as Float
+                animatedCurrentTemp = previous + (currentTemp - previous) * fraction
+                invalidate()
+            }
+            start()
+        }
         invalidate()
+    }
+
+    override fun onDetachedFromWindow() {
+        dotAnimator?.cancel()
+        super.onDetachedFromWindow()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -88,7 +112,8 @@ class TempRangeBar @JvmOverloads constructor(
         }
         canvas.drawRoundRect(startX, top, endX, bottom, radius, radius, barPaint)
 
-        currentTemp?.let { temp ->
+        currentTemp?.let { _ ->
+            val temp = animatedCurrentTemp ?: return
             val fraction = (((temp - weekMin) / span).coerceIn(0.0, 1.0)).toFloat()
             canvas.drawCircle(fraction * w, h / 2f, dotRadiusPx, dotPaint)
         }

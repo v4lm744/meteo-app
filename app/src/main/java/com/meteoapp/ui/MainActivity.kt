@@ -248,7 +248,11 @@ class MainActivity : AppCompatActivity() {
         binding.dailyRecycler.visibility = View.VISIBLE
 
         val current = weather.current
-        binding.temperature.text = WeatherUtils.formatTemp(this, current.temp)
+        com.meteoapp.util.WeatherTransition.animateTemperature(
+            binding.temperature,
+            { value -> WeatherUtils.formatTemp(this, value) },
+            current.temp
+        )
         current.weather.firstOrNull()?.let { cond ->
             WeatherIcons.bind(
                 binding.heroIcon,
