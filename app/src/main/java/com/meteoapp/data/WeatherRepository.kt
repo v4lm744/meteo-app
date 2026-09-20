@@ -3,6 +3,7 @@ package com.meteoapp.data
 import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.api.OpenWeatherApi
+import com.meteoapp.data.model.AirPollutionResponse
 import com.meteoapp.data.model.CurrentData
 import com.meteoapp.data.model.DailyData
 import com.meteoapp.data.model.GeoLocation
@@ -57,10 +58,11 @@ class WeatherRepository(
                     windSpeed = current.wind.speed,
                     windDeg = current.wind.deg,
                     weather = current.weather,
+                    cloudiness = current.clouds?.all ?: 0L,
                     timezoneOffset = timezoneOffset
                 )
 
-                val hourly = forecast.list.take(24).map { item ->
+                val hourly = forecast.list.take(16).map { item ->
                     HourlyData(
                         dt = item.dt,
                         temp = item.main.temp,
@@ -200,6 +202,17 @@ class WeatherRepository(
             set(Calendar.MILLISECOND, 0)
         }
         return cal.timeInMillis / 1000L
+    }
+
+    suspend fun getAirQuality(lat: Double, lon: Double): WeatherResult<AirPollutionResponse> {
+        if (!isApiKeyConfigured) {
+            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
+        }
+        return try {
+            WeatherResult.Success(api.getAirPollution(lat = lat, lon = lon, apiKey = apiKey))
+        } catch (e: Exception) {
+            WeatherResult.Error(appContext.getString(R.string.error_region_cities))
+        }
     }
 
     suspend fun searchCity(query: String): WeatherResult<List<GeoLocation>> {

@@ -14,7 +14,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.meteoapp.R
 import com.meteoapp.databinding.DialogSettingsBinding
+import com.meteoapp.notifications.AlertPrefs
 import com.meteoapp.notifications.NotificationPrefs
+import com.meteoapp.notifications.WeatherAlertScheduler
 import com.meteoapp.notifications.WeatherNotificationScheduler
 import com.meteoapp.util.ThemePrefs
 import com.meteoapp.util.UnitPrefs
@@ -39,6 +41,7 @@ class SettingsDialog(
     private var selectedMinutes: Int = SyncPrefs.SYNC_DISABLED
     private var notificationsEnabled: Boolean = false
     private var notificationHour: Int = NotificationPrefs.DEFAULT_HOUR
+    private var alertsEnabled: Boolean = false
     private var selectedThemeMode: ThemePrefs.ThemeMode = ThemePrefs.ThemeMode.FOLLOW_SYSTEM
     private var dynamicColorsEnabled: Boolean = false
 
@@ -58,6 +61,9 @@ class SettingsDialog(
         notificationsEnabled = NotificationPrefs.isEnabled(context)
         notificationHour = NotificationPrefs.getHour(context)
         buildNotificationOptions()
+
+        alertsEnabled = AlertPrefs.isEnabled(context)
+        buildAlertOptions(context)
 
         selectedThemeMode = ThemePrefs.getMode(context)
         dynamicColorsEnabled = ThemePrefs.isDynamicColorsEnabled(context)
@@ -84,6 +90,11 @@ class SettingsDialog(
                 NotificationPrefs.setEnabled(context, notificationsEnabled)
                 NotificationPrefs.setHour(context, notificationHour)
                 WeatherNotificationScheduler.reschedule(context)
+                AlertPrefs.setEnabled(context, alertsEnabled)
+                AlertPrefs.setRainThresholdMm(context, parseThreshold(binding.alertRainInput.text) ?: AlertPrefs.DEFAULT_RAIN_MM)
+                AlertPrefs.setWindThresholdKmh(context, parseThreshold(binding.alertWindInput.text) ?: AlertPrefs.DEFAULT_WIND_KMH)
+                AlertPrefs.setFrostThresholdCelsius(context, parseThreshold(binding.alertFrostInput.text) ?: AlertPrefs.DEFAULT_FROST_TEMP)
+                WeatherAlertScheduler.reschedule(context)
                 ThemePrefs.setMode(context, selectedThemeMode)
                 ThemePrefs.setDynamicColorsEnabled(context, dynamicColorsEnabled)
                 ThemePrefs.applyMode(context)
@@ -249,6 +260,43 @@ class SettingsDialog(
         }
         group.setOnCheckedChangeListener { _, checkedId ->
             notificationHour = checkedId
+        }
+    }
+
+    private fun buildAlertOptions(context: android.content.Context) {
+        val switch: MaterialSwitch = binding.alertsSwitch
+        switch.isChecked = alertsEnabled
+        switch.setOnCheckedChangeListener { _, checked ->
+            if (checked) requestNotificationPermissionIfNeeded()
+            alertsEnabled = checked
+            updateAlertSectionVisibility()
+        }
+        binding.alertRainInput.setText(trimDecimal(AlertPrefs.getRainThresholdMm(context)))
+        binding.alertWindInput.setText(trimDecimal(AlertPrefs.getWindThresholdKmh(context)))
+        binding.alertFrostInput.setText(trimDecimal(AlertPrefs.getFrostThresholdCelsius(context)))
+        updateAlertSectionVisibility()
+    }
+
+    private fun updateAlertSectionVisibility() {
+        val visibility =
+            if (alertsEnabled) android.view.View.VISIBLE else android.view.View.GONE
+        binding.alertRainInputLayout.visibility = visibility
+        binding.alertWindInputLayout.visibility = visibility
+        binding.alertFrostInputLayout.visibility = visibility
+    }
+
+    private fun parseThreshold(text: android.text.Editable?): Double? {
+        val value = text?.toString()?.trim()?.replace(',', '.') ?: return null
+        if (value.isEmpty()) return null
+        return value.toDoubleOrNull()
+    }
+
+    private fun trimDecimal(value: Double): String {
+        val rounded = kotlin.math.round(value * 10.0) / 10.0
+        return if (rounded == rounded.toLong().toDouble()) {
+            rounded.toLong().toString()
+        } else {
+            String.format(java.util.Locale.FRANCE, "%.1f", rounded)
         }
     }
 

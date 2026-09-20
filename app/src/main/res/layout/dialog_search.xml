@@ -41,6 +41,41 @@
         android:alpha="0.6"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/widgetThemeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/widget_theme_label"
+        android:textColor="@color/md_text_dark"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <RadioGroup
+        android:id="@+id/widgetThemeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <RadioButton
+            android:id="@+id/themeGradientRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/widget_theme_gradient"
+            android:textColor="@color/md_text_dark" />
+
+        <RadioButton
+            android:id="@+id/themeDarkRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/widget_theme_dark"
+            android:textColor="@color/md_text_dark" />
+    </RadioGroup>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/resultsRecycler"
         android:layout_width="match_parent"

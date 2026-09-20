@@ -1,5 +1,6 @@
 package com.meteoapp.data.api
 
+import com.meteoapp.data.model.AirPollutionResponse
 import com.meteoapp.data.model.CurrentWeatherResponse
 import com.meteoapp.data.model.FindResponse
 import com.meteoapp.data.model.ForecastResponse
@@ -36,6 +37,13 @@ interface OpenWeatherApi {
         @Query("lang") lang: String = "fr",
         @Query("appid") apiKey: String
     ): FindResponse
+
+    @GET("data/2.5/air_pollution")
+    suspend fun getAirPollution(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("appid") apiKey: String
+    ): AirPollutionResponse
 
     @GET("geo/1.0/direct")
     suspend fun geocode(

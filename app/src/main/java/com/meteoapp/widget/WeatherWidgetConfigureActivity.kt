@@ -26,6 +26,7 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
     private var searchJob: Job? = null
     private var searchSequence = 0
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
+    private var widgetTheme: WidgetThemePrefs.Theme = WidgetThemePrefs.Theme.WEATHER_GRADIENT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +67,16 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
         })
 
         binding.cityInputLayout.requestFocus()
+
+        binding.widgetThemeLabel.visibility = View.VISIBLE
+        binding.widgetThemeGroup.visibility = View.VISIBLE
+        binding.widgetThemeGroup.setOnCheckedChangeListener { _, checkedId ->
+            widgetTheme = if (checkedId == R.id.themeDarkRadio) {
+                WidgetThemePrefs.Theme.DARK
+            } else {
+                WidgetThemePrefs.Theme.WEATHER_GRADIENT
+            }
+        }
     }
 
     private fun performSearch(query: String) {
@@ -119,6 +130,7 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
 
     private fun onCityChosen(city: GeoLocation) {
         WidgetPrefs.saveCity(this, appWidgetId, city)
+        WidgetThemePrefs.setTheme(this, appWidgetId, widgetTheme)
 
         val resultValue = Intent().apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

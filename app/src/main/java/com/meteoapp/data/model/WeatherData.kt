@@ -15,6 +15,7 @@ data class CurrentData(
     val windSpeed: Double,
     val windDeg: Long,
     val weather: List<WeatherCondition>,
+    val cloudiness: Long = 0L,
     val timezoneOffset: Long
 )
 

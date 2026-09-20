@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.meteoapp.R
 import com.meteoapp.data.WeatherResult
 import com.meteoapp.data.WeatherRepository
+import com.meteoapp.data.model.AirPollutionItem
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.data.model.RegionCity
 import com.meteoapp.data.model.WeatherData
@@ -21,6 +22,7 @@ data class UiState(
     val weather: WeatherData? = null,
     val city: GeoLocation? = null,
     val regionCities: List<RegionCity> = emptyList(),
+    val airQuality: AirPollutionItem? = null,
     val error: String? = null,
     val fromCache: Boolean = false
 )
@@ -45,6 +47,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
             _state.value = _state.value?.copy(loading = true, error = null, city = city)
             when (val result = repository.getWeather(city.lat, city.lon)) {
                 is WeatherResult.Success -> {
+                    com.meteoapp.stats.WeatherHistoryStore.record(getApplication(), result.data)
                     _state.value = UiState(
                         loading = false,
                         weather = result.data,
@@ -53,6 +56,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         fromCache = result.fromCache
                     )
                     loadRegionCities(city.lat, city.lon)
+                    loadAirQuality(city.lat, city.lon)
                 }
                 is WeatherResult.Error -> {
                     _state.value = _state.value?.copy(
@@ -74,6 +78,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
             _state.value = current.copy(refreshing = true, error = null)
             when (val result = repository.getWeather(lat, lon)) {
                 is WeatherResult.Success -> {
+                    com.meteoapp.stats.WeatherHistoryStore.record(getApplication(), result.data)
                     _state.value = current.copy(
                         refreshing = false,
                         weather = result.data,
@@ -81,6 +86,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         fromCache = result.fromCache
                     )
                     loadRegionCities(lat, lon)
+                    loadAirQuality(lat, lon)
                 }
                 is WeatherResult.Error -> {
                     _state.value = current.copy(refreshing = false, error = result.message)
@@ -95,6 +101,19 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
             when (val result = repository.getRegionCities(lat, lon)) {
                 is WeatherResult.Success -> {
                     _state.value = _state.value?.copy(regionCities = result.data)
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun loadAirQuality(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            when (val result = repository.getAirQuality(lat, lon)) {
+                is WeatherResult.Success -> {
+                    _state.value = _state.value?.copy(
+                        airQuality = result.data.list.firstOrNull()
+                    )
                 }
                 else -> {}
             }
@@ -132,6 +151,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
 
             when (val result = repository.getWeather(location.latitude, location.longitude)) {
                 is WeatherResult.Success -> {
+                    com.meteoapp.stats.WeatherHistoryStore.record(getApplication(), result.data)
                     _state.value = UiState(
                         loading = false,
                         weather = result.data,
@@ -140,6 +160,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
                         fromCache = result.fromCache
                     )
                     loadRegionCities(location.latitude, location.longitude)
+                    loadAirQuality(location.latitude, location.longitude)
                 }
                 is WeatherResult.Error -> {
                     _state.value = _state.value?.copy(

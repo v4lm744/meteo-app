@@ -19,6 +19,16 @@
         android:title="@string/action_favorite"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_info"
+        android:title="@string/action_share"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_compare"
+        android:icon="@drawable/ic_star_filled"
+        android:title="@string/action_compare"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_api_key"
         android:icon="@drawable/ic_key"
         android:title="@string/action_api_key"

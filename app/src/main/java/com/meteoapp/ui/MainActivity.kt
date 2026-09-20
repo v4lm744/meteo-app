@@ -216,6 +216,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 true
             }
+            R.id.action_share -> {
+                shareCurrentWeather()
+                true
+            }
+            R.id.action_compare -> {
+                startActivity(android.content.Intent(this, CityComparisonActivity::class.java))
+                true
+            }
             R.id.action_api_key -> {
                 openApiKeyDialog()
                 true
@@ -296,6 +304,7 @@ class MainActivity : AppCompatActivity() {
         cityChipsAdapter.submitList(favorites, current)
         binding.cityChips.visibility =
             if (favorites.isEmpty()) View.GONE else View.VISIBLE
+        com.meteoapp.util.ShortcutsHelper.refresh(this)
     }
 
     @androidx.annotation.VisibleForTesting
@@ -327,7 +336,7 @@ class MainActivity : AppCompatActivity() {
 
         val weather = state.weather
         if (weather != null) {
-            showContent(weather, state.city, state.regionCities, state.fromCache)
+            showContent(weather, state.city, state.regionCities, state.airQuality, state.fromCache)
         }
     }
 
@@ -335,6 +344,7 @@ class MainActivity : AppCompatActivity() {
         weather: WeatherData,
         city: GeoLocation?,
         regionCities: List<RegionCity>,
+        airQuality: com.meteoapp.data.model.AirPollutionItem? = null,
         fromCache: Boolean = false
     ) {
         binding.errorLayout.visibility = View.GONE
@@ -418,10 +428,13 @@ class MainActivity : AppCompatActivity() {
             binding.sunArcCard.visibility = View.GONE
         }
 
-        // Hourly : 24 prochaines heures
+        showAirQuality(weather, airQuality)
+        showHistory(weather)
+
+        // Hourly : 48 prochaines heures (pas de 3 h)
         binding.hourlyRecycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.hourlyRecycler.adapter = HourlyAdapter(this, weather.hourly.take(24)) { hour ->
+        binding.hourlyRecycler.adapter = HourlyAdapter(this, weather.hourly) { hour ->
             openHourDetail(hour)
         }
 
@@ -442,13 +455,118 @@ class MainActivity : AppCompatActivity() {
         EntranceAnimator.cascade(
             binding.headerLayout,
             binding.detailsCard,
+            binding.airQualityCard.root,
             binding.sunArcCard,
+            binding.historyCard.root,
             binding.regionMapTitle,
             binding.regionMapCard,
             binding.hourlyTitle,
             binding.hourlyRecycler,
             binding.dailyTitle,
             binding.dailyRecycler
+        )
+    }
+
+    private fun showAirQuality(weather: WeatherData, airQuality: com.meteoapp.data.model.AirPollutionItem?) {
+        val aqi = airQuality?.main?.aqi
+        if (aqi != null) {
+            binding.airQualityCard.airQualityValue.text = com.meteoapp.util.AirQualityUtils.label(this, aqi)
+            binding.airQualityCard.airQualityPm.text = airQuality.components?.let {
+                getString(
+                    R.string.pollutant_unit_ugm3,
+                    com.meteoapp.util.AirQualityUtils.formatPm25(it.pm25)
+                )
+            } ?: ""
+            binding.airQualityCard.airQualityAdvice.text = com.meteoapp.util.AirQualityUtils.recommendation(this, aqi)
+        } else {
+            binding.airQualityCard.airQualityValue.text = getString(R.string.comparison_unavailable)
+            binding.airQualityCard.airQualityPm.text = ""
+            binding.airQualityCard.airQualityAdvice.text = ""
+        }
+
+        val uv = com.meteoapp.util.UvIndexEstimator.estimate(
+            weather.lat,
+            weather.lon,
+            weather.current.dt,
+            weather.timezoneOffset,
+            weather.current.cloudiness
+        )
+        binding.airQualityCard.uvIndexValue.text = String.format(java.util.Locale.FRANCE, "%.1f", uv)
+        binding.airQualityCard.uvIndexLabel.text = com.meteoapp.util.UvIndexEstimator.label(this, uv)
+        binding.airQualityCard.uvAdvice.text = com.meteoapp.util.UvIndexEstimator.recommendation(this, uv)
+        binding.airQualityCard.root.visibility = View.VISIBLE
+    }
+
+    private fun showHistory(weather: WeatherData) {
+        val store = com.meteoapp.stats.WeatherHistoryStore
+        val records = store.last7Days(this, weather.lat, weather.lon)
+        if (records.size < 2) {
+            binding.historyCard.historyChart.submit(emptyList())
+            binding.historyCard.historyRecords.text = getString(R.string.history_empty)
+            binding.historyCard.historyWeekCompare.visibility = View.GONE
+            binding.historyCard.root.visibility = View.VISIBLE
+            return
+        }
+        binding.historyCard.historyChart.submit(records)
+
+        val recordsText = buildString {
+            store.allTimeMin(this@MainActivity, weather.lat, weather.lon)?.let {
+                append(
+                    getString(
+                        R.string.history_record_min,
+                        WeatherUtils.formatTemp(this@MainActivity, it.tempMin),
+                        WeatherUtils.formatDate(it.dayKey, 0)
+                    )
+                )
+                append('\n')
+            }
+            store.allTimeMax(this@MainActivity, weather.lat, weather.lon)?.let {
+                append(
+                    getString(
+                        R.string.history_record_max,
+                        WeatherUtils.formatTemp(this@MainActivity, it.tempMax),
+                        WeatherUtils.formatDate(it.dayKey, 0)
+                    )
+                )
+            }
+        }
+        binding.historyCard.historyRecords.text = recordsText.trim()
+
+        store.weekComparison(this, weather.lat, weather.lon)?.let { (current, previous) ->
+            val delta = String.format(java.util.Locale.FRANCE, "%.1f°C", kotlin.math.abs(current - previous))
+            binding.historyCard.historyWeekCompare.text = getString(
+                if (current >= previous) R.string.history_week_compare_warmer
+                else R.string.history_week_compare_cooler,
+                delta
+            )
+            binding.historyCard.historyWeekCompare.visibility = View.VISIBLE
+        } ?: run {
+            binding.historyCard.historyWeekCompare.visibility = View.GONE
+        }
+        binding.historyCard.root.visibility = View.VISIBLE
+    }
+
+    private fun shareCurrentWeather() {
+        val state = viewModel.state.value ?: return
+        val weather = state.weather ?: return
+        val cityLabel = state.city?.localNames?.fr ?: state.city?.name ?: weather.timezone
+        val cond = weather.current.weather.firstOrNull()?.description ?: ""
+        val shareText = getString(
+            R.string.share_text,
+            WeatherUtils.formatTemp(this, weather.current.temp),
+            cityLabel,
+            cond.replaceFirstChar { it.uppercase() },
+            WeatherUtils.formatTemp(this, weather.current.feelsLike),
+            WeatherUtils.formatTemp(this, weather.daily.firstOrNull()?.tempMax ?: weather.current.temp),
+            WeatherUtils.formatTemp(this, weather.daily.firstOrNull()?.tempMin ?: weather.current.temp),
+            getString(R.string.app_full_name)
+        )
+        val sendIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+        }
+        startActivity(
+            android.content.Intent.createChooser(sendIntent, getString(R.string.share_via))
         )
     }
 
@@ -536,7 +654,9 @@ class MainActivity : AppCompatActivity() {
         binding.headerLayout.visibility = View.GONE
         binding.cacheBanner.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
+        binding.airQualityCard.root.visibility = View.GONE
         binding.sunArcCard.visibility = View.GONE
+        binding.historyCard.root.visibility = View.GONE
         binding.regionMapTitle.visibility = View.GONE
         binding.regionMapCard.visibility = View.GONE
         binding.hourlyTitle.visibility = View.GONE

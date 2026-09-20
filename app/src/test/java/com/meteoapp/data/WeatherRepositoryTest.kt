@@ -77,7 +77,7 @@ class WeatherRepositoryTest {
         assertEquals(18.5, data.current.temp, 0.001)
         assertEquals(17.2, data.current.feelsLike, 0.001)
         assertEquals("Paris", data.timezone)
-        assertEquals(24, data.hourly.size)
+        assertEquals(16, data.hourly.size)
         assertEquals(200L, data.current.windDeg)
         assertEquals(3.6, data.current.windSpeed, 0.001)
     }

@@ -2,6 +2,7 @@ package com.meteoapp
 
 import android.app.Application
 import org.osmdroid.config.Configuration
+import com.meteoapp.notifications.WeatherAlertScheduler
 import com.meteoapp.notifications.WeatherNotificationScheduler
 import com.meteoapp.util.ThemePrefs
 import com.meteoapp.widget.WidgetSyncScheduler
@@ -35,5 +36,6 @@ class MeteoApp : Application(), androidx.work.Configuration.Provider {
         }
         WidgetSyncScheduler.reschedule(this)
         WeatherNotificationScheduler.reschedule(this)
+        WeatherAlertScheduler.reschedule(this)
     }
 }
