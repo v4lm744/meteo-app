@@ -16,6 +16,7 @@ import com.meteoapp.R
 import com.meteoapp.databinding.DialogSettingsBinding
 import com.meteoapp.notifications.NotificationPrefs
 import com.meteoapp.notifications.WeatherNotificationScheduler
+import com.meteoapp.util.ThemePrefs
 import com.meteoapp.util.UnitPrefs
 import com.meteoapp.widget.SyncPrefs
 import com.meteoapp.widget.WidgetSyncScheduler
@@ -38,6 +39,8 @@ class SettingsDialog(
     private var selectedMinutes: Int = SyncPrefs.SYNC_DISABLED
     private var notificationsEnabled: Boolean = false
     private var notificationHour: Int = NotificationPrefs.DEFAULT_HOUR
+    private var selectedThemeMode: ThemePrefs.ThemeMode = ThemePrefs.ThemeMode.FOLLOW_SYSTEM
+    private var dynamicColorsEnabled: Boolean = false
 
     private var selectedTempUnit: UnitPrefs.TempUnit = UnitPrefs.TempUnit.CELSIUS
     private var selectedWindUnit: UnitPrefs.WindUnit = UnitPrefs.WindUnit.KMH
@@ -55,6 +58,10 @@ class SettingsDialog(
         notificationsEnabled = NotificationPrefs.isEnabled(context)
         notificationHour = NotificationPrefs.getHour(context)
         buildNotificationOptions()
+
+        selectedThemeMode = ThemePrefs.getMode(context)
+        dynamicColorsEnabled = ThemePrefs.isDynamicColorsEnabled(context)
+        buildAppearanceOptions(context)
 
         selectedTempUnit = UnitPrefs.getTempUnit(context)
         selectedWindUnit = UnitPrefs.getWindUnit(context)
@@ -77,6 +84,9 @@ class SettingsDialog(
                 NotificationPrefs.setEnabled(context, notificationsEnabled)
                 NotificationPrefs.setHour(context, notificationHour)
                 WeatherNotificationScheduler.reschedule(context)
+                ThemePrefs.setMode(context, selectedThemeMode)
+                ThemePrefs.setDynamicColorsEnabled(context, dynamicColorsEnabled)
+                ThemePrefs.applyMode(context)
                 onSettingsApplied()
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -176,6 +186,41 @@ class SettingsDialog(
         precisionGroup.setOnCheckedChangeListener { _, checkedId ->
             selectedPrecision = UnitPrefs.ValuePrecision.entries[checkedId]
         }
+    }
+
+    private fun buildAppearanceOptions(context: android.content.Context) {
+        val modeGroup: RadioGroup = binding.themeModeGroup
+        modeGroup.removeAllViews()
+        ThemePrefs.ThemeMode.entries.forEach { mode ->
+            val radio = RadioButton(context).apply {
+                text = getString(themeModeLabelFor(mode))
+                id = mode.ordinal
+                isChecked = mode == selectedThemeMode
+            }
+            modeGroup.addView(radio)
+        }
+        modeGroup.setOnCheckedChangeListener { _, checkedId ->
+            selectedThemeMode = ThemePrefs.ThemeMode.entries[checkedId]
+        }
+
+        val dynamicSwitch: com.google.android.material.materialswitch.MaterialSwitch =
+            binding.dynamicColorsSwitch
+        val supported = ThemePrefs.isDynamicColorsSupported(context)
+        dynamicSwitch.isEnabled = supported
+        dynamicSwitch.isChecked = supported && dynamicColorsEnabled
+        dynamicSwitch.setOnCheckedChangeListener { _, checked ->
+            dynamicColorsEnabled = checked
+        }
+        binding.dynamicColorsHint.setText(
+            if (supported) R.string.settings_dynamic_colors_hint
+            else R.string.settings_dynamic_colors_unavailable
+        )
+    }
+
+    private fun themeModeLabelFor(mode: ThemePrefs.ThemeMode): Int = when (mode) {
+        ThemePrefs.ThemeMode.FOLLOW_SYSTEM -> R.string.settings_theme_mode_system
+        ThemePrefs.ThemeMode.LIGHT -> R.string.settings_theme_mode_light
+        ThemePrefs.ThemeMode.DARK -> R.string.settings_theme_mode_dark
     }
 
     private fun buildNotificationOptions() {

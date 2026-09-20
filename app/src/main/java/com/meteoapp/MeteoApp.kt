@@ -3,6 +3,7 @@ package com.meteoapp
 import android.app.Application
 import org.osmdroid.config.Configuration
 import com.meteoapp.notifications.WeatherNotificationScheduler
+import com.meteoapp.util.ThemePrefs
 import com.meteoapp.widget.WidgetSyncScheduler
 import java.io.File
 
@@ -19,6 +20,12 @@ class MeteoApp : Application(), androidx.work.Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        ThemePrefs.applyMode(this)
+        if (ThemePrefs.isDynamicColorsSupported(this) &&
+            ThemePrefs.isDynamicColorsEnabled(this)
+        ) {
+            com.google.android.material.color.DynamicColors.applyToActivitiesIfAvailable(this)
+        }
         val baseDir = getExternalFilesDir(null) ?: filesDir
         Configuration.getInstance().apply {
             userAgentValue = packageName

@@ -51,6 +51,14 @@
     <string name="notification_channel_name">Météo du jour</string>
     <string name="notification_channel_desc">Résumé météo quotidien de votre ville</string>
     <string name="notification_title">Météo à %1$s</string>
+    <string name="settings_appearance_title">Apparence</string>
+    <string name="settings_theme_mode_label">Thème</string>
+    <string name="settings_theme_mode_system">Système</string>
+    <string name="settings_theme_mode_light">Clair</string>
+    <string name="settings_theme_mode_dark">Sombre</string>
+    <string name="settings_dynamic_colors">Couleurs dynamiques</string>
+    <string name="settings_dynamic_colors_hint">Material You : les couleurs de l’interface s’adaptent à votre fond d’écran (Android 12+). Le dégradé météo reste inchangé.</string>
+    <string name="settings_dynamic_colors_unavailable">Couleurs dynamiques indisponibles avant Android 12.</string>
     <string name="settings_notifications_title">Notifications météo</string>
     <string name="settings_notifications_hint">Recevez chaque jour un résumé de la météo de votre ville (condition, température, min/max du jour).</string>
     <string name="settings_notifications_enable">Activer la notification quotidienne</string>

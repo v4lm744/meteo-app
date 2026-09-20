@@ -14,6 +14,50 @@
         <TextView style="@style/Widget.MeteoApp.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/settings_appearance_title" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/settings_theme_mode_label"
+            android:textColor="@color/md_text_dark"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/themeModeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/dynamicColorsSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/settings_dynamic_colors"
+            android:textColor="@color/md_text_dark" />
+
+        <TextView
+            android:id="@+id/dynamicColorsHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/settings_dynamic_colors_hint"
+            android:textColor="@color/md_text_dark"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="6dp"
+            android:background="#1F1A1A2E" />
+
+        <TextView style="@style/Widget.MeteoApp.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/settings_units_title" />
 
         <TextView
