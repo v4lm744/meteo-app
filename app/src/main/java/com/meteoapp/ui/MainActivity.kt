@@ -340,7 +340,13 @@ class MainActivity : AppCompatActivity() {
         binding.errorLayout.visibility = View.GONE
         binding.loadingBar.visibility = View.GONE
 
-        binding.cacheBanner.visibility = if (fromCache) View.VISIBLE else View.GONE
+        if (fromCache) {
+            binding.cacheBanner.text =
+                com.meteoapp.util.WeatherUtils.formatOfflineAge(this, weather.lat, weather.lon)
+            binding.cacheBanner.visibility = View.VISIBLE
+        } else {
+            binding.cacheBanner.visibility = View.GONE
+        }
 
         val displayName = city?.localNames?.fr
             ?: city?.name
