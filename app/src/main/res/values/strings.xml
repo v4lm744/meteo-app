@@ -7,6 +7,9 @@
     <string name="action_about">À propos</string>
     <string name="action_tutorial">Tutoriel clé API</string>
     <string name="action_settings">Paramètres</string>
+    <string name="action_favorite">Ajouter aux favoris</string>
+    <string name="favorite_added">%1$s ajoutée aux favoris</string>
+    <string name="favorite_removed">%1$s retirée des favoris</string>
     <string name="settings_sync_title">Synchronisation automatique des widgets</string>
     <string name="settings_sync_interval_label">Fréquence de mise à jour</string>
     <string name="settings_sync_disabled">Désactivée</string>
