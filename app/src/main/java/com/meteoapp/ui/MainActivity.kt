@@ -221,7 +221,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_settings -> {
-                SettingsDialog { rerenderCurrentState() }
+                SettingsDialog { onSettingsChanged() }
                     .show(supportFragmentManager, "settings")
                 true
             }
@@ -239,6 +239,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun rerenderCurrentState() {
         viewModel.state.value?.let { render(it) }
+    }
+
+    /**
+     * Après validation des Paramètres : le mode de thème peut avoir changé,
+     * l'activité est recréée pour l'appliquer partout ; sinon simple re-rendu.
+     */
+    private fun onSettingsChanged() {
+        val currentMode = com.meteoapp.util.ThemePrefs.getMode(this)
+        val appliedMode = resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val needsRecreate = when (currentMode) {
+            com.meteoapp.util.ThemePrefs.ThemeMode.DARK ->
+                appliedMode != android.content.res.Configuration.UI_MODE_NIGHT_YES
+            com.meteoapp.util.ThemePrefs.ThemeMode.LIGHT ->
+                appliedMode != android.content.res.Configuration.UI_MODE_NIGHT_NO
+            else -> false
+        }
+        if (needsRecreate) {
+            recreate()
+        } else {
+            rerenderCurrentState()
+        }
     }
 
     private fun toggleFavoriteCurrentCity() {
@@ -318,7 +340,13 @@ class MainActivity : AppCompatActivity() {
         binding.errorLayout.visibility = View.GONE
         binding.loadingBar.visibility = View.GONE
 
-        binding.cacheBanner.visibility = if (fromCache) View.VISIBLE else View.GONE
+        if (fromCache) {
+            binding.cacheBanner.text =
+                com.meteoapp.util.WeatherUtils.formatOfflineAge(this, weather.lat, weather.lon)
+            binding.cacheBanner.visibility = View.VISIBLE
+        } else {
+            binding.cacheBanner.visibility = View.GONE
+        }
 
         val displayName = city?.localNames?.fr
             ?: city?.name

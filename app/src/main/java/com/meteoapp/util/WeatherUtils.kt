@@ -134,6 +134,30 @@ object WeatherUtils {
         return "$value°"
     }
 
+    /**
+     * Libellé de la bannière hors ligne : âge des données du cache pour la
+     * ville affichée (« à l'instant », « il y a 12 minutes », « il y a 3 heures »).
+     */
+    fun formatOfflineAge(context: Context, lat: Double, lon: Double): String {
+        val cache = com.meteoapp.data.WeatherCache(context)
+        val age = cache.ageMillis(lat, lon)
+        if (age == Long.MAX_VALUE || age < 0) {
+            return context.getString(R.string.cache_offline_banner)
+        }
+        val ageLabel = when {
+            age < 60_000L -> context.getString(R.string.offline_age_now)
+            age < 3_600_000L -> {
+                val minutes = (age / 60_000L).toInt()
+                context.resources.getQuantityString(R.plurals.offline_age_minutes, minutes, minutes)
+            }
+            else -> {
+                val hours = (age / 3_600_000L).toInt()
+                context.resources.getQuantityString(R.plurals.offline_age_hours, hours, hours)
+            }
+        }
+        return context.getString(R.string.cache_offline_with_age, ageLabel)
+    }
+
     /** Formate une vitesse du vent selon l'unité choisie dans les Paramètres. */
     fun formatWindSpeed(context: Context, speedMs: Double): String =
         when (UnitPrefs.getWindUnit(context)) {

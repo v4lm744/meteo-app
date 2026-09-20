@@ -41,7 +41,8 @@ android {
             }
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             if (debugKeystorePath != null) {
                 signingConfig = signingConfigs.getByName("sharedDebug")
             } else {
