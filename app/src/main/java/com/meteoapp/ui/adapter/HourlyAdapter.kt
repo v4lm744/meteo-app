@@ -11,10 +11,23 @@ import com.meteoapp.util.WeatherUtils
 import com.meteoapp.util.WeatherIcons
 
 class HourlyAdapter(
-    private val context: Context,
-    private val items: List<HourlyData>,
+    context: Context,
+    items: List<HourlyData>,
     private val onItemClick: (HourlyData) -> Unit = {}
 ) : RecyclerView.Adapter<HourlyAdapter.ViewHolder>() {
+
+    private val context = context.applicationContext
+    private var items = items
+
+    /**
+     * Met à jour la liste sans recréer l'adapter (rafraîchissement de la
+     * même ville via la minimap ou la qualité de l'air) : évite de perdre
+     * la position de défilement.
+     */
+    fun submitItems(newItems: List<HourlyData>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(val binding: ItemHourlyBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -24,7 +37,7 @@ class HourlyAdapter(
         )
         return ViewHolder(binding).apply {
             itemView.setOnClickListener {
-                val pos = adapterPosition
+                val pos = bindingAdapterPosition
                 if (pos != RecyclerView.NO_POSITION) onItemClick(items[pos])
             }
         }

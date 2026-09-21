@@ -11,11 +11,27 @@ import com.meteoapp.util.WeatherUtils
 import com.meteoapp.util.WeatherIcons
 
 class DailyAdapter(
-    private val context: Context,
-    private val items: List<DailyData>,
-    private val currentTemp: Double? = null,
+    context: Context,
+    items: List<DailyData>,
+    currentTemp: Double? = null,
     private val onItemClick: (DailyData) -> Unit = {}
 ) : RecyclerView.Adapter<DailyAdapter.ViewHolder>() {
+
+    private val context = context.applicationContext
+    private var items = items
+    private var currentTemp = currentTemp
+
+    /**
+     * Met à jour les données sans recréer l'adapter ni rejouer la cascade
+     * d'animation d'entrée (les plages de la semaine sont recalculées).
+     */
+    fun submitItems(newItems: List<DailyData>, newCurrentTemp: Double?) {
+        items = newItems
+        currentTemp = newCurrentTemp
+        weekMinBacking = items.minOfOrNull { it.tempMin } ?: 0.0
+        weekMaxBacking = items.maxOfOrNull { it.tempMax } ?: 1.0
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(val binding: ItemDailyBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -63,6 +79,8 @@ class DailyAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    private val weekMin: Double = items.minOfOrNull { it.tempMin } ?: 0.0
-    private val weekMax: Double = items.maxOfOrNull { it.tempMax } ?: 1.0
+    private var weekMinBacking: Double = items.minOfOrNull { it.tempMin } ?: 0.0
+    private var weekMaxBacking: Double = items.maxOfOrNull { it.tempMax } ?: 1.0
+    private val weekMin: Double get() = weekMinBacking
+    private val weekMax: Double get() = weekMaxBacking
 }
