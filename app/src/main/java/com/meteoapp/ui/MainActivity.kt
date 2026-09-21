@@ -431,7 +431,7 @@ class MainActivity : AppCompatActivity() {
         binding.windValue.text = getString(
             R.string.format_wind,
             WeatherUtils.formatWindSpeed(this, current.windSpeed),
-            WeatherUtils.windDirection(current.windDeg)
+            WeatherUtils.windDirection(this, current.windDeg)
         )
         binding.pressureValue.text = WeatherUtils.formatPressure(this, current.pressure)
         binding.visibilityValue.text = WeatherUtils.formatVisibility(this, current.visibility)
@@ -445,6 +445,7 @@ class MainActivity : AppCompatActivity() {
             binding.arcSunriseValue.text = WeatherUtils.formatTime(this, sunrise, weather.timezoneOffset)
             binding.arcSunsetValue.text = WeatherUtils.formatTime(this, sunset, weather.timezoneOffset)
             binding.sunArcView.setSunTimes(sunrise, sunset, current.dt)
+            showMoonPhase()
             binding.sunArcCard.visibility = View.VISIBLE
         } else {
             binding.sunArcCard.visibility = View.GONE
@@ -478,6 +479,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.regionMapView.clear()
         }
+        // Tendance 24 h : courbe des températures + probabilité de pluie
+        if (weather.hourly.size >= 2) {
+            binding.hourlyChartView.submit(weather.hourly)
+            binding.hourlyChartCard.visibility = View.VISIBLE
+        } else {
+            binding.hourlyChartCard.visibility = View.GONE
+        }
 
         applyDynamicBackground(weather)
         if (isCityChange) {
@@ -500,6 +508,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun cityKeyFor(city: GeoLocation?): String? =
         city?.let { "%.2f_%.2f".format(java.util.Locale.US, it.lat, it.lon) }
+
+    /**
+     * Phase lunaire du jour calculée localement (cycle synodique) et
+     * affichée sous l'arc solaire avec la fraction éclairée du disque.
+     */
+    private fun showMoonPhase() {
+        val phaseName = when (com.meteoapp.util.MoonPhase.phase()) {
+            com.meteoapp.util.MoonPhase.Phase.NEW_MOON -> getString(R.string.moon_new)
+            com.meteoapp.util.MoonPhase.Phase.WAXING_CRESCENT -> getString(R.string.moon_waxing_crescent)
+            com.meteoapp.util.MoonPhase.Phase.FIRST_QUARTER -> getString(R.string.moon_first_quarter)
+            com.meteoapp.util.MoonPhase.Phase.WAXING_GIBBOUS -> getString(R.string.moon_waxing_gibbous)
+            com.meteoapp.util.MoonPhase.Phase.FULL_MOON -> getString(R.string.moon_full)
+            com.meteoapp.util.MoonPhase.Phase.WANING_GIBBOUS -> getString(R.string.moon_waning_gibbous)
+            com.meteoapp.util.MoonPhase.Phase.LAST_QUARTER -> getString(R.string.moon_last_quarter)
+            com.meteoapp.util.MoonPhase.Phase.WANING_CRESCENT -> getString(R.string.moon_waning_crescent)
+        }
+        val pct = kotlin.math.round(com.meteoapp.util.MoonPhase.illuminatedFraction() * 100).toInt()
+        val illuminated = getString(R.string.moon_illumination_format, "$pct %")
+        binding.moonPhaseValue.text = getString(R.string.moon_phase_label, phaseName, illuminated)
+    }
 
     private fun showAirQuality(weather: WeatherData, airQuality: com.meteoapp.data.model.AirPollutionItem?) {
         val aqi = airQuality?.main?.aqi
@@ -631,6 +659,7 @@ class MainActivity : AppCompatActivity() {
         binding.dailyTitle.visibility = View.GONE
         binding.hourlyRecycler.visibility = View.GONE
         binding.dailyRecycler.visibility = View.GONE
+        binding.hourlyChartCard.visibility = View.GONE
         binding.swipeRefresh.isRefreshing = false
     }
 

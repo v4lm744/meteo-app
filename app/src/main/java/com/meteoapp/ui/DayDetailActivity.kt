@@ -73,8 +73,9 @@ class DayDetailActivity : AppCompatActivity() {
         binding.windValue.text = getString(
             R.string.format_wind,
             WeatherUtils.formatWindSpeed(this, day.windSpeed),
-            WeatherUtils.windDirection(day.windDeg)
+            WeatherUtils.windDirection(this, day.windDeg)
         )
+        binding.windCompass.setWind(day.windDeg, WeatherUtils.kmh(day.windSpeed).toString() + " km/h")
         binding.pressureValue.text = WeatherUtils.formatPressure(this, day.pressure)
         val pop = day.pop ?: 0.0
         binding.popValue.text = getString(R.string.format_percent, (pop * 100).toInt())

@@ -6,6 +6,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.meteoapp.R
 
 /**
  * Travail en arrière-plan planifié par [WidgetSyncScheduler] qui rafraîchit la
@@ -41,7 +42,35 @@ class WidgetSyncWorker(
                 Log.w(TAG, "Échec de synchro du widget $id", e)
             }
         }
+        if (syncHourlyWidget(context)) {
+            anySuccess = true
+        }
         return if (anySuccess) Result.success() else Result.retry()
+    }
+
+    /**
+     * Rafraîchit le stockage du widget collection horaire pour chaque
+     * instance installée, puis notifie les listes RemoteViews.
+     */
+    private suspend fun syncHourlyWidget(context: Context): Boolean {
+        val manager = AppWidgetManager.getInstance(context)
+        val hourlyIds = manager.getAppWidgetIds(
+            ComponentName(context, HourlyForecastWidgetProvider::class.java)
+        )
+        if (hourlyIds.isEmpty()) return true
+        var anySuccess = false
+        for (id in hourlyIds.sorted()) {
+            val city = WidgetPrefs.getCity(context, id) ?: continue
+            try {
+                if (HourlyForecastStore.refresh(context, id, city)) {
+                    anySuccess = true
+                    manager.notifyAppWidgetViewDataChanged(id, R.id.hourlyWidgetList)
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Échec de synchro du widget horaire $id", e)
+            }
+        }
+        return anySuccess
     }
 
     companion object {

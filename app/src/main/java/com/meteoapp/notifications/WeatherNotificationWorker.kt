@@ -20,9 +20,11 @@ import com.meteoapp.ui.MainActivity
 import com.meteoapp.util.WeatherUtils
 
 /**
- * Travail quotidien de notification météo : récupère la météo de la ville
- * courante (dernière consultée, ou première des favoris) et affiche une
- * notification récapitulative (température, condition, min/max du jour).
+ * Travail quotidien de notification météo : récupère la météo de chaque ville
+ * favorite (la ville courante est incluse si elle est favorite ou dernière
+ * consultée) et affiche une notification récapitulative par ville (température,
+ * condition, min/max du jour). Chaque ville possède son propre ID de
+ * notification, ce qui permet de les examiner ou supprimer indépendamment.
  */
 class WeatherNotificationWorker(
     context: Context,
@@ -31,31 +33,46 @@ class WeatherNotificationWorker(
 
     companion object {
         const val CHANNEL_ID = "weather_daily"
-        private const val NOTIFICATION_ID = 1001
+        private const val NOTIFICATION_ID_BASE = 1000
     }
 
     override suspend fun doWork(): Result {
         val context = applicationContext
-
-        val city = com.meteoapp.city.FavoriteCitiesStore.currentNotificationCity(context)
-        if (city == null || !NotificationPrefs.isEnabled(context)) {
+        if (!NotificationPrefs.isEnabled(context)) {
             return Result.success()
         }
-
-        val repository = WeatherRepository(context)
-        val weather = when (val result = repository.getWeather(city.lat, city.lon)) {
-            is WeatherResult.Success -> result.data
-            else -> return Result.success()
+        val cities = com.meteoapp.city.FavoriteCitiesStore
+            .dailyNotificationCities(context)
+        if (cities.isEmpty()) {
+            return Result.success()
         }
-
-        postNotification(context, city.name, weather)
+        val repository = WeatherRepository(context)
+        cities.forEachIndexed { index, city ->
+            val weather = when (
+                val result = repository.getWeather(city.lat, city.lon)
+            ) {
+                is WeatherResult.Success -> result.data
+                else -> return@forEachIndexed
+            }
+            postNotification(
+                context,
+                city.displayName(context),
+                city.lat,
+                city.lon,
+                weather,
+                NOTIFICATION_ID_BASE + index
+            )
+        }
         return Result.success()
     }
 
     private fun postNotification(
         context: Context,
         cityName: String,
-        weather: com.meteoapp.data.model.WeatherData
+        lat: Double,
+        lon: Double,
+        weather: com.meteoapp.data.model.WeatherData,
+        notificationId: Int
     ) {
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
@@ -63,7 +80,6 @@ class WeatherNotificationWorker(
         ) {
             return
         }
-
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(
             NotificationChannel(
@@ -74,7 +90,6 @@ class WeatherNotificationWorker(
                 description = context.getString(R.string.notification_channel_desc)
             }
         )
-
         val temp = WeatherUtils.formatTemp(context, weather.current.temp)
         val condition = weather.current.weather.firstOrNull()?.description
             ?.replaceFirstChar { it.uppercase() } ?: ""
@@ -86,14 +101,17 @@ class WeatherNotificationWorker(
                 WeatherUtils.formatTemp(context, it.tempMin)
             )
         } ?: ""
-
+        val openIntent = Intent(context, MainActivity::class.java).apply {
+            putExtra(MainActivity.EXTRA_CITY_NAME, cityName)
+            putExtra(MainActivity.EXTRA_CITY_LAT, lat)
+            putExtra(MainActivity.EXTRA_CITY_LON, lon)
+        }
         val contentIntent = PendingIntent.getActivity(
             context,
-            0,
-            Intent(context, MainActivity::class.java),
+            notificationId,
+            openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_weather_placeholder)
             .setContentTitle(context.getString(R.string.notification_title, cityName))
@@ -107,7 +125,6 @@ class WeatherNotificationWorker(
             .setContentIntent(contentIntent)
             .setAutoCancel(true)
             .build()
-
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 }

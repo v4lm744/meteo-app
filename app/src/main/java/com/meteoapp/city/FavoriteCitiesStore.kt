@@ -68,6 +68,21 @@ object FavoriteCitiesStore {
         return current ?: getFavorites(context).firstOrNull()
     }
 
+    /**
+     * Villes notifiées par le résumé quotidien : toutes les favorites, la
+     * ville courante en tête si elle n'y figure pas déjà (l'utilisateur
+     * s'intéresse de près à la dernière ville consultée).
+     */
+    fun dailyNotificationCities(context: Context): List<GeoLocation> {
+        val favorites = getFavorites(context)
+        val current = getCurrentCity(context)
+        return if (current != null && favorites.none { it.lat == current.lat && it.lon == current.lon }) {
+            listOf(current) + favorites
+        } else {
+            favorites
+        }
+    }
+
     fun setCurrentCity(context: Context, city: GeoLocation) {
         prefs(context).edit { putString(KEY_CURRENT, cityAdapter.toJson(city)) }
     }

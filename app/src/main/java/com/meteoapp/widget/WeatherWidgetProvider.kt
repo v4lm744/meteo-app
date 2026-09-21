@@ -199,14 +199,16 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                     var h = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
                     if (w <= 0) w = (250 * density).toInt()
                     if (h <= 0) h = (70 * density).toInt()
-                    val bg =
-                        if (WidgetThemePrefs.getTheme(context, appWidgetId) == WidgetThemePrefs.Theme.DARK) {
+                    val bg = when (WidgetThemePrefs.getTheme(context, appWidgetId)) {
+                        WidgetThemePrefs.Theme.DARK ->
                             WidgetGradient.buildDarkBackground(context.applicationContext, w, h)
-                        } else {
+                        WidgetThemePrefs.Theme.MATERIAL_YOU ->
+                            WidgetGradient.buildDynamicBackground(context.applicationContext, w, h)
+                        WidgetThemePrefs.Theme.WEATHER_GRADIENT ->
                             WidgetGradient.buildBackground(
                                 context.applicationContext, result.data, w, h
                             )
-                        }
+                    }
                     views.setImageViewBitmap(R.id.widgetBackground, bg)
                 } catch (_: Exception) {
                 }

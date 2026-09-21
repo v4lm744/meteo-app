@@ -167,6 +167,7 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_margin="6dp"
+                        android:gravity="center_horizontal"
                         android:orientation="vertical">
 
                         <TextView
@@ -181,6 +182,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:text="12 km/h" />
+
+                        <com.meteoapp.ui.widget.WindCompassView
+                            android:id="@+id/windCompass"
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:layout_marginTop="8dp" />
                     </LinearLayout>
 
                     <LinearLayout

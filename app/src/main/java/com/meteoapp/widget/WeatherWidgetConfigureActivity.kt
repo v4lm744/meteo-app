@@ -52,10 +52,10 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
         binding.widgetThemeLabel.visibility = View.VISIBLE
         binding.widgetThemeGroup.visibility = View.VISIBLE
         binding.widgetThemeGroup.setOnCheckedChangeListener { _, checkedId ->
-            widgetTheme = if (checkedId == R.id.themeDarkRadio) {
-                WidgetThemePrefs.Theme.DARK
-            } else {
-                WidgetThemePrefs.Theme.WEATHER_GRADIENT
+            widgetTheme = when (checkedId) {
+                R.id.themeDarkRadio -> WidgetThemePrefs.Theme.DARK
+                R.id.themeMaterialYouRadio -> WidgetThemePrefs.Theme.MATERIAL_YOU
+                else -> WidgetThemePrefs.Theme.WEATHER_GRADIENT
             }
         }
     }

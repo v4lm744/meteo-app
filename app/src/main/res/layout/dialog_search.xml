@@ -74,6 +74,13 @@
             android:layout_marginStart="16dp"
             android:text="@string/widget_theme_dark"
             android:textColor="@color/md_text_dark" />
+        <RadioButton
+            android:id="@+id/themeMaterialYouRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/widget_theme_material_you"
+            android:textColor="@color/md_text_dark" />
     </RadioGroup>
 
     <androidx.recyclerview.widget.RecyclerView

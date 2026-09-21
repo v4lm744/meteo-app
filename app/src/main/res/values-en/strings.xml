@@ -43,6 +43,7 @@
     <string name="api_key_hint">Key stored on the device. Get a free key at openweathermap.org.</string>
     <string name="hint_city">Enter a city\u2026</string>
     <string name="hourly_forecast">48-hour forecast</string>
+    <string name="hourly_chart_title">24-hour trend</string>
     <string name="daily_forecast">7-day forecast</string>
     <string name="region_map">Regional weather</string>
     <string name="radar_toggle_off">Rain radar</string>
@@ -60,12 +61,22 @@
     <string name="settings_dynamic_colors_hint">Material You: interface colors adapt to your wallpaper (Android 12+). The weather gradient stays unchanged.</string>
     <string name="settings_dynamic_colors_unavailable">Dynamic colors unavailable before Android 12.</string>
     <string name="settings_notifications_title">Weather notifications</string>
-    <string name="settings_notifications_hint">Get a daily summary of your city\'s weather (condition, temperature, day min/max).</string>
+    <string name="settings_notifications_hint">Get a daily summary of your favorite cities and the last one viewed (condition, temperature, day min/max).</string>
     <string name="settings_notifications_enable">Enable the daily notification</string>
     <string name="settings_notifications_hour">Delivery time</string>
     <string name="settings_notifications_hour_format">%1$02d:00</string>
     <string name="notification_permission_needed">Allow notifications in Android settings to receive the weather of the day.</string>
     <string name="sun_arc_title">Sun path</string>
+    <string name="moon_phase_label">Moon phase: %1$s %2$s</string>
+    <string name="moon_new">New moon</string>
+    <string name="moon_waxing_crescent">Waxing crescent</string>
+    <string name="moon_first_quarter">First quarter</string>
+    <string name="moon_waxing_gibbous">Waxing gibbous</string>
+    <string name="moon_full">Full moon</string>
+    <string name="moon_waning_gibbous">Waning gibbous</string>
+    <string name="moon_last_quarter">Last quarter</string>
+    <string name="moon_waning_crescent">Waning crescent</string>
+    <string name="moon_illumination_format">(%1$s illuminated)</string>
     <string name="feels_like">Feels like</string>
     <string name="humidity">Humidity</string>
     <string name="wind">Wind</string>
@@ -215,4 +226,6 @@
     <string name="widget_theme_label">Widget theme</string>
     <string name="widget_theme_gradient">Weather gradient</string>
     <string name="widget_theme_dark">Dark</string>
+    <string name="widget_theme_material_you">Material You</string>
+    <string name="hourly_widget_description">Hourly forecast for your city</string>
 </resources>
