@@ -34,8 +34,10 @@ jobs:
           profile: Nexus 6
           heap-size: 512M
           ram-size: 2048M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save
           script: |
+            adb wait-for-device
+            adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; echo "boot OK"'
             ./gradlew connectedDebugAndroidTest --stacktrace
 
       - name: Upload instrumentation test results
