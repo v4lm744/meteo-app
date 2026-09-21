@@ -30,7 +30,7 @@ class DynamicBackgroundController(
         if (currentTop < 0 || currentBottom < 0) {
             currentTop = top
             currentBottom = bottom
-            window.statusBarColor = top
+            com.meteoapp.util.SystemBars.setStatusBarColorCompat(window, top)
             binding.root.background = gradientDrawable(top, bottom)
             tintToolbar(top)
             return
@@ -49,7 +49,7 @@ class DynamicBackgroundController(
                 val fraction = anim.animatedValue as Float
                 val blendedTop = argbBlend(fromTop, top, fraction)
                 val blendedBottom = argbBlend(fromBottom, bottom, fraction)
-                window.statusBarColor = blendedTop
+                com.meteoapp.util.SystemBars.setStatusBarColorCompat(window, blendedTop)
                 binding.root.background = gradientDrawable(blendedTop, blendedBottom)
             }
             start()

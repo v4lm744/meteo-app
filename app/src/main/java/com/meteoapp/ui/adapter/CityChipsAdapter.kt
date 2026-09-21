@@ -42,7 +42,7 @@ class CityChipsAdapter(
 
     inner class ChipViewHolder(private val view: TextView) : RecyclerView.ViewHolder(view) {
         fun bind(city: GeoLocation, isActive: Boolean) {
-            view.text = city.localNames?.fr ?: city.name
+            view.text = city.displayName(view.context)
             view.background.setTint(
                 if (isActive) ContextCompat.getColor(view.context, R.color.md_white)
                 else ContextCompat.getColor(view.context, android.R.color.transparent)

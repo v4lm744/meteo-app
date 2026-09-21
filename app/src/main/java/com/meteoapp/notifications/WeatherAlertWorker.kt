@@ -56,7 +56,7 @@ class WeatherAlertWorker(
 
         if (!hasNotificationPermission(context)) return Result.success()
         ensureChannel(context)
-        postAlert(context, city.localNames?.fr ?: city.name, fresh)
+        postAlert(context, city.displayName(context), fresh)
         return Result.success()
     }
 

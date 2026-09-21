@@ -66,7 +66,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
 
         val openIntent = Intent(context, MainActivity::class.java).apply {
             if (city != null) {
-                putExtra(MainActivity.EXTRA_CITY_NAME, city.localNames?.fr ?: city.name)
+                putExtra(MainActivity.EXTRA_CITY_NAME, city.displayName(context))
                 putExtra(MainActivity.EXTRA_CITY_LAT, city.lat)
                 putExtra(MainActivity.EXTRA_CITY_LON, city.lon)
             }
@@ -86,7 +86,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
             return
         }
 
-        val displayName = city.localNames?.fr ?: city.name
+        val displayName = city.displayName(context)
         views.setTextViewText(R.id.widgetCity, displayName)
         views.setTextViewText(R.id.widgetTemp, "\u2026")
         views.setTextViewText(R.id.widgetDesc, context.getString(R.string.loading))
@@ -133,7 +133,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.widget_weather)
 
         val openIntent = Intent(context, MainActivity::class.java).apply {
-            putExtra(MainActivity.EXTRA_CITY_NAME, city.localNames?.fr ?: city.name)
+            putExtra(MainActivity.EXTRA_CITY_NAME, city.displayName(context))
             putExtra(MainActivity.EXTRA_CITY_LAT, city.lat)
             putExtra(MainActivity.EXTRA_CITY_LON, city.lon)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -145,7 +145,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.widgetRoot, pi)
 
         withContext(Dispatchers.Main) {
-            val displayName = city.localNames?.fr ?: city.name
+            val displayName = city.displayName(context)
             views.setTextViewText(R.id.widgetCity, displayName)
             views.setTextViewText(R.id.widgetTemp, "\u2026")
             views.setTextViewText(R.id.widgetDesc, context.getString(R.string.loading))
@@ -169,7 +169,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         when (result) {
             is WeatherResult.Success -> {
                 val current = result.data.current
-                views.setTextViewText(R.id.widgetCity, city.localNames?.fr ?: city.name)
+                views.setTextViewText(R.id.widgetCity, city.displayName(context))
                 views.setTextViewText(
                     R.id.widgetTemp,
                     WeatherUtils.formatTemp(context, current.temp)

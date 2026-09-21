@@ -135,15 +135,39 @@ class WeatherUtilsTest {
     }
 
     @Test
-    fun formatDayName_returnsAbbreviatedFrenchDay() {
-        // 1970-01-01 00:00:00 UTC est un jeudi -> "jeu."
-        assertEquals("jeu.", WeatherUtils.formatDayName(0L, 0))
+    fun formatDayName_returnsAbbreviatedLocalizedDay() {
+        val original = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.FRANCE)
+        try {
+            // 1970-01-01 00:00:00 UTC est un jeudi -> "jeu."
+            assertEquals("jeu.", WeatherUtils.formatDayName(0L, 0))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
+        java.util.Locale.setDefault(java.util.Locale.ENGLISH)
+        try {
+            assertEquals("Thu", WeatherUtils.formatDayName(0L, 0))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
     }
 
     @Test
-    fun formatFullDayName_returnsFullFrenchDay() {
-        // 1970-01-01 00:00:00 UTC est un jeudi -> "Jeudi"
-        assertEquals("Jeudi", WeatherUtils.formatFullDayName(0L, 0))
+    fun formatFullDayName_returnsFullLocalizedDay() {
+        val original = java.util.Locale.getDefault()
+        java.util.Locale.setDefault(java.util.Locale.FRANCE)
+        try {
+            // 1970-01-01 00:00:00 UTC est un jeudi -> "Jeudi"
+            assertEquals("Jeudi", WeatherUtils.formatFullDayName(0L, 0))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
+        java.util.Locale.setDefault(java.util.Locale.ENGLISH)
+        try {
+            assertEquals("Thursday", WeatherUtils.formatFullDayName(0L, 0))
+        } finally {
+            java.util.Locale.setDefault(original)
+        }
     }
 
     @Test

@@ -89,7 +89,7 @@ class DayDetailActivity : AppCompatActivity() {
             intArrayOf(grad.top, grad.bottom)
         )
         binding.dayDetailRoot.background = drawable
-        window.statusBarColor = grad.top
+        com.meteoapp.util.SystemBars.setStatusBarColorCompat(window, grad.top)
         androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars =
             com.meteoapp.util.WeatherColors.contrastColor(grad.top) == 0xFF000000.toInt()
