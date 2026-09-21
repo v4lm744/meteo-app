@@ -381,6 +381,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.cacheBanner.visibility = View.GONE
         }
+        showRainBanner(weather.hourly)
 
         val displayName = city?.displayName(this) ?: ""
         binding.cityName.text = displayName
@@ -508,6 +509,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun cityKeyFor(city: GeoLocation?): String? =
         city?.let { "%.2f_%.2f".format(java.util.Locale.US, it.lat, it.lon) }
+
+    /**
+     * Bandeau de précipitation imminente : calcule localement le premier
+     * créneau pluvieux/neigeux à venir depuis les prévisions 3 h et
+     * l'affiche sous l'en-tête (masqué si rien n'est prévu).
+     */
+    private fun showRainBanner(hours: List<com.meteoapp.data.model.HourlyData>) {
+        val precipitation = com.meteoapp.util.ImminentRain.detect(hours)
+        if (precipitation == null) {
+            binding.rainBanner.visibility = View.GONE
+            return
+        }
+        binding.rainBanner.text = com.meteoapp.util.ImminentRain.bannerText(this, precipitation)
+        val icon = if (precipitation.isSnow) {
+            com.meteoapp.R.drawable.ic_wx_snow
+        } else {
+            com.meteoapp.R.drawable.ic_wx_rain
+        }
+        binding.rainBanner.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0)
+        binding.rainBanner.visibility = View.VISIBLE
+    }
 
     /**
      * Phase lunaire du jour calculée localement (cycle synodique) et
@@ -649,6 +671,7 @@ class MainActivity : AppCompatActivity() {
         backgroundController.tintToolbar(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
         binding.cacheBanner.visibility = View.GONE
+        binding.rainBanner.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
         binding.airQualityCard.root.visibility = View.GONE
         binding.sunArcCard.visibility = View.GONE
