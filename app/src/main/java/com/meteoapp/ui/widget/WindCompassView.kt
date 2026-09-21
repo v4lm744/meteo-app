@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import com.meteoapp.R
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -96,7 +97,7 @@ class WindCompassView @JvmOverloads constructor(
         }
 
         val cardinalOffset = radius + 10f * density
-        val westLabel = if (resources.configuration.locales[0].language == "fr") "O" else "W"
+        val westLabel = context.getString(R.string.compass_west)
         canvas.drawText("N", cx, cy - cardinalOffset + cardinalsOn.ascent() * -0.4f, cardinalsOn)
         canvas.drawText("E", cx + cardinalOffset, cy + cardinalsOff.textSize * 0.35f, cardinalsOff)
         canvas.drawText("S", cx, cy + cardinalOffset + cardinalsOff.textSize * 0.3f, cardinalsOff)

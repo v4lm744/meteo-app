@@ -28,7 +28,10 @@ class WidgetSyncWorker(
         val ids = manager.getAppWidgetIds(
             ComponentName(context, WeatherWidgetProvider::class.java)
         )
-        if (ids.isEmpty()) return Result.success()
+        if (ids.isEmpty() && manager.getAppWidgetIds(
+                ComponentName(context, HourlyForecastWidgetProvider::class.java)
+            ).isEmpty()
+        ) return Result.success()
 
         // Un seul appel réseau par ville : plusieurs widgets sur la même
         // ville partagent les mêmes données via le cache du repository.

@@ -11,6 +11,7 @@ import com.meteoapp.R
 import com.meteoapp.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
@@ -57,8 +58,15 @@ class HourlyForecastWidgetProvider : AppWidgetProvider() {
             views.setEmptyView(R.id.hourlyWidgetList, R.id.hourlyWidgetEmpty)
             appWidgetManager.updateAppWidget(id, views)
             appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.hourlyWidgetList)
-            CoroutineScope(Dispatchers.IO).launch {
-                HourlyForecastStore.refresh(context, id, city)
+            val pendingResult = goAsync()
+            CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+                try {
+                    if (HourlyForecastStore.refresh(context, id, city)) {
+                        appWidgetManager.notifyAppWidgetViewDataChanged(id, R.id.hourlyWidgetList)
+                    }
+                } finally {
+                    pendingResult.finish()
+                }
             }
         }
     }
