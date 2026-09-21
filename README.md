@@ -20,15 +20,27 @@ votre appareil (autorisez « Installer des applications inconnues » si demandé
   actuelle sur la ligne du jour
 - **Arc solaire** : carte « Course du soleil » montrant la progression de la
   journée entre lever et coucher (balayage animé, soleil positionné à l'heure
-  actuelle, heures de lever/coucher affichées)
+  actuelle, heures de lever/coucher affichées) et **phase lunaire** du jour
+  (nom de phase + pourcentage du disque éclairé, calcul local du cycle synodique)
+- **Tendance 24 h** : graphique des températures (courbe dorée) et probabilité
+  de précipitations (barres bleues) des prochaines heures
 - **Minimap de la région** de la ville sélectionnée (osmdroid / OpenStreetMap) avec
   les principales villes voisines, leur icône météo et leur température ;
   tap sur une ville voisine charge sa météo, et le pull-to-refresh rafraîchit les marqueurs
 - Recherche de ville (géocoding OpenWeather)
 - Géolocalisation (position courante)
+- **Villes favorites** avec chips de navigation rapide et écran de comparaison multi-villes
+- **Résumé quotidien par notification** : une notification par ville favorite
+  (température, condition, min/max du jour), tap pour ouvrir la ville concernée
+- **Alertes météo** en notification (évaluateur local configurable)
+- **Bilingue français/anglais** : l'interface suit la langue du système (jours, dates,
+  directions du vent, noms de villes localisés)
 - **Widget d'accueil** : résumé météo du jour (icône, température, description, min/max)
   pour une ville choisie à l'ajout du widget (écran de configuration avec recherche) ;
   fond en dégradé dynamique selon la météo et l'heure (jour/nuit, soleil, nuages, pluie, neige…)
+  ou **thème Material You** (couleurs dynamiques du système, Android 12+)
+- **Widget horaire** : liste défilante des 12 prochaines heures (icône, heure,
+  température, probabilité de pluie) pour la ville du widget principal
 - **Synchronisation automatique des widgets** : mise à jour régulière de la météo des
   widgets en arrière-plan (WorkManager), même quand l'application est fermée ;
   l'intervalle (15 min, 30 min, 1 h, 3 h ou désactivé) se règle dans le menu
@@ -41,7 +53,8 @@ votre appareil (autorisez « Installer des applications inconnues » si demandé
   et les widgets.
 - Rafraîchissement par « pull-to-refresh » (indicateur teinté à la couleur
   dynamique du fond)
-- Affichage détaillé : humidité, vent, pression, visibilité, lever/coucher du soleil
+- Affichage détaillé : humidité, vent (avec **boussole de direction** sur les écrans
+  détail heure/jour), pression, visibilité, lever/coucher du soleil
 - **Design Google Météo** : icônes météo vectorielles animées (soleil, pluie, neige,
   orage, brume, nuit…), cartes en verre dépoli, animations d'entrée en cascade
 - **Fond dynamique de l'app** : dégradé vertical en haut selon la météo et l'heure
@@ -131,13 +144,23 @@ partagée devront être réinstallées une dernière fois.
 
 ## Architecture
 
-- `data/` : modèles, API Retrofit, repository
+- `data/` : modèles, API Retrofit, repository, cache météo
 - `location/` : géolocalisation (FusedLocationProvider)
-- `widget/` : `WeatherWidgetProvider`, `WeatherWidgetConfigureActivity`, `WidgetPrefs`,
-  `SyncPrefs`, `WidgetSyncScheduler`, `WidgetSyncWorker` (synchro auto WorkManager)
-- `ui/` : MainActivity, ViewModel, adapters, dialogs (recherche, paramètres, à propos…)
+- `city/` : recherche de ville partagée (`CitySearchController`), villes favorites
+  (`FavoriteCitiesStore`)
+- `notifications/` : résumé quotidien multi-villes, alertes météo (WorkManager)
+- `stats/` : historique météo (`WeatherHistoryStore`)
+- `widget/` : widgets principal et horaire (`WeatherWidgetProvider`,
+  `HourlyForecastWidgetProvider`), écran de configuration, préférences et thèmes
+  (`WidgetPrefs`, `WidgetThemePrefs`), dégradés de fond (`WidgetGradient`),
+  synchro auto WorkManager (`WidgetSyncScheduler`, `WidgetSyncWorker`)
+- `ui/` : MainActivity, écrans de détail heure/jour, comparaison, ViewModel, adapters,
+  vues canvas personnalisées (`HourlyChartView`, `WindCompassView`, `SunArcView`),
+  dialogs (recherche, paramètres, à propos…)
 - `util/` : formatage des dates/températures/vent/pression, préférences d'unités
-  (`UnitPrefs`), couleurs dynamiques (`WeatherColors`)
+  (`UnitPrefs`), couleurs dynamiques (`WeatherColors`), phase lunaire (`MoonPhase`),
+  barres système (`SystemBars`)
 
-Technologies : Kotlin, Coroutines, WorkManager (synchro widget), Retrofit + Moshi, Glide, Material 3,
-ViewBinding, LiveData, FusedLocationProvider, osmdroid (cartes OpenStreetMap).
+Technologies : Kotlin, Coroutines, WorkManager (synchro widget, notifications, alertes),
+Retrofit + Moshi (KSP), Material 3, ViewBinding, LiveData, FusedLocationProvider,
+osmdroid (cartes OpenStreetMap), splashscreen AndroidX.
