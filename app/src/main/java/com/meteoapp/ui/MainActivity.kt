@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private var toolbarTint: Int = 0xFFFFFFFF.toInt()
     private lateinit var cityChipsAdapter: com.meteoapp.ui.adapter.CityChipsAdapter
     private lateinit var backgroundController: com.meteoapp.ui.background.DynamicBackgroundController
+    private var displayedCityKey: String? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -97,28 +98,46 @@ class MainActivity : AppCompatActivity() {
             showError(getString(R.string.error_no_api_key))
             openApiKeyDialog()
         } else {
-            val launchName = intent?.getStringExtra(EXTRA_CITY_NAME)
-            val launchLat = intent?.getDoubleExtra(EXTRA_CITY_LAT, Double.NaN)
-            val launchLon = intent?.getDoubleExtra(EXTRA_CITY_LON, Double.NaN)
-            if (!launchName.isNullOrBlank() && !launchLat!!.isNaN() && !launchLon!!.isNaN()) {
-                viewModel.loadWeatherForCity(
-                    GeoLocation(
-                        name = launchName,
-                        localNames = null,
-                        lat = launchLat,
-                        lon = launchLon,
-                        country = null,
-                        state = null
-                    )
+            loadFromLaunchIntent(intent)
+        }
+    }
+
+    /**
+     * Charge la ville portée par un intent de lancement (widget, raccourci
+     * dynamique, écran de comparaison), sinon la dernière ville consultée,
+     * sinon la position courante.
+     */
+    private fun loadFromLaunchIntent(intent: android.content.Intent?) {
+        val launchName = intent?.getStringExtra(EXTRA_CITY_NAME)
+        val launchLat = intent?.getDoubleExtra(EXTRA_CITY_LAT, Double.NaN) ?: Double.NaN
+        val launchLon = intent?.getDoubleExtra(EXTRA_CITY_LON, Double.NaN) ?: Double.NaN
+        if (!launchName.isNullOrBlank() && !launchLat.isNaN() && !launchLon.isNaN()) {
+            viewModel.loadWeatherForCity(
+                GeoLocation(
+                    name = launchName,
+                    localNames = null,
+                    lat = launchLat,
+                    lon = launchLon,
+                    country = null,
+                    state = null
                 )
+            )
+        } else {
+            val savedCity = com.meteoapp.city.FavoriteCitiesStore.getCurrentCity(this)
+            if (savedCity != null) {
+                viewModel.loadWeatherForCity(savedCity)
             } else {
-                val savedCity = com.meteoapp.city.FavoriteCitiesStore.getCurrentCity(this)
-                if (savedCity != null) {
-                    viewModel.loadWeatherForCity(savedCity)
-                } else {
-                    requestLocationAndLoad()
-                }
+                requestLocationAndLoad()
             }
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        // singleTop : un tap widget/raccourci alors que l'activité est déjà
+        // affichée arrive ici sans recréer l'activité ; on charge la ville demandée.
+        if (viewModel.isApiKeyConfigured) {
+            loadFromLaunchIntent(intent)
         }
     }
 
@@ -437,16 +456,22 @@ class MainActivity : AppCompatActivity() {
         showHistory(weather)
 
         // Hourly : 48 prochaines heures (pas de 3 h)
-        binding.hourlyRecycler.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.hourlyRecycler.adapter = HourlyAdapter(this, weather.hourly) { hour ->
-            openHourDetail(hour)
-        }
+        val isCityChange = displayedCityKey != cityKeyFor(city ?: viewModel.state.value?.city)
+        if (isCityChange) {
+            binding.hourlyRecycler.layoutManager =
+                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            binding.hourlyRecycler.adapter = HourlyAdapter(this, weather.hourly) { hour ->
+                openHourDetail(hour)
+            }
 
-        // Daily : 7 jours
-        binding.dailyRecycler.layoutManager = LinearLayoutManager(this)
-        binding.dailyRecycler.adapter = DailyAdapter(this, weather.daily.take(7), current.temp) { day ->
-            openDayDetail(day)
+            // Daily : 7 jours
+            binding.dailyRecycler.layoutManager = LinearLayoutManager(this)
+            binding.dailyRecycler.adapter = DailyAdapter(this, weather.daily.take(7), current.temp) { day ->
+                openDayDetail(day)
+            }
+        } else {
+            (binding.hourlyRecycler.adapter as? HourlyAdapter)?.submitItems(weather.hourly)
+            (binding.dailyRecycler.adapter as? DailyAdapter)?.submitItems(weather.daily.take(7), current.temp)
         }
 
         // Minimap région : villes proches avec météo
@@ -457,20 +482,26 @@ class MainActivity : AppCompatActivity() {
         }
 
         applyDynamicBackground(weather)
-        EntranceAnimator.cascade(
-            binding.headerLayout,
-            binding.detailsCard,
-            binding.airQualityCard.root,
-            binding.sunArcCard,
-            binding.historyCard.root,
-            binding.regionMapTitle,
-            binding.regionMapCard,
-            binding.hourlyTitle,
-            binding.hourlyRecycler,
-            binding.dailyTitle,
-            binding.dailyRecycler
-        )
+        if (isCityChange) {
+            displayedCityKey = cityKeyFor(city ?: viewModel.state.value?.city)
+            EntranceAnimator.cascade(
+                binding.headerLayout,
+                binding.detailsCard,
+                binding.airQualityCard.root,
+                binding.sunArcCard,
+                binding.historyCard.root,
+                binding.regionMapTitle,
+                binding.regionMapCard,
+                binding.hourlyTitle,
+                binding.hourlyRecycler,
+                binding.dailyTitle,
+                binding.dailyRecycler
+            )
+        }
     }
+
+    private fun cityKeyFor(city: GeoLocation?): String? =
+        city?.let { "%.2f_%.2f".format(java.util.Locale.US, it.lat, it.lon) }
 
     private fun showAirQuality(weather: WeatherData, airQuality: com.meteoapp.data.model.AirPollutionItem?) {
         val aqi = airQuality?.main?.aqi
