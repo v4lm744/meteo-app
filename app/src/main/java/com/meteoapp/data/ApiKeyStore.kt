@@ -15,21 +15,35 @@ object ApiKeyStore {
     private const val PREFS_NAME = "meteo_prefs"
     private const val KEY_API_KEY = "open_weather_api_key"
 
+    @Volatile
+    private var cachedPrefs: SharedPreferences? = null
+
+    /**
+     * Instance mémoïsée : la création d'EncryptedSharedPreferences dérive la
+     * clé maître (coûteux, ~50 ms) ; on la construit une seule fois par process
+     * plutôt qu'à chaque lecture de la clé API.
+     */
     private fun prefs(context: Context): SharedPreferences {
-        val appContext = context.applicationContext
-        return try {
-            val masterKey = MasterKey.Builder(appContext)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            EncryptedSharedPreferences.create(
-                appContext,
-                PREFS_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        } catch (e: Exception) {
-            appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        cachedPrefs?.let { return it }
+        synchronized(this) {
+            cachedPrefs?.let { return it }
+            val appContext = context.applicationContext
+            val prefs = try {
+                val masterKey = MasterKey.Builder(appContext)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
+                EncryptedSharedPreferences.create(
+                    appContext,
+                    PREFS_NAME,
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+            } catch (e: Exception) {
+                appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            }
+            cachedPrefs = prefs
+            return prefs
         }
     }
 

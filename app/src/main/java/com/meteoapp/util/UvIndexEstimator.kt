@@ -2,8 +2,8 @@ package com.meteoapp.util
 
 import android.content.Context
 import com.meteoapp.R
-import java.util.Calendar
-import java.util.TimeZone
+import java.time.Instant
+import java.time.ZoneOffset
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.max
@@ -44,13 +44,10 @@ object UvIndexEstimator {
         timestampSeconds: Long,
         timezoneOffsetSeconds: Long
     ): Double {
-        val cal = Calendar.getInstance().apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-        }
-        val dayOfYear = cal.get(Calendar.DAY_OF_YEAR)
-        val hour = cal.get(Calendar.HOUR_OF_DAY) +
-            cal.get(Calendar.MINUTE) / 60.0
+        val dateTime = Instant.ofEpochSecond(timestampSeconds + timezoneOffsetSeconds)
+            .atZone(ZoneOffset.UTC)
+        val dayOfYear = dateTime.dayOfYear
+        val hour = dateTime.hour + dateTime.minute / 60.0
 
         val gamma = 2.0 * Math.PI / 365.0 * (dayOfYear - 1 + (hour - 12) / 24.0)
         val declination = 0.006918 -

@@ -53,14 +53,6 @@ class WeatherUtilsTest {
     }
 
     @Test
-    fun iconUrl_buildsExpectedUrl() {
-        assertEquals(
-            "https://openweathermap.org/img/wn/01d@2x.png",
-            WeatherUtils.iconUrl("01d")
-        )
-    }
-
-    @Test
     fun formatHour_appendsHSuffix() {
         // 0 offset : 00:00 UTC -> "00h" (format 24 h par défaut)
         assertEquals("00h", WeatherUtils.formatHour(context, 0L, 0))

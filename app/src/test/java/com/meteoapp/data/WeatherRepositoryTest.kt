@@ -2,7 +2,9 @@ package com.meteoapp.data
 
 import androidx.test.core.app.ApplicationProvider
 import com.meteoapp.data.api.OpenWeatherApi
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.RecordedRequest
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -47,6 +49,31 @@ class WeatherRepositoryTest {
         server.shutdown()
     }
 
+    private fun installWeatherDispatcher(currentBody: String, forecastBody: String) {
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse =
+                if (request.requestUrl?.encodedPath?.contains("forecast") == true) {
+                    MockResponse().setBody(forecastBody)
+                } else {
+                    MockResponse().setBody(currentBody)
+                }
+        }
+    }
+
+    private fun installStatusDispatcher(code: Int) {
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse =
+                MockResponse().setResponseCode(code).setBody("{}")
+        }
+    }
+
+    private fun ageCacheFile(lat: Double, lon: Double, ageMillis: Long) {
+        val cacheDir = ApplicationProvider.getApplicationContext<android.content.Context>().cacheDir
+        val name = "weather_" + String.format(java.util.Locale.US, "%.2f_%.2f", lat, lon) + ".json"
+        java.io.File(cacheDir, name).setLastModified(System.currentTimeMillis() - ageMillis)
+    }
+
+
     @Test
     fun isApiKeyConfigured_trueWhenKeySet() {
         assertTrue(repository.isApiKeyConfigured)
@@ -66,8 +93,7 @@ class WeatherRepositoryTest {
 
     @Test
     fun getWeather_returnsSuccessAndMapsCurrentAndDaily() {
-        server.enqueue(MockResponse().setBody(CURRENT_JSON))
-        server.enqueue(MockResponse().setBody(FORECAST_JSON))
+        installWeatherDispatcher(CURRENT_JSON, FORECAST_JSON)
 
         val result = runBlocking { repository.getWeather(48.85, 2.35) }
 
@@ -84,8 +110,7 @@ class WeatherRepositoryTest {
 
     @Test
     fun getWeather_returnsErrorOnHttp404() {
-        server.enqueue(MockResponse().setResponseCode(404).setBody("{}"))
-        server.enqueue(MockResponse().setResponseCode(404).setBody("{}"))
+        installStatusDispatcher(404)
 
         val result = runBlocking { repository.getWeather(0.0, 0.0) }
 
@@ -128,19 +153,61 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun getWeather_returnsCachedOnNetworkFailureWhenCacheExists() {
-        server.enqueue(MockResponse().setBody(CURRENT_JSON))
-        server.enqueue(MockResponse().setBody(FORECAST_JSON))
+    fun getWeather_servesFreshCacheWithoutNetwork() {
+        installWeatherDispatcher(CURRENT_JSON, FORECAST_JSON)
         val first = runBlocking { repository.getWeather(48.85, 2.35) }
         assertTrue(first is WeatherResult.Success)
         assertFalse((first as WeatherResult.Success).fromCache)
 
         server.shutdown()
 
+        val second = runBlocking { repository.getWeather(48.85, 2.35) }
+        assertTrue(second is WeatherResult.Success)
+        assertTrue((second as WeatherResult.Success).fromCache)
+        assertFalse(second.stale)
+        assertEquals(18.5, second.data.current.temp, 0.001)
+    }
+
+    @Test
+    fun getWeather_forceRefreshBypassesFreshCache() {
+        installWeatherDispatcher(CURRENT_JSON, FORECAST_JSON)
+        runBlocking { repository.getWeather(48.85, 2.35) }
+
+        installWeatherDispatcher(CURRENT_JSON, FORECAST_JSON)
+        val refreshed = runBlocking {
+            repository.getWeather(48.85, 2.35, forceRefresh = true)
+        }
+        assertTrue(refreshed is WeatherResult.Success)
+        assertFalse((refreshed as WeatherResult.Success).fromCache)
+    }
+
+    @Test
+    fun getWeather_staleCacheServedOnNetworkFailureIsFlaggedStale() {
+        installWeatherDispatcher(CURRENT_JSON, FORECAST_JSON)
+        runBlocking { repository.getWeather(48.85, 2.35) }
+
+        ageCacheFile(48.85, 2.35, 60 * 60 * 1000L)
+
+        server.shutdown()
+
         val result = runBlocking { repository.getWeather(48.85, 2.35) }
         assertTrue(result is WeatherResult.Success)
         assertTrue((result as WeatherResult.Success).fromCache)
-        assertEquals(18.5, (result as WeatherResult.Success).data.current.temp, 0.001)
+        assertTrue(result.stale)
+    }
+
+    @Test
+    fun getWeather_rateLimitedFallsBackToCache() {
+        installWeatherDispatcher(CURRENT_JSON, FORECAST_JSON)
+        runBlocking { repository.getWeather(48.85, 2.35) }
+
+        ageCacheFile(48.85, 2.35, 60 * 60 * 1000L)
+
+        installStatusDispatcher(429)
+        val result = runBlocking { repository.getWeather(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Success)
+        assertTrue((result as WeatherResult.Success).stale)
+        assertEquals(18.5, result.data.current.temp, 0.001)
     }
 
     @Test

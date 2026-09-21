@@ -59,7 +59,19 @@ object WeatherIcons {
         if (iconCode.length < 2) return null
         val isDay = isDayOverride ?: iconCode.endsWith("d")
         val group = iconCode.substring(0, 2).toIntOrNull() ?: return null
-        return nameFor(group * 100L, isDay)
+        val conditionId = when (group) {
+            1 -> 800L
+            2 -> 801L
+            3 -> 802L
+            4 -> 804L
+            9 -> 504L
+            10 -> 500L
+            11 -> 200L
+            13 -> 600L
+            50 -> 701L
+            else -> return null
+        }
+        return nameFor(conditionId, isDay)
     }
 
     /**

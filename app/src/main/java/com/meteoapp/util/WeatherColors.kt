@@ -108,13 +108,10 @@ object WeatherColors {
     }
 
     /** Heure du jour (0-23) en temps UTC décalé, sans formatage dépendant des préférences. */
-    private fun hourOfDayUtc(timestampSeconds: Long, timezoneOffsetSeconds: Long): Int {
-        val cal = java.util.Calendar.getInstance().apply {
-            timeZone = java.util.TimeZone.getTimeZone("UTC")
-            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-        }
-        return cal.get(java.util.Calendar.HOUR_OF_DAY)
-    }
+    private fun hourOfDayUtc(timestampSeconds: Long, timezoneOffsetSeconds: Long): Int =
+        java.time.Instant.ofEpochSecond(timestampSeconds + timezoneOffsetSeconds)
+            .atZone(java.time.ZoneOffset.UTC)
+            .hour
 
     private fun colorForCode(code: Long, isDay: Boolean): Int {
         return when {

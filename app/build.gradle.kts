@@ -98,12 +98,10 @@ dependencies {
     implementation(libs.moshi)
     ksp(libs.moshi.kotlin.codegen)
 
-    implementation(libs.glide)
 
     implementation(libs.play.services.location)
 
     implementation(libs.osmdroid.android)
-    implementation(libs.osmdroid.mapsforge)
     implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)

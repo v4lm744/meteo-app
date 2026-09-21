@@ -6,95 +6,87 @@ import com.meteoapp.util.UnitPrefs.PressureUnit
 import com.meteoapp.util.UnitPrefs.TempUnit
 import com.meteoapp.util.UnitPrefs.TimeFormat
 import com.meteoapp.util.UnitPrefs.WindUnit
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.TimeZone
 
 object WeatherUtils {
 
-    private val dayNames = arrayOf(
-        "dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."
-    )
+
+    private fun utcDateTime(timestampSeconds: Long, timezoneOffsetSeconds: Long): LocalDateTime =
+        Instant.ofEpochSecond(timestampSeconds + timezoneOffsetSeconds)
+            .atZone(ZoneOffset.UTC)
+            .toLocalDateTime()
 
     fun formatHour(context: Context, timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
-        val millis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-        val pattern = when (UnitPrefs.getTimeFormat(context)) {
-            TimeFormat.FORMAT_24H -> "HH"
-            TimeFormat.FORMAT_12H -> "h a"
-        }
-        val sdf = SimpleDateFormat(pattern, Locale.FRANCE)
-        sdf.timeZone = TimeZone.getTimeZone("UTC")
+        val dateTime = utcDateTime(timestampSeconds, timezoneOffsetSeconds)
         return if (UnitPrefs.getTimeFormat(context) == TimeFormat.FORMAT_24H) {
-            "${sdf.format(Date(millis))}h"
+            "${dateTime.hour.toString().padStart(2, '0')}h"
         } else {
-            sdf.format(Date(millis))
+            dateTime.format(DateTimeFormatter.ofPattern("h a", Locale.FRANCE))
         }
     }
 
     fun formatDayName(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
-        val cal = Calendar.getInstance().apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        val dayOfWeek = utcDateTime(timestampSeconds, timezoneOffsetSeconds).dayOfWeek
+        return when (dayOfWeek) {
+            java.time.DayOfWeek.MONDAY -> "lun."
+            java.time.DayOfWeek.TUESDAY -> "mar."
+            java.time.DayOfWeek.WEDNESDAY -> "mer."
+            java.time.DayOfWeek.THURSDAY -> "jeu."
+            java.time.DayOfWeek.FRIDAY -> "ven."
+            java.time.DayOfWeek.SATURDAY -> "sam."
+            java.time.DayOfWeek.SUNDAY -> "dim."
         }
-        return dayNames[cal.get(Calendar.DAY_OF_WEEK) - 1]
     }
 
     fun formatFullDayName(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
-        val names = arrayOf(
-            "Dimanche", "Lundi", "Mardi", "Mercredi",
-            "Jeudi", "Vendredi", "Samedi"
-        )
-        val cal = Calendar.getInstance().apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
+        val dayOfWeek = utcDateTime(timestampSeconds, timezoneOffsetSeconds).dayOfWeek
+        return when (dayOfWeek) {
+            java.time.DayOfWeek.MONDAY -> "Lundi"
+            java.time.DayOfWeek.TUESDAY -> "Mardi"
+            java.time.DayOfWeek.WEDNESDAY -> "Mercredi"
+            java.time.DayOfWeek.THURSDAY -> "Jeudi"
+            java.time.DayOfWeek.FRIDAY -> "Vendredi"
+            java.time.DayOfWeek.SATURDAY -> "Samedi"
+            java.time.DayOfWeek.SUNDAY -> "Dimanche"
         }
-        return names[cal.get(Calendar.DAY_OF_WEEK) - 1]
     }
 
     fun formatDate(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
-        val millis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-        val sdf = SimpleDateFormat("d MMM", Locale.FRANCE)
-        sdf.timeZone = TimeZone.getTimeZone("UTC")
-        return sdf.format(Date(millis))
+        return utcDateTime(timestampSeconds, timezoneOffsetSeconds)
+            .format(DateTimeFormatter.ofPattern("d MMM", Locale.FRANCE))
     }
 
     fun isToday(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): Boolean {
-        val target = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-        val now = System.currentTimeMillis() + timezoneOffsetSeconds * 1000L
-        val cal1 = Calendar.getInstance().apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-            timeInMillis = target
-        }
-        val cal2 = Calendar.getInstance().apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-            timeInMillis = now
-        }
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+        val targetDate = utcDateTime(timestampSeconds, timezoneOffsetSeconds).toLocalDate()
+        val nowDate = Instant.ofEpochMilli(System.currentTimeMillis())
+            .plusSeconds(timezoneOffsetSeconds)
+            .atZone(ZoneOffset.UTC)
+            .toLocalDate()
+        return targetDate == nowDate
     }
 
     fun formatTime(context: Context, timestampSeconds: Long, timezoneOffsetSeconds: Long): String {
-        val millis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-        val pattern = when (UnitPrefs.getTimeFormat(context)) {
-            TimeFormat.FORMAT_24H -> "HH:mm"
-            TimeFormat.FORMAT_12H -> "h:mm a"
+        val dateTime = utcDateTime(timestampSeconds, timezoneOffsetSeconds)
+        return when (UnitPrefs.getTimeFormat(context)) {
+            TimeFormat.FORMAT_24H ->
+                dateTime.format(DateTimeFormatter.ofPattern("HH:mm", Locale.FRANCE))
+            TimeFormat.FORMAT_12H ->
+                dateTime.format(DateTimeFormatter.ofPattern("h:mm a", Locale.FRANCE))
         }
-        val sdf = SimpleDateFormat(pattern, Locale.FRANCE)
-        sdf.timeZone = TimeZone.getTimeZone("UTC")
-        return sdf.format(Date(millis))
     }
 
     fun formatFullDateTime(context: Context, timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
-        val millis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-        val pattern = when (UnitPrefs.getTimeFormat(context)) {
-            TimeFormat.FORMAT_24H -> "EEEE HH:mm"
-            TimeFormat.FORMAT_12H -> "EEEE h:mm a"
+        val dateTime = utcDateTime(timestampSeconds, timezoneOffsetSeconds)
+        return when (UnitPrefs.getTimeFormat(context)) {
+            TimeFormat.FORMAT_24H ->
+                dateTime.format(DateTimeFormatter.ofPattern("EEEE HH:mm", Locale.FRANCE))
+            TimeFormat.FORMAT_12H ->
+                dateTime.format(DateTimeFormatter.ofPattern("EEEE h:mm a", Locale.FRANCE))
         }
-        val sdf = SimpleDateFormat(pattern, Locale.FRANCE)
-        sdf.timeZone = TimeZone.getTimeZone("UTC")
-        return sdf.format(Date(millis))
     }
 
     fun formatFullDayNameTime(context: Context, timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
@@ -191,8 +183,6 @@ object WeatherUtils {
             WindUnit.MPH -> context.getString(R.string.miles, kmToMiles(visibilityMeters / 1000.0).toInt())
         }
     }
-
-    fun iconUrl(icon: String): String = "https://openweathermap.org/img/wn/$icon@2x.png"
 
     fun windDirection(deg: Long): String {
         val directions = arrayOf(
