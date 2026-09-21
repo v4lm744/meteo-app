@@ -8,14 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.target.AppWidgetTarget
 import com.meteoapp.R
 import com.meteoapp.data.WeatherResult
 import com.meteoapp.data.WeatherRepository
 import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.ui.MainActivity
+import com.meteoapp.util.WeatherIcons
 import com.meteoapp.util.WeatherUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -213,24 +211,11 @@ class WeatherWidgetProvider : AppWidgetProvider() {
                 } catch (_: Exception) {
                 }
 
-                val iconCode = current.weather.firstOrNull()?.icon
-                if (!iconCode.isNullOrEmpty()) {
-                    try {
-                        Glide.with(context.applicationContext)
-                            .asBitmap()
-                            .load(WeatherUtils.iconUrl(iconCode))
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(
-                                AppWidgetTarget(
-                                    context.applicationContext,
-                                    R.id.widgetIcon,
-                                    views,
-                                    appWidgetId
-                                )
-                            )
-                    } catch (_: Exception) {
-                    }
-                }
+                val condition = current.weather.firstOrNull()
+                val iconRes = condition?.let {
+                    WeatherIcons.forCondition(context, it.id, isDay = !it.icon.endsWith("n"))
+                } ?: R.drawable.ic_wx_partly
+                views.setImageViewResource(R.id.widgetIcon, iconRes)
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             }
             is WeatherResult.Error -> {

@@ -29,9 +29,11 @@ class WidgetSyncWorker(
         )
         if (ids.isEmpty()) return Result.success()
 
+        // Un seul appel réseau par ville : plusieurs widgets sur la même
+        // ville partagent les mêmes données via le cache du repository.
         val provider = WeatherWidgetProvider()
         var anySuccess = false
-        for (id in ids) {
+        for (id in ids.sorted()) {
             try {
                 provider.syncOne(context, id)
                 anySuccess = true

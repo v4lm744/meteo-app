@@ -36,9 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private var toolbarTint: Int = 0xFFFFFFFF.toInt()
     private lateinit var cityChipsAdapter: com.meteoapp.ui.adapter.CityChipsAdapter
-    private var currentBgTop: Int = -1
-    private var currentBgBottom: Int = -1
-    private var bgAnimator: android.animation.ValueAnimator? = null
+    private lateinit var backgroundController: com.meteoapp.ui.background.DynamicBackgroundController
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -61,7 +59,14 @@ class MainActivity : AppCompatActivity() {
         // fitsSystemWindows sur la racine décale le contenu (toolbar) sous la barre.
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        setSupportActionBar(findViewById(R.id.meteoToolbar))
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.meteoToolbar)
+        setSupportActionBar(toolbar)
+        backgroundController = com.meteoapp.ui.background.DynamicBackgroundController(
+            binding = binding,
+            window = window,
+            toolbar = toolbar,
+            onTintChanged = { tint -> toolbarTint = tint }
+        )
 
         binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
         binding.retryButton.setOnClickListener { retryLast() }
@@ -336,7 +341,7 @@ class MainActivity : AppCompatActivity() {
 
         val weather = state.weather
         if (weather != null) {
-            showContent(weather, state.city, state.regionCities, state.airQuality, state.fromCache)
+            showContent(weather, state.city, state.regionCities, state.airQuality, state.stale)
         }
     }
 
@@ -345,12 +350,12 @@ class MainActivity : AppCompatActivity() {
         city: GeoLocation?,
         regionCities: List<RegionCity>,
         airQuality: com.meteoapp.data.model.AirPollutionItem? = null,
-        fromCache: Boolean = false
+        stale: Boolean = false
     ) {
         binding.errorLayout.visibility = View.GONE
         binding.loadingBar.visibility = View.GONE
 
-        if (fromCache) {
+        if (stale) {
             binding.cacheBanner.text =
                 com.meteoapp.util.WeatherUtils.formatOfflineAge(this, weather.lat, weather.lon)
             binding.cacheBanner.visibility = View.VISIBLE
@@ -572,85 +577,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyDynamicBackground(weather: WeatherData) {
         val stop = com.meteoapp.util.SkyGradient.stopFor(weather)
-        animateBackgroundTo(stop.top, stop.bottom)
+        backgroundController.apply(stop.top, stop.bottom)
         binding.swipeRefresh.setColorSchemeColors(stop.top)
-        tintToolbarIcons(stop.top)
-    }
-
-    /**
-     * Transition douce du dégradé de fond vers les nouvelles couleurs :
-     * interpolation ARGB sur 800 ms à chaque changement d'heure ou de ville.
-     */
-    private fun animateBackgroundTo(targetTop: Int, targetBottom: Int) {
-        if (currentBgTop < 0 || currentBgBottom < 0) {
-            currentBgTop = targetTop
-            currentBgBottom = targetBottom
-            window.statusBarColor = targetTop
-            binding.root.background = gradientDrawable(targetTop, targetBottom)
-            return
-        }
-        if (currentBgTop == targetTop && currentBgBottom == targetBottom) return
-
-        val fromTop = currentBgTop
-        val fromBottom = currentBgBottom
-        currentBgTop = targetTop
-        currentBgBottom = targetBottom
-
-        bgAnimator?.cancel()
-        bgAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 800L
-            addUpdateListener { anim ->
-                val fraction = anim.animatedValue as Float
-                val top = argbBlend(fromTop, targetTop, fraction)
-                val bottom = argbBlend(fromBottom, targetBottom, fraction)
-                window.statusBarColor = top
-                binding.root.background = gradientDrawable(top, bottom)
-            }
-            start()
-        }
-    }
-
-    private fun gradientDrawable(top: Int, bottom: Int): android.graphics.drawable.GradientDrawable =
-        android.graphics.drawable.GradientDrawable(
-            android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(top, bottom)
-        )
-
-    private fun argbBlend(from: Int, to: Int, fraction: Float): Int {
-        val inv = 1f - fraction
-        fun channel(shift: Int): Int =
-            (((from shr shift) and 0xFF) * inv + ((to shr shift) and 0xFF) * fraction).toInt()
-        return 0xFF shl 24 or (channel(16) shl 16) or (channel(8) shl 8) or channel(0)
-    }
-
-    /**
-     * Teinte les icônes de la barre d'outils (menu débordement + items d'action)
-     * en blanc ou noir selon la luminance du fond, pour rester toujours visible.
-     */
-
-    private fun tintToolbarIcons(bgColor: Int) {
-        val tint = com.meteoapp.util.WeatherColors.contrastColor(bgColor)
-        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.meteoToolbar)
-        toolbar.overflowIcon?.mutate()?.setTint(tint)
-        toolbar.navigationIcon?.mutate()?.setTint(tint)
-        toolbar.setTitleTextColor(tint)
-        val isLightBg = tint == 0xFF000000.toInt()
-        androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
-            .isAppearanceLightStatusBars = isLightBg
-        toolbarTint = tint
     }
 
     private fun showError(message: String) {
         binding.errorLayout.visibility = View.VISIBLE
         binding.errorText.text = message
         binding.loadingBar.visibility = View.GONE
-        currentBgTop = -1
-        currentBgBottom = -1
-        bgAnimator?.cancel()
+        backgroundController.reset()
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
         window.statusBarColor = ContextCompat.getColor(this, R.color.md_blue_deep)
         binding.swipeRefresh.setWeatherCondition(800L, isDay = true)
-        tintToolbarIcons(ContextCompat.getColor(this, R.color.md_blue_deep))
+        backgroundController.tintToolbar(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE
         binding.cacheBanner.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE

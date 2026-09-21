@@ -7,9 +7,9 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 import com.meteoapp.stats.DailyRecord
-import java.util.Calendar
+import java.time.Instant
+import java.time.ZoneOffset
 import java.util.Locale
-import java.util.TimeZone
 import kotlin.math.max
 import kotlin.math.min
 
@@ -62,8 +62,6 @@ class HistoryChartView @JvmOverloads constructor(
     private val maxPath = Path()
     private val minPath = Path()
     private val fillPath = Path()
-
-    private val labelCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
 
     fun submit(newRecords: List<DailyRecord>) {
         records = newRecords
@@ -121,8 +119,16 @@ class HistoryChartView @JvmOverloads constructor(
         canvas.drawPath(minPath, minPaint)
 
         records.forEachIndexed { i, r ->
-            labelCalendar.timeInMillis = r.dayKey * 1000L
-            val label = dayNames[labelCalendar.get(Calendar.DAY_OF_WEEK) - 1]
+            val dayOfWeek = Instant.ofEpochSecond(r.dayKey).atZone(ZoneOffset.UTC).dayOfWeek
+            val label = when (dayOfWeek) {
+                java.time.DayOfWeek.MONDAY -> dayNames[1]
+                java.time.DayOfWeek.TUESDAY -> dayNames[2]
+                java.time.DayOfWeek.WEDNESDAY -> dayNames[3]
+                java.time.DayOfWeek.THURSDAY -> dayNames[4]
+                java.time.DayOfWeek.FRIDAY -> dayNames[5]
+                java.time.DayOfWeek.SATURDAY -> dayNames[6]
+                java.time.DayOfWeek.SUNDAY -> dayNames[0]
+            }
             val x = min(w - 20f, max(20f, xAt(i)))
             canvas.drawText(label, x - labelPaint.measureText(label) / 2, h - 8f, labelPaint)
         }

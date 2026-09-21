@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 /**
@@ -43,16 +46,14 @@ object WeatherNotificationScheduler {
      * Millisecondes jusqu'au prochain passage à [hour]:00 de l'heure locale.
      */
     fun delayUntilNextRun(hour: Int, nowMillis: Long = System.currentTimeMillis()): Long {
-        val now = Calendar.getInstance().apply { timeInMillis = nowMillis }
-        val target = (now.clone() as Calendar).apply {
-            set(Calendar.HOUR_OF_DAY, hour.coerceIn(0, 23))
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
+        val zone = ZoneId.systemDefault()
+        val now = java.time.Instant.ofEpochMilli(nowMillis).atZone(zone)
+        val targetDate = if (now.toLocalTime() > LocalTime.of(hour.coerceIn(0, 23), 0)) {
+            now.toLocalDate().plusDays(1)
+        } else {
+            now.toLocalDate()
         }
-        if (target.timeInMillis <= now.timeInMillis) {
-            target.add(Calendar.DAY_OF_YEAR, 1)
-        }
-        return target.timeInMillis - now.timeInMillis
+        val target = LocalDateTime.of(targetDate, LocalTime.of(hour.coerceIn(0, 23), 0))
+        return target.atZone(zone).toInstant().toEpochMilli() - nowMillis
     }
 }

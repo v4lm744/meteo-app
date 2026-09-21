@@ -10,11 +10,25 @@ import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.data.model.HourlyData
 import com.meteoapp.data.model.RegionCity
 import com.meteoapp.data.model.WeatherData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import java.util.Calendar
+import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 
 sealed class WeatherResult<out T> {
-    data class Success<T>(val data: T, val fromCache: Boolean = false) : WeatherResult<T>()
+    /**
+     * [stale] signale des données servies du cache suite à un échec
+     * réseau (bannière hors ligne) ; un cache frais servi sans appel
+     * réseau reste `stale = false`.
+     */
+    data class Success<T>(
+        val data: T,
+        val fromCache: Boolean = false,
+        val stale: Boolean = false
+    ) : WeatherResult<T>()
     data class Error(val message: String, val cityNotFound: Boolean = false) : WeatherResult<Nothing>()
     object Loading : WeatherResult<Nothing>()
 }
@@ -23,6 +37,11 @@ class WeatherRepository(
     context: android.content.Context,
     api: OpenWeatherApi = ApiClient.api
 ) {
+
+    companion object {
+        const val FRESH_CACHE_MAX_AGE_MS = 10 * 60 * 1000L
+        private const val RATE_LIMIT_BACKOFF_MS = 15_000L
+    }
 
     private val appContext = context.applicationContext
     private val api = api
@@ -34,14 +53,33 @@ class WeatherRepository(
     val isApiKeyConfigured: Boolean
         get() = apiKey.isNotBlank()
 
-    suspend fun getWeather(lat: Double, lon: Double): WeatherResult<WeatherData> {
+    suspend fun getWeather(
+        lat: Double,
+        lon: Double,
+        forceRefresh: Boolean = false
+    ): WeatherResult<WeatherData> = fetchWeather(lat, lon, forceRefresh, allowRateLimitRetry = true)
+
+    private suspend fun fetchWeather(
+        lat: Double,
+        lon: Double,
+        forceRefresh: Boolean,
+        allowRateLimitRetry: Boolean
+    ): WeatherResult<WeatherData> {
         if (!isApiKeyConfigured) {
             return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
         }
+        if (!forceRefresh) {
+            val fresh = withContext(Dispatchers.IO) { cache.loadIfFresh(lat, lon) }
+            if (fresh != null) {
+                return WeatherResult.Success(fresh, fromCache = true, stale = false)
+            }
+        }
         return try {
             coroutineScope {
-                val current = api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey)
-                val forecast = api.getForecast(lat = lat, lon = lon, apiKey = apiKey)
+                val currentDeferred = async { api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey) }
+                val forecastDeferred = async { api.getForecast(lat = lat, lon = lon, apiKey = apiKey) }
+                val current = currentDeferred.await()
+                val forecast = forecastDeferred.await()
 
                 val timezoneOffset = (forecast.city.timezone ?: current.timezone ?: 0L)
                 val tz = forecast.city.name ?: current.name ?: ""
@@ -92,10 +130,20 @@ class WeatherRepository(
                     hourly = hourly,
                     daily = daily
                 )
-                cache.save(lat, lon, weatherData)
+                withContext(Dispatchers.IO) { cache.save(lat, lon, weatherData) }
                 WeatherResult.Success(weatherData)
             }
         } catch (e: retrofit2.HttpException) {
+            if (e.code() == 429) {
+                val cached = withContext(Dispatchers.IO) { cache.load(lat, lon) }
+                if (cached != null) {
+                    return WeatherResult.Success(cached, fromCache = true, stale = true)
+                }
+                if (allowRateLimitRetry) {
+                    kotlinx.coroutines.delay(RATE_LIMIT_BACKOFF_MS)
+                    return fetchWeather(lat, lon, forceRefresh = true, allowRateLimitRetry = false)
+                }
+            }
             WeatherResult.Error(
                 message = if (e.code() == 401 || e.code() == 403) {
                     appContext.getString(R.string.error_api_key_invalid)
@@ -107,9 +155,9 @@ class WeatherRepository(
                 cityNotFound = e.code() == 404
             )
         } catch (e: Exception) {
-            val cached = cache.load(lat, lon)
+            val cached = withContext(Dispatchers.IO) { cache.load(lat, lon) }
             if (cached != null) {
-                WeatherResult.Success(cached, fromCache = true)
+                WeatherResult.Success(cached, fromCache = true, stale = true)
             } else {
                 WeatherResult.Error(appContext.getString(R.string.error_network))
             }
@@ -178,11 +226,7 @@ class WeatherRepository(
         var best: com.meteoapp.data.model.ForecastItem? = null
         var bestDiff = Int.MAX_VALUE
         for (item in this) {
-            val cal = Calendar.getInstance().apply {
-                timeInMillis = (item.dt + timezoneOffset) * 1000L
-                timeZone = java.util.TimeZone.getTimeZone("UTC")
-            }
-            val itemHour = cal.get(Calendar.HOUR_OF_DAY)
+            val itemHour = hourOfDayUtc(item.dt + timezoneOffset)
             val diff = Math.abs(itemHour - hour)
             if (diff < bestDiff) {
                 bestDiff = diff
@@ -193,16 +237,14 @@ class WeatherRepository(
     }
 
     private fun dayStartKey(timestampSeconds: Long): Long {
-        val cal = Calendar.getInstance().apply {
-            timeZone = java.util.TimeZone.getTimeZone("UTC")
-            timeInMillis = timestampSeconds * 1000L
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        return cal.timeInMillis / 1000L
+        return Instant.ofEpochSecond(timestampSeconds)
+            .atZone(ZoneOffset.UTC)
+            .truncatedTo(ChronoUnit.DAYS)
+            .toEpochSecond()
     }
+
+    private fun hourOfDayUtc(timestampSeconds: Long): Int =
+        Instant.ofEpochSecond(timestampSeconds).atZone(ZoneOffset.UTC).hour
 
     suspend fun getAirQuality(lat: Double, lon: Double): WeatherResult<AirPollutionResponse> {
         if (!isApiKeyConfigured) {

@@ -7,8 +7,9 @@ import com.meteoapp.data.api.ApiClient
 import com.meteoapp.data.model.WeatherData
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Types
-import java.util.Calendar
-import java.util.TimeZone
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 
 @JsonClass(generateAdapter = true)
 data class DailyRecord(
@@ -108,14 +109,9 @@ object WeatherHistoryStore {
         dayKey(System.currentTimeMillis() / 1000L, timezoneOffsetSeconds)
 
     fun dayKey(timestampSeconds: Long, timezoneOffsetSeconds: Long): Long {
-        val cal = Calendar.getInstance().apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-            timeInMillis = (timestampSeconds + timezoneOffsetSeconds) * 1000L
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        return cal.timeInMillis / 1000L
+        return Instant.ofEpochSecond(timestampSeconds + timezoneOffsetSeconds)
+            .atZone(ZoneOffset.UTC)
+            .truncatedTo(ChronoUnit.DAYS)
+            .toEpochSecond()
     }
 }
