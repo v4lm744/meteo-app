@@ -61,7 +61,7 @@ class HourDetailActivity : AppCompatActivity() {
             WeatherUtils.formatWindSpeed(this, hour.windSpeed),
             WeatherUtils.windDirection(this, hour.windDeg)
         )
-        binding.windCompass.setWind(hour.windDeg, WeatherUtils.kmh(hour.windSpeed).toString() + " km/h")
+        binding.windCompass.setWind(hour.windDeg, WeatherUtils.formatWindSpeed(this, hour.windSpeed))
         binding.pressureValue.text = WeatherUtils.formatPressure(this, hour.pressure)
         val pop = hour.pop ?: 0.0
         binding.popValue.text = getString(R.string.format_percent, (pop * 100).toInt())

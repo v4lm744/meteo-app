@@ -7,6 +7,7 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 import com.meteoapp.data.model.HourlyData
+import com.meteoapp.util.WeatherUtils
 import kotlin.math.max
 import kotlin.math.min
 
@@ -114,20 +115,14 @@ class HourlyChartView @JvmOverloads constructor(
 
         labelPaint.textSize = 11f * density
         val first = hours.first()
-        val labelStart = formatHour(first.dt, first.timezoneOffset)
+        val labelStart = WeatherUtils.formatHour(context, first.dt, first.timezoneOffset)
         canvas.drawText(labelStart, 2f * density, h - 4f * density, labelPaint)
         val last = hours.last()
-        val labelEnd = formatHour(last.dt, last.timezoneOffset)
+        val labelEnd = WeatherUtils.formatHour(context, last.dt, last.timezoneOffset)
         val endW = labelPaint.measureText(labelEnd)
         canvas.drawText(labelEnd, w - endW - 2f * density, h - 4f * density, labelPaint)
     }
 
-    private fun formatHour(dt: Long, offset: Long): String {
-        val hour = java.time.Instant.ofEpochSecond(dt + offset)
-            .atZone(java.time.ZoneOffset.UTC)
-            .hour
-        return "${hour.toString().padStart(2, '0')}h"
-    }
 
     companion object {
         private const val CHART_HOURS = 24
