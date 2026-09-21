@@ -43,6 +43,7 @@
     <string name="api_key_hint">Clé stockée sur l’appareil. Obtenez une clé gratuite sur openweathermap.org.</string>
     <string name="hint_city">Saisissez une ville…</string>
     <string name="hourly_forecast">Prévisions horaires 48 h</string>
+    <string name="hourly_chart_title">Tendance sur 24 h</string>
     <string name="daily_forecast">Prévisions sur 7 jours</string>
     <string name="region_map">Météo de la région</string>
     <string name="radar_toggle_off">Radar de pluie</string>
@@ -60,12 +61,22 @@
     <string name="settings_dynamic_colors_hint">Material You : les couleurs de l’interface s’adaptent à votre fond d’écran (Android 12+). Le dégradé météo reste inchangé.</string>
     <string name="settings_dynamic_colors_unavailable">Couleurs dynamiques indisponibles avant Android 12.</string>
     <string name="settings_notifications_title">Notifications météo</string>
-    <string name="settings_notifications_hint">Recevez chaque jour un résumé de la météo de votre ville (condition, température, min/max du jour).</string>
+    <string name="settings_notifications_hint">Recevez chaque jour un résumé de la météo de vos villes favorites et de la dernière consultée (condition, température, min/max du jour).</string>
     <string name="settings_notifications_enable">Activer la notification quotidienne</string>
     <string name="settings_notifications_hour">Heure de remise</string>
     <string name="settings_notifications_hour_format">%1$02d:00</string>
     <string name="notification_permission_needed">Autorisez les notifications dans les paramètres Android pour recevoir la météo du jour.</string>
     <string name="sun_arc_title">Course du soleil</string>
+    <string name="moon_phase_label">Phase de lune : %1$s %2$s</string>
+    <string name="moon_new">Nouvelle lune</string>
+    <string name="moon_waxing_crescent">Premier croissant</string>
+    <string name="moon_first_quarter">Premier quartier</string>
+    <string name="moon_waxing_gibbous">Gibbeuse croissante</string>
+    <string name="moon_full">Pleine lune</string>
+    <string name="moon_waning_gibbous">Gibbeuse décroissante</string>
+    <string name="moon_last_quarter">Dernier quartier</string>
+    <string name="moon_waning_crescent">Dernier croissant</string>
+    <string name="moon_illumination_format">(%1$s éclairée)</string>
     <string name="feels_like">Ressenti</string>
     <string name="humidity">Humidité</string>
     <string name="wind">Vent</string>
@@ -219,4 +230,6 @@ Ressenti %4$s · Max %5$s · Min %6$s
     <string name="widget_theme_label">Thème du widget</string>
     <string name="widget_theme_gradient">Dégradé météo</string>
     <string name="widget_theme_dark">Sombre</string>
+    <string name="widget_theme_material_you">Material You</string>
+    <string name="hourly_widget_description">Prévisions horaires de votre ville</string>
 </resources>

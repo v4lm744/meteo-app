@@ -10,7 +10,7 @@ import androidx.core.content.edit
  */
 object WidgetThemePrefs {
 
-    enum class Theme { WEATHER_GRADIENT, DARK }
+    enum class Theme { WEATHER_GRADIENT, DARK, MATERIAL_YOU }
 
     private const val PREFS_NAME = "meteo_widget_theme_prefs"
 
@@ -20,10 +20,10 @@ object WidgetThemePrefs {
     private fun keyFor(appWidgetId: Int) = "theme_$appWidgetId"
 
     fun getTheme(context: Context, appWidgetId: Int): Theme =
-        if (prefs(context).getString(keyFor(appWidgetId), null) == Theme.DARK.name) {
-            Theme.DARK
-        } else {
-            Theme.WEATHER_GRADIENT
+        when (prefs(context).getString(keyFor(appWidgetId), null)) {
+            Theme.DARK.name -> Theme.DARK
+            Theme.MATERIAL_YOU.name -> Theme.MATERIAL_YOU
+            else -> Theme.WEATHER_GRADIENT
         }
 
     fun setTheme(context: Context, appWidgetId: Int, theme: Theme) {

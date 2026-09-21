@@ -46,6 +46,51 @@ object WidgetGradient {
         return bitmap
     }
 
+    /**
+     * Fond Material You : dégradé construit à partir de la palette dynamique
+     * du système (Android 12+, couleur de surface et couleur primaire
+     * adaptées au fond d'écran). Repli sur le fond sombre uni si les
+     * couleurs dynamiques ne sont pas disponibles.
+     */
+    fun buildDynamicBackground(context: Context, width: Int, height: Int): Bitmap {
+        val fallbackTop = 0xFF1B1B1F.toInt()
+        val fallbackBottom = 0xFF2D2D33.toInt()
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+            return buildLinearBackground(fallbackTop, fallbackBottom, width, height)
+        }
+        val themed = com.google.android.material.color.DynamicColors
+            .wrapContextIfAvailable(context)
+        val top = com.google.android.material.color.MaterialColors.getColor(
+            themed,
+            com.google.android.material.R.attr.colorSurfaceContainer,
+            fallbackTop
+        )
+        val bottom = com.google.android.material.color.MaterialColors.getColor(
+            themed,
+            com.google.android.material.R.attr.colorPrimaryContainer,
+            fallbackBottom
+        )
+        return buildLinearBackground(top, bottom, width, height)
+    }
+
+    private fun buildLinearBackground(startColor: Int, endColor: Int, width: Int, height: Int): Bitmap {
+        val w = if (width <= 0) 1 else width
+        val h = if (height <= 0) 1 else height
+        val bitmap = createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+            isAntiAlias = true
+            shader = LinearGradient(0f, 0f, 0f, h.toFloat(), startColor, endColor, Shader.TileMode.CLAMP)
+        }
+        val radius = 0.08f * minOf(w, h)
+        val path = Path().apply {
+            addRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), radius, radius, Path.Direction.CW)
+        }
+        canvas.clipPath(path)
+        canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), paint)
+        return bitmap
+    }
+
     fun buildDarkBackground(context: Context, width: Int, height: Int): Bitmap {
         val w = if (width <= 0) 1 else width
         val h = if (height <= 0) 1 else height
