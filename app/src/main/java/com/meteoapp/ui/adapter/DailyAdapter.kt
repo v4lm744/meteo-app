@@ -3,34 +3,41 @@ package com.meteoapp.ui.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.meteoapp.data.model.DailyData
 import com.meteoapp.R
+import com.meteoapp.data.model.DailyData
 import com.meteoapp.databinding.ItemDailyBinding
-import com.meteoapp.util.WeatherUtils
 import com.meteoapp.util.WeatherIcons
+import com.meteoapp.util.WeatherUtils
 
+/**
+ * Prévisions sur 7 jours : barres de température proportionnelles aux plages
+ * de la semaine. Basé sur ListAdapter/DiffUtil pour ne rebinder que les
+ * éléments modifiés lors des rafraîchissements de la même ville.
+ */
 class DailyAdapter(
     context: Context,
     items: List<DailyData>,
     currentTemp: Double? = null,
     private val onItemClick: (DailyData) -> Unit = {}
-) : RecyclerView.Adapter<DailyAdapter.ViewHolder>() {
+) : ListAdapter<DailyData, DailyAdapter.ViewHolder>(DIFF) {
 
     private val context = context.applicationContext
-    private var items = items
     private var currentTemp = currentTemp
+
+    init {
+        submitList(items)
+    }
 
     /**
      * Met à jour les données sans recréer l'adapter ni rejouer la cascade
      * d'animation d'entrée (les plages de la semaine sont recalculées).
      */
     fun submitItems(newItems: List<DailyData>, newCurrentTemp: Double?) {
-        items = newItems
         currentTemp = newCurrentTemp
-        weekMinBacking = items.minOfOrNull { it.tempMin } ?: 0.0
-        weekMaxBacking = items.maxOfOrNull { it.tempMax } ?: 1.0
-        notifyDataSetChanged()
+        submitList(newItems)
     }
 
     class ViewHolder(val binding: ItemDailyBinding) : RecyclerView.ViewHolder(binding.root)
@@ -43,11 +50,13 @@ class DailyAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         holder.itemView.setOnClickListener { onItemClick(item) }
+        val weekMin = currentList.minOfOrNull { it.tempMin } ?: 0.0
+        val weekMax = currentList.maxOfOrNull { it.tempMax } ?: 1.0
         with(holder.binding) {
             dayText.text = if (WeatherUtils.isToday(item.dt, item.timezoneOffset)) {
-                context.getString(com.meteoapp.R.string.today_short)
+                context.getString(R.string.today_short)
             } else {
                 WeatherUtils.formatDayName(item.dt, item.timezoneOffset)
             }
@@ -77,10 +86,13 @@ class DailyAdapter(
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    companion object {
+        private val DIFF = object : DiffUtil.ItemCallback<DailyData>() {
+            override fun areItemsTheSame(oldItem: DailyData, newItem: DailyData) =
+                oldItem.dt == newItem.dt
 
-    private var weekMinBacking: Double = items.minOfOrNull { it.tempMin } ?: 0.0
-    private var weekMaxBacking: Double = items.maxOfOrNull { it.tempMax } ?: 1.0
-    private val weekMin: Double get() = weekMinBacking
-    private val weekMax: Double get() = weekMaxBacking
+            override fun areContentsTheSame(oldItem: DailyData, newItem: DailyData) =
+                oldItem == newItem
+        }
+    }
 }

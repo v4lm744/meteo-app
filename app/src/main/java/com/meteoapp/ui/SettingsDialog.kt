@@ -296,7 +296,7 @@ class SettingsDialog(
         return if (rounded == rounded.toLong().toDouble()) {
             rounded.toLong().toString()
         } else {
-            String.format(java.util.Locale.FRANCE, "%.1f", rounded)
+            String.format(java.util.Locale.getDefault(), "%.1f", rounded)
         }
     }
 

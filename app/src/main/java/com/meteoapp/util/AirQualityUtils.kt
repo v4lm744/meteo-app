@@ -2,7 +2,6 @@ package com.meteoapp.util
 
 import android.content.Context
 import com.meteoapp.R
-import java.util.Locale
 
 /**
  * Utilitaires qualité de l'air : libellé OWM AQI (1–5), couleur associée
@@ -35,5 +34,5 @@ object AirQualityUtils {
     }
 
     fun formatPm25(value: Double): String =
-        String.format(Locale.FRANCE, "%.1f", value)
+        String.format(java.util.Locale.getDefault(), "%.1f", value)
 }

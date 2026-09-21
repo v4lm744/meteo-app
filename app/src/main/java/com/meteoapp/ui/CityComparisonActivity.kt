@@ -68,8 +68,7 @@ class CityComparisonActivity : AppCompatActivity() {
             val itemBinding = ItemComparisonCityBinding.inflate(
                 layoutInflater, binding.columnsLayout, false
             )
-            itemBinding.comparisonCityName.text =
-                city.localNames?.fr ?: city.name
+            itemBinding.comparisonCityName.text = city.displayName(this)
 
             val weather = weathers.getOrNull(index)
             if (weather != null) {

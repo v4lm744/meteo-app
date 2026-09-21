@@ -33,7 +33,7 @@ object ShortcutsHelper {
         }
 
         val shortcuts = favorites.take(MAX_SHORTCUTS).mapIndexed { index, city ->
-            val label = city.localNames?.fr ?: city.name
+            val label = city.displayName(appContext)
             ShortcutInfoCompat.Builder(appContext, "city_${city.lat}_${city.lon}")
                 .setShortLabel(label)
                 .setIcon(IconCompat.createWithAdaptiveBitmap(locationBitmap(appContext)))

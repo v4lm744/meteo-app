@@ -129,7 +129,20 @@ data class GeoLocation(
     val lon: Double,
     val country: String?,
     val state: String?
-)
+) {
+    /**
+     * Nom d'affichage de la ville dans la langue de l'interface : nom local
+     * correspondant à la locale si l'API l'a fourni, sinon nom international.
+     */
+    fun displayName(context: android.content.Context): String {
+        val lang = context.resources.configuration.locales[0].language
+        return when (lang) {
+            "fr" -> localNames?.fr ?: name
+            "en" -> localNames?.en ?: name
+            else -> localNames?.featureName ?: name
+        }
+    }
+}
 
 @JsonClass(generateAdapter = true)
 data class LocalNames(

@@ -298,7 +298,7 @@ class MainActivity : AppCompatActivity() {
     private fun toggleFavoriteCurrentCity() {
         val city = viewModel.state.value?.city ?: return
         val store = com.meteoapp.city.FavoriteCitiesStore
-        val displayName = city.localNames?.fr ?: city.name
+        val displayName = city.displayName(this)
         if (store.isFavorite(this, city)) {
             store.removeFavorite(this, city)
             showSnackbar(getString(R.string.favorite_removed, displayName))
@@ -315,7 +315,7 @@ class MainActivity : AppCompatActivity() {
         showSnackbar(
             getString(
                 R.string.favorite_removed,
-                city.localNames?.fr ?: city.name
+                city.displayName(this)
             )
         )
         refreshCityChips()
@@ -382,9 +382,7 @@ class MainActivity : AppCompatActivity() {
             binding.cacheBanner.visibility = View.GONE
         }
 
-        val displayName = city?.localNames?.fr
-            ?: city?.name
-            ?: ""
+        val displayName = city?.displayName(this) ?: ""
         binding.cityName.text = displayName
         refreshCityChips()
         binding.headerLayout.visibility = View.VISIBLE
@@ -470,7 +468,7 @@ class MainActivity : AppCompatActivity() {
                 openDayDetail(day)
             }
         } else {
-            (binding.hourlyRecycler.adapter as? HourlyAdapter)?.submitItems(weather.hourly)
+            (binding.hourlyRecycler.adapter as? HourlyAdapter)?.submitList(weather.hourly)
             (binding.dailyRecycler.adapter as? DailyAdapter)?.submitItems(weather.daily.take(7), current.temp)
         }
 
@@ -527,7 +525,7 @@ class MainActivity : AppCompatActivity() {
             weather.timezoneOffset,
             weather.current.cloudiness
         )
-        binding.airQualityCard.uvIndexValue.text = String.format(java.util.Locale.FRANCE, "%.1f", uv)
+        binding.airQualityCard.uvIndexValue.text = String.format(java.util.Locale.getDefault(), "%.1f", uv)
         binding.airQualityCard.uvIndexLabel.text = com.meteoapp.util.UvIndexEstimator.label(this, uv)
         binding.airQualityCard.uvAdvice.text = com.meteoapp.util.UvIndexEstimator.recommendation(this, uv)
         binding.airQualityCard.root.visibility = View.VISIBLE
@@ -569,7 +567,7 @@ class MainActivity : AppCompatActivity() {
         binding.historyCard.historyRecords.text = recordsText.trim()
 
         store.weekComparison(this, weather.lat, weather.lon)?.let { (current, previous) ->
-            val delta = String.format(java.util.Locale.FRANCE, "%.1f°C", kotlin.math.abs(current - previous))
+            val delta = String.format(java.util.Locale.getDefault(), "%.1f°C", kotlin.math.abs(current - previous))
             binding.historyCard.historyWeekCompare.text = getString(
                 if (current >= previous) R.string.history_week_compare_warmer
                 else R.string.history_week_compare_cooler,
@@ -585,7 +583,7 @@ class MainActivity : AppCompatActivity() {
     private fun shareCurrentWeather() {
         val state = viewModel.state.value ?: return
         val weather = state.weather ?: return
-        val cityLabel = state.city?.localNames?.fr ?: state.city?.name ?: weather.timezone
+        val cityLabel = state.city?.displayName(this) ?: weather.timezone
         val cond = weather.current.weather.firstOrNull()?.description ?: ""
         val shareText = getString(
             R.string.share_text,
@@ -618,7 +616,7 @@ class MainActivity : AppCompatActivity() {
         binding.loadingBar.visibility = View.GONE
         backgroundController.reset()
         binding.root.setBackgroundResource(R.drawable.bg_sky_gradient)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.md_blue_deep)
+        com.meteoapp.util.SystemBars.setStatusBarColorCompat(window, ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.swipeRefresh.setWeatherCondition(800L, isDay = true)
         backgroundController.tintToolbar(ContextCompat.getColor(this, R.color.md_blue_deep))
         binding.headerLayout.visibility = View.GONE

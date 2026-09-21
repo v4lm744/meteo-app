@@ -4,7 +4,6 @@ import android.content.Context
 import com.meteoapp.R
 import com.meteoapp.data.model.WeatherData
 import com.meteoapp.util.WeatherUtils
-import java.util.Locale
 
 /**
  * Détection locale de seuils d'alerte sur les 12 prochaines heures :
@@ -31,7 +30,7 @@ object WeatherAlertEvaluator {
                     key = "rain",
                     message = context.getString(
                         R.string.alert_heavy_rain,
-                        String.format(Locale.FRANCE, "%.1f mm", rainMm)
+                        String.format(java.util.Locale.getDefault(), "%.1f mm", rainMm)
                     )
                 )
             )

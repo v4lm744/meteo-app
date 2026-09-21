@@ -25,39 +25,29 @@ object WeatherUtils {
         return if (UnitPrefs.getTimeFormat(context) == TimeFormat.FORMAT_24H) {
             "${dateTime.hour.toString().padStart(2, '0')}h"
         } else {
-            dateTime.format(DateTimeFormatter.ofPattern("h a", Locale.FRANCE))
+            dateTime.format(DateTimeFormatter.ofPattern("h a"))
         }
     }
 
     fun formatDayName(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
         val dayOfWeek = utcDateTime(timestampSeconds, timezoneOffsetSeconds).dayOfWeek
-        return when (dayOfWeek) {
-            java.time.DayOfWeek.MONDAY -> "lun."
-            java.time.DayOfWeek.TUESDAY -> "mar."
-            java.time.DayOfWeek.WEDNESDAY -> "mer."
-            java.time.DayOfWeek.THURSDAY -> "jeu."
-            java.time.DayOfWeek.FRIDAY -> "ven."
-            java.time.DayOfWeek.SATURDAY -> "sam."
-            java.time.DayOfWeek.SUNDAY -> "dim."
-        }
+        return dayOfWeek.getDisplayName(
+            java.time.format.TextStyle.SHORT,
+            Locale.getDefault()
+        )
     }
 
     fun formatFullDayName(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
         val dayOfWeek = utcDateTime(timestampSeconds, timezoneOffsetSeconds).dayOfWeek
-        return when (dayOfWeek) {
-            java.time.DayOfWeek.MONDAY -> "Lundi"
-            java.time.DayOfWeek.TUESDAY -> "Mardi"
-            java.time.DayOfWeek.WEDNESDAY -> "Mercredi"
-            java.time.DayOfWeek.THURSDAY -> "Jeudi"
-            java.time.DayOfWeek.FRIDAY -> "Vendredi"
-            java.time.DayOfWeek.SATURDAY -> "Samedi"
-            java.time.DayOfWeek.SUNDAY -> "Dimanche"
-        }
+        return dayOfWeek.getDisplayName(
+            java.time.format.TextStyle.FULL,
+            Locale.getDefault()
+        ).replaceFirstChar { it.uppercase() }
     }
 
     fun formatDate(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): String {
         return utcDateTime(timestampSeconds, timezoneOffsetSeconds)
-            .format(DateTimeFormatter.ofPattern("d MMM", Locale.FRANCE))
+            .format(DateTimeFormatter.ofPattern("d MMM"))
     }
 
     fun isToday(timestampSeconds: Long, timezoneOffsetSeconds: Long = 0): Boolean {
@@ -73,9 +63,9 @@ object WeatherUtils {
         val dateTime = utcDateTime(timestampSeconds, timezoneOffsetSeconds)
         return when (UnitPrefs.getTimeFormat(context)) {
             TimeFormat.FORMAT_24H ->
-                dateTime.format(DateTimeFormatter.ofPattern("HH:mm", Locale.FRANCE))
+                dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
             TimeFormat.FORMAT_12H ->
-                dateTime.format(DateTimeFormatter.ofPattern("h:mm a", Locale.FRANCE))
+                dateTime.format(DateTimeFormatter.ofPattern("h:mm a"))
         }
     }
 
@@ -83,9 +73,9 @@ object WeatherUtils {
         val dateTime = utcDateTime(timestampSeconds, timezoneOffsetSeconds)
         return when (UnitPrefs.getTimeFormat(context)) {
             TimeFormat.FORMAT_24H ->
-                dateTime.format(DateTimeFormatter.ofPattern("EEEE HH:mm", Locale.FRANCE))
+                dateTime.format(DateTimeFormatter.ofPattern("EEEE HH:mm"))
             TimeFormat.FORMAT_12H ->
-                dateTime.format(DateTimeFormatter.ofPattern("EEEE h:mm a", Locale.FRANCE))
+                dateTime.format(DateTimeFormatter.ofPattern("EEEE h:mm a"))
         }
     }
 
@@ -188,6 +178,20 @@ object WeatherUtils {
         val directions = arrayOf(
             "N", "NE", "E", "SE", "S", "SO", "O", "NO"
         )
+        val index = ((deg.toDouble() + 22.5) / 45.0).toInt() % 8
+        return directions[if (index < 0) index + 8 else index]
+    }
+
+    /**
+     * Direction du vent localisée : abréviations cardinales de la locale
+     * (en français « SO »/« O », en anglais « SW »/« W »).
+     */
+    fun windDirection(context: Context, deg: Long): String {
+        val locale = context.resources.configuration.locales[0]
+        val directions = when (locale.language) {
+            "fr" -> arrayOf("N", "NE", "E", "SE", "S", "SO", "O", "NO")
+            else -> arrayOf("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+        }
         val index = ((deg.toDouble() + 22.5) / 45.0).toInt() % 8
         return directions[if (index < 0) index + 8 else index]
     }

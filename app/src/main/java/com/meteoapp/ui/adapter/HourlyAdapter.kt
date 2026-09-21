@@ -2,31 +2,33 @@ package com.meteoapp.ui.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.meteoapp.data.model.HourlyData
 import com.meteoapp.R
+import com.meteoapp.data.model.HourlyData
 import com.meteoapp.databinding.ItemHourlyBinding
-import com.meteoapp.util.WeatherUtils
 import com.meteoapp.util.WeatherIcons
+import com.meteoapp.util.WeatherUtils
 
+/**
+ * Prévisions horaires : liste horizontale des 48 prochaines heures. Basé sur
+ * ListAdapter/DiffUtil : les rafraîchissements de la même ville (qualité de
+ * l'air, minimap) mettent à jour uniquement les éléments modifiés et
+ * conservent la position de défilement.
+ */
 class HourlyAdapter(
     context: Context,
     items: List<HourlyData>,
     private val onItemClick: (HourlyData) -> Unit = {}
-) : RecyclerView.Adapter<HourlyAdapter.ViewHolder>() {
+) : ListAdapter<HourlyData, HourlyAdapter.ViewHolder>(DIFF) {
 
     private val context = context.applicationContext
-    private var items = items
 
-    /**
-     * Met à jour la liste sans recréer l'adapter (rafraîchissement de la
-     * même ville via la minimap ou la qualité de l'air) : évite de perdre
-     * la position de défilement.
-     */
-    fun submitItems(newItems: List<HourlyData>) {
-        items = newItems
-        notifyDataSetChanged()
+    init {
+        submitList(items)
     }
 
     class ViewHolder(val binding: ItemHourlyBinding) : RecyclerView.ViewHolder(binding.root)
@@ -38,13 +40,13 @@ class HourlyAdapter(
         return ViewHolder(binding).apply {
             itemView.setOnClickListener {
                 val pos = bindingAdapterPosition
-                if (pos != RecyclerView.NO_POSITION) onItemClick(items[pos])
+                if (pos != RecyclerView.NO_POSITION) onItemClick(getItem(pos))
             }
         }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         with(holder.binding) {
             hourText.text = WeatherUtils.formatHour(context, item.dt, item.timezoneOffset)
             hourTemp.text = WeatherUtils.formatTemp(context, item.temp)
@@ -58,13 +60,21 @@ class HourlyAdapter(
             }
             val pop = item.pop ?: 0.0
             if (pop >= 0.05) {
-                hourPop.visibility = android.view.View.VISIBLE
+                hourPop.visibility = View.VISIBLE
                 hourPop.text = context.getString(R.string.format_percent, (pop * 100).toInt())
             } else {
-                hourPop.visibility = android.view.View.GONE
+                hourPop.visibility = View.GONE
             }
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    companion object {
+        private val DIFF = object : DiffUtil.ItemCallback<HourlyData>() {
+            override fun areItemsTheSame(oldItem: HourlyData, newItem: HourlyData) =
+                oldItem.dt == newItem.dt
+
+            override fun areContentsTheSame(oldItem: HourlyData, newItem: HourlyData) =
+                oldItem == newItem
+        }
+    }
 }

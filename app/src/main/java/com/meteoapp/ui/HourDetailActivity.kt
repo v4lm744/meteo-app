@@ -77,7 +77,7 @@ class HourDetailActivity : AppCompatActivity() {
             intArrayOf(grad.top, grad.bottom)
         )
         binding.hourDetailRoot.background = drawable
-        window.statusBarColor = grad.top
+        com.meteoapp.util.SystemBars.setStatusBarColorCompat(window, grad.top)
         androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars =
             WeatherColors.contrastColor(grad.top) == 0xFF000000.toInt()
