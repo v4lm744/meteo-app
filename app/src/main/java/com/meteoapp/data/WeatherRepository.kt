@@ -2,6 +2,7 @@ package com.meteoapp.data
 
 import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
+import com.meteoapp.data.api.OpenMeteoApi
 import com.meteoapp.data.api.OpenWeatherApi
 import com.meteoapp.data.model.AirPollutionResponse
 import com.meteoapp.data.model.CurrentData
@@ -35,7 +36,9 @@ sealed class WeatherResult<out T> {
 
 class WeatherRepository(
     context: android.content.Context,
-    api: OpenWeatherApi = ApiClient.api
+    api: OpenWeatherApi = ApiClient.api,
+    openMeteoApi: OpenMeteoApi = ApiClient.openMeteoApi,
+    private val lang: String = context.resources.configuration.locales[0].language
 ) {
 
     companion object {
@@ -45,6 +48,7 @@ class WeatherRepository(
 
     private val appContext = context.applicationContext
     private val api = api
+    private val openMeteoApi = openMeteoApi
     private val cache = WeatherCache(appContext)
 
     private val apiKey: String
@@ -65,19 +69,23 @@ class WeatherRepository(
         forceRefresh: Boolean,
         allowRateLimitRetry: Boolean
     ): WeatherResult<WeatherData> {
-        if (!isApiKeyConfigured) {
-            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
-        }
         if (!forceRefresh) {
             val fresh = withContext(Dispatchers.IO) { cache.loadIfFresh(lat, lon) }
             if (fresh != null) {
                 return WeatherResult.Success(fresh, fromCache = true, stale = false)
             }
         }
+        val openMeteoResult = fetchWeatherFromOpenMeteo(lat, lon)
+        if (openMeteoResult is WeatherResult.Success) {
+            return openMeteoResult
+        }
+        if (!isApiKeyConfigured) {
+            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
+        }
         return try {
             coroutineScope {
-                val currentDeferred = async { api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey) }
-                val forecastDeferred = async { api.getForecast(lat = lat, lon = lon, apiKey = apiKey) }
+                val currentDeferred = async { api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey, lang = lang) }
+                val forecastDeferred = async { api.getForecast(lat = lat, lon = lon, apiKey = apiKey, lang = lang) }
                 val current = currentDeferred.await()
                 val forecast = forecastDeferred.await()
 
@@ -161,6 +169,26 @@ class WeatherRepository(
             } else {
                 WeatherResult.Error(appContext.getString(R.string.error_network))
             }
+        }
+    }
+
+    /**
+     * Source principale des prévisions : Open-Meteo (gratuit, sans clé) —
+     * pas horaire réel de 1 h, 7 jours réels avec lever/coucher par jour
+     * et indice UV fourni par l'API. En cas d'échec, l'appelant retombe
+     * sur OpenWeatherMap.
+     */
+    private suspend fun fetchWeatherFromOpenMeteo(
+        lat: Double,
+        lon: Double
+    ): WeatherResult<WeatherData> {
+        return try {
+            val response = openMeteoApi.getForecast(lat = lat, lon = lon)
+            val weatherData = OpenMeteoMapper.toWeatherData(response, lang)
+            withContext(Dispatchers.IO) { cache.save(lat, lon, weatherData) }
+            WeatherResult.Success(weatherData)
+        } catch (e: Exception) {
+            WeatherResult.Error(appContext.getString(R.string.error_network))
         }
     }
 
@@ -253,7 +281,7 @@ class WeatherRepository(
         return try {
             WeatherResult.Success(api.getAirPollution(lat = lat, lon = lon, apiKey = apiKey))
         } catch (e: Exception) {
-            WeatherResult.Error(appContext.getString(R.string.error_region_cities))
+            WeatherResult.Error(appContext.getString(R.string.error_air_quality))
         }
     }
 
@@ -285,7 +313,7 @@ class WeatherRepository(
             return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
         }
         return try {
-            val response = api.findCities(lat = lat, lon = lon, count = 10, apiKey = apiKey)
+            val response = api.findCities(lat = lat, lon = lon, count = 10, apiKey = apiKey, lang = lang)
             val cities = response.list.map { item ->
                 RegionCity(
                     id = item.id,

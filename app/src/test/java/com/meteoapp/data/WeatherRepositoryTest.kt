@@ -1,6 +1,7 @@
 package com.meteoapp.data
 
 import androidx.test.core.app.ApplicationProvider
+import com.meteoapp.data.api.OpenMeteoApi
 import com.meteoapp.data.api.OpenWeatherApi
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -41,7 +42,7 @@ class WeatherRepositoryTest {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         ApiKeyStore.setApiKey(context, "test-key")
         context.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
-        repository = WeatherRepository(context, api)
+        repository = WeatherRepository(context, api, openMeteoApi = buildFailingOpenMeteoApi())
     }
 
     @After
@@ -83,7 +84,7 @@ class WeatherRepositoryTest {
     fun getWeather_returnsErrorWhenApiKeyMissing() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         ApiKeyStore.setApiKey(context, "")
-        val repo = WeatherRepository(context, buildApi())
+        val repo = WeatherRepository(context, buildApi(), openMeteoApi = buildFailingOpenMeteoApi())
 
         val result = runBlocking { repo.getWeather(48.85, 2.35) }
 
@@ -224,6 +225,17 @@ class WeatherRepositoryTest {
         .addConverterFactory(MoshiConverterFactory.create(ApiClient.moshi))
         .build()
         .create(OpenWeatherApi::class.java)
+
+    /**
+     * API Open-Meteo pointant vers un serveur mort : les tests du
+     * comportement OpenWeatherMap valident le fallback, les tests
+     * Open-Meteo utilisent un MockWebServer dédié.
+     */
+    private fun buildFailingOpenMeteoApi(): OpenMeteoApi = Retrofit.Builder()
+        .baseUrl("http://localhost:1/")
+        .addConverterFactory(MoshiConverterFactory.create(ApiClient.moshi))
+        .build()
+        .create(OpenMeteoApi::class.java)
 
     private val CURRENT_JSON = """
         {
