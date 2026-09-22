@@ -36,6 +36,8 @@ class MainActivity : AppCompatActivity() {
 
     private var toolbarTint: Int = 0xFFFFFFFF.toInt()
     private lateinit var cityChipsAdapter: com.meteoapp.ui.adapter.CityChipsAdapter
+    private lateinit var airQualityCardController: com.meteoapp.ui.card.AirQualityCardController
+    private lateinit var historyCardController: com.meteoapp.ui.card.HistoryCardController
     private lateinit var backgroundController: com.meteoapp.ui.background.DynamicBackgroundController
     private var displayedCityKey: String? = null
 
@@ -72,6 +74,8 @@ class MainActivity : AppCompatActivity() {
         binding.swipeRefresh.setOnRefreshListener { viewModel.refresh() }
         binding.retryButton.setOnClickListener { retryLast() }
 
+        airQualityCardController = com.meteoapp.ui.card.AirQualityCardController(binding.airQualityCard)
+        historyCardController = com.meteoapp.ui.card.HistoryCardController(binding.historyCard)
         cityChipsAdapter = com.meteoapp.ui.adapter.CityChipsAdapter(
             onCityClick = { city -> viewModel.loadWeatherForCity(city) },
             onCityLongClick = { city -> removeFavoriteCity(city) }
@@ -92,11 +96,15 @@ class MainActivity : AppCompatActivity() {
             viewModel.loadWeatherForCity(city)
         }
 
-        viewModel.state.observe(this) { state -> render(state) }
+        viewModel.stateLiveData.observe(this) { state -> render(state) }
 
         if (!viewModel.isApiKeyConfigured) {
-            showError(getString(R.string.error_no_api_key))
-            openApiKeyDialog()
+            // Les prévisions (Open-Meteo) fonctionnent sans clé ; seule la
+            // recherche de villes et la qualité de l'air (OpenWeather)
+            // nécessitent une clé : on charge la météo et on informe
+            // discrètement plutôt que de bloquer sur le dialogue de clé.
+            loadFromLaunchIntent(intent)
+            showSnackbar(getString(R.string.api_key_optional_hint))
         } else {
             loadFromLaunchIntent(intent)
         }
@@ -188,9 +196,7 @@ class MainActivity : AppCompatActivity() {
         ApiKeyDialog {
             if (viewModel.isApiKeyConfigured) {
                 binding.errorLayout.visibility = View.GONE
-                requestLocationAndLoad()
-            } else {
-                showError(getString(R.string.error_no_api_key))
+                rerenderCurrentState()
             }
         }.show(supportFragmentManager, "api_key")
     }
@@ -530,82 +536,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showAirQuality(weather: WeatherData, airQuality: com.meteoapp.data.model.AirPollutionItem?) {
-        val aqi = airQuality?.main?.aqi
-        if (aqi != null) {
-            binding.airQualityCard.airQualityValue.text = com.meteoapp.util.AirQualityUtils.label(this, aqi)
-            binding.airQualityCard.airQualityPm.text = airQuality.components?.let {
-                getString(
-                    R.string.pollutant_unit_ugm3,
-                    com.meteoapp.util.AirQualityUtils.formatPm25(it.pm25)
-                )
-            } ?: ""
-            binding.airQualityCard.airQualityAdvice.text = com.meteoapp.util.AirQualityUtils.recommendation(this, aqi)
-        } else {
-            binding.airQualityCard.airQualityValue.text = getString(R.string.comparison_unavailable)
-            binding.airQualityCard.airQualityPm.text = ""
-            binding.airQualityCard.airQualityAdvice.text = ""
-        }
-
-        val uv = com.meteoapp.util.UvIndexEstimator.estimate(
-            weather.lat,
-            weather.lon,
-            weather.current.dt,
-            weather.timezoneOffset,
-            weather.current.cloudiness
-        )
-        binding.airQualityCard.uvIndexValue.text = String.format(java.util.Locale.getDefault(), "%.1f", uv)
-        binding.airQualityCard.uvIndexLabel.text = com.meteoapp.util.UvIndexEstimator.label(this, uv)
-        binding.airQualityCard.uvAdvice.text = com.meteoapp.util.UvIndexEstimator.recommendation(this, uv)
-        binding.airQualityCard.root.visibility = View.VISIBLE
+        airQualityCardController.bind(weather, airQuality)
     }
 
     private fun showHistory(weather: WeatherData) {
-        val store = com.meteoapp.stats.WeatherHistoryStore
-        val records = store.last7Days(this, weather.lat, weather.lon)
-        if (records.size < 2) {
-            binding.historyCard.historyChart.submit(emptyList())
-            binding.historyCard.historyRecords.text = getString(R.string.history_empty)
-            binding.historyCard.historyWeekCompare.visibility = View.GONE
-            binding.historyCard.root.visibility = View.VISIBLE
-            return
-        }
-        binding.historyCard.historyChart.submit(records)
-
-        val recordsText = buildString {
-            store.allTimeMin(this@MainActivity, weather.lat, weather.lon)?.let {
-                append(
-                    getString(
-                        R.string.history_record_min,
-                        WeatherUtils.formatTemp(this@MainActivity, it.tempMin),
-                        WeatherUtils.formatDate(it.dayKey, 0)
-                    )
-                )
-                append('\n')
-            }
-            store.allTimeMax(this@MainActivity, weather.lat, weather.lon)?.let {
-                append(
-                    getString(
-                        R.string.history_record_max,
-                        WeatherUtils.formatTemp(this@MainActivity, it.tempMax),
-                        WeatherUtils.formatDate(it.dayKey, 0)
-                    )
-                )
-            }
-        }
-        binding.historyCard.historyRecords.text = recordsText.trim()
-
-        store.weekComparison(this, weather.lat, weather.lon)?.let { (current, previous) ->
-            val delta = String.format(java.util.Locale.getDefault(), "%.1f°C", kotlin.math.abs(current - previous))
-            binding.historyCard.historyWeekCompare.text = getString(
-                if (current >= previous) R.string.history_week_compare_warmer
-                else R.string.history_week_compare_cooler,
-                delta
-            )
-            binding.historyCard.historyWeekCompare.visibility = View.VISIBLE
-        } ?: run {
-            binding.historyCard.historyWeekCompare.visibility = View.GONE
-        }
-        binding.historyCard.root.visibility = View.VISIBLE
+        historyCardController.bind(weather)
     }
 
     private fun shareCurrentWeather() {
@@ -650,9 +585,9 @@ class MainActivity : AppCompatActivity() {
         binding.headerLayout.visibility = View.GONE
         binding.cacheBanner.visibility = View.GONE
         binding.detailsCard.visibility = View.GONE
-        binding.airQualityCard.root.visibility = View.GONE
+        airQualityCardController.hide()
         binding.sunArcCard.visibility = View.GONE
-        binding.historyCard.root.visibility = View.GONE
+        historyCardController.hide()
         binding.regionMapTitle.visibility = View.GONE
         binding.regionMapCard.visibility = View.GONE
         binding.hourlyTitle.visibility = View.GONE

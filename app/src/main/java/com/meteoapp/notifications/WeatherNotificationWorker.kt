@@ -46,7 +46,7 @@ class WeatherNotificationWorker(
         if (cities.isEmpty()) {
             return Result.success()
         }
-        val repository = WeatherRepository(context)
+        val repository = com.meteoapp.data.ServiceLocator.weatherRepository(context)
         cities.forEachIndexed { index, city ->
             val weather = when (
                 val result = repository.getWeather(city.lat, city.lon)

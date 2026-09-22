@@ -44,7 +44,7 @@ class WeatherAlertWorker(
         val city = com.meteoapp.city.FavoriteCitiesStore.currentNotificationCity(context)
             ?: return Result.success()
 
-        val repository = WeatherRepository(context)
+        val repository = com.meteoapp.data.ServiceLocator.weatherRepository(context)
         val result = repository.getWeather(city.lat, city.lon)
         val weather = (result as? WeatherResult.Success)?.data ?: return Result.success()
 

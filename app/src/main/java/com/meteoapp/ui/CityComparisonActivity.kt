@@ -45,7 +45,7 @@ class CityComparisonActivity : AppCompatActivity() {
             return
         }
 
-        val repository = WeatherRepository(this)
+        val repository = com.meteoapp.data.ServiceLocator.weatherRepository(this)
         lifecycleScope.launch {
             val weathers = withContext(Dispatchers.IO) {
                 favorites.map { city ->
