@@ -61,6 +61,21 @@ data class DailyData(
     val uvIndexMax: Double? = null
 )
 
+/**
+ * Précipitation imminente au pas de 15 min (Open-Meteo minutely_15) :
+ * alimente le bandeau « pluie dans l'heure » avec une précision supérieure
+ * aux créneaux horaires. Absent quand la source ne fournit pas ce pas
+ * (repli OpenWeatherMap).
+ */
+@JsonClass(generateAdapter = true)
+data class MinutelyPrecipitation(
+    val dt: Long,
+    val precipitation: Double,
+    val probabilityPercent: Int,
+    val isSnow: Boolean,
+    val timezoneOffset: Long
+)
+
 @JsonClass(generateAdapter = true)
 data class WeatherData(
     val lat: Double,
@@ -69,7 +84,8 @@ data class WeatherData(
     val timezoneOffset: Long,
     val current: CurrentData,
     val hourly: List<HourlyData>,
-    val daily: List<DailyData>
+    val daily: List<DailyData>,
+    val minutely: List<MinutelyPrecipitation> = emptyList()
 )
 
 @JsonClass(generateAdapter = true)

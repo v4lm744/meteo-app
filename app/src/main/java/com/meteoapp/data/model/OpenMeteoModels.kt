@@ -11,7 +11,8 @@ data class OpenMeteoResponse(
     @Json(name = "utc_offset_seconds") val utcOffsetSeconds: Long = 0L,
     val current: OpenMeteoCurrent,
     val hourly: OpenMeteoHourly,
-    val daily: OpenMeteoDaily
+    val daily: OpenMeteoDaily,
+    @Json(name = "minutely_15") val minutely15: OpenMeteoMinutely15? = null
 )
 
 @JsonClass(generateAdapter = true)
@@ -45,6 +46,14 @@ data class OpenMeteoHourly(
     @Json(name = "wind_speed_10m") val windSpeed10m: List<Double>,
     @Json(name = "wind_direction_10m") val windDirection10m: List<Long>,
     @Json(name = "uv_index") val uvIndex: List<Double>
+)
+
+@JsonClass(generateAdapter = true)
+data class OpenMeteoMinutely15(
+    val time: List<String>,
+    val precipitation: List<Double>,
+    @Json(name = "precipitation_probability") val precipitationProbability: List<Long?>,
+    @Json(name = "weather_code") val weatherCode: List<Long>
 )
 
 @JsonClass(generateAdapter = true)

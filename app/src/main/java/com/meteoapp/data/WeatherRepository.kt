@@ -2,6 +2,7 @@ package com.meteoapp.data
 
 import com.meteoapp.R
 import com.meteoapp.data.api.ApiClient
+import com.meteoapp.data.api.OpenMeteoAirQualityApi
 import com.meteoapp.data.api.OpenMeteoApi
 import com.meteoapp.data.api.OpenWeatherApi
 import com.meteoapp.data.model.AirPollutionResponse
@@ -38,6 +39,7 @@ class WeatherRepository(
     context: android.content.Context,
     api: OpenWeatherApi = ApiClient.api,
     openMeteoApi: OpenMeteoApi = ApiClient.openMeteoApi,
+    airQualityApi: OpenMeteoAirQualityApi = ApiClient.openMeteoAirQualityApi,
     private val lang: String = context.resources.configuration.locales[0].language
 ) {
 
@@ -49,6 +51,7 @@ class WeatherRepository(
     private val appContext = context.applicationContext
     private val api = api
     private val openMeteoApi = openMeteoApi
+    private val airQualityApi = airQualityApi
     private val cache = WeatherCache(appContext)
 
     private val apiKey: String
@@ -274,9 +277,24 @@ class WeatherRepository(
     private fun hourOfDayUtc(timestampSeconds: Long): Int =
         Instant.ofEpochSecond(timestampSeconds).atZone(ZoneOffset.UTC).hour
 
+    /**
+     * Qualité de l'air : Open-Meteo en source principale (gratuit, sans
+     * clé, indice européen EEA converti vers l'échelle 1–5 OWM), avec
+     * repli sur l'API pollution OpenWeatherMap si l'appel échoue.
+     */
     suspend fun getAirQuality(lat: Double, lon: Double): WeatherResult<AirPollutionResponse> {
+        try {
+            val response = airQualityApi.getCurrent(lat = lat, lon = lon)
+            if (response.current.europeanAqi != null) {
+                return WeatherResult.Success(
+                    OpenMeteoAirQualityMapper.toAirPollutionResponse(response)
+                )
+            }
+        } catch (e: Exception) {
+            // Repli OpenWeatherMap ci-dessous.
+        }
         if (!isApiKeyConfigured) {
-            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
+            return WeatherResult.Error(appContext.getString(R.string.error_air_quality))
         }
         return try {
             WeatherResult.Success(api.getAirPollution(lat = lat, lon = lon, apiKey = apiKey))

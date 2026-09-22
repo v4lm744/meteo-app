@@ -1,12 +1,14 @@
 package com.meteoapp.util
 
 import com.meteoapp.data.model.HourlyData
+import com.meteoapp.data.model.MinutelyPrecipitation
 
 /**
- * Détecte une précipitation imminente dans les créneaux horaires
- * disponibles (prévisions 3 h de l'API). Le calcul est volontairement
- * simple et local : premier créneau pluvieux à venir dans les prochaines
- * heures, exprimé en minutes depuis maintenant.
+ * Détecte une précipitation imminente dans les créneaux disponibles.
+ * Source privilégiée : pas de 15 min (Open-Meteo minutely_15) quand la
+ * réponse en fournit ; sinon repli sur les créneaux horaires (prévisions
+ * de l'API). Le calcul reste volontairement simple et local : premier
+ * créneau pluvieux à venir, exprimé en minutes depuis maintenant.
  */
 object ImminentRain {
 
@@ -18,6 +20,9 @@ object ImminentRain {
         600L..622L
     )
 
+    /** Seuil de volume pour considérer un créneau minutely_15 pluvieux. */
+    private const val MIN_MINUTELY_VOLUME_MM = 0.05
+
     /** Seuil de volume pour considérer un créneau comme pluvieux. */
     private const val MIN_VOLUME_MM = 0.1
 
@@ -28,14 +33,16 @@ object ImminentRain {
     )
 
     /**
-     * Retourne la première précipitation à venir dans les créneaux
-     * horaires, ou null si aucun créneau pluvieux n'est prévu (ou si
-     * les données sont trop anciennes).
+     * Retourne la première précipitation à venir dans les créneaux de
+     * 15 min si disponibles, sinon dans les créneaux horaires ; null si
+     * rien n'est prévu (ou si les données sont trop anciennes).
      */
     fun detect(
         hours: List<HourlyData>,
-        nowEpochSeconds: Long = System.currentTimeMillis() / 1000
+        nowEpochSeconds: Long = System.currentTimeMillis() / 1000,
+        minutely: List<MinutelyPrecipitation> = emptyList()
     ): ImminentPrecipitation? {
+        detectFromMinutely(minutely, nowEpochSeconds)?.let { return it }
         val upcoming = hours
             .filter { it.dt > nowEpochSeconds }
             .sortedBy { it.dt }
@@ -46,6 +53,26 @@ object ImminentRain {
                     startsInMinutes = ((hour.dt - nowEpochSeconds) / 60).coerceAtLeast(0),
                     isSnow = hour.weather.any { it.id in 600..622 },
                     probabilityPercent = ((hour.pop ?: 0.0) * 100).toInt().coerceIn(0, 100)
+                )
+            }
+        }
+        return null
+    }
+
+    /** Détection sur le pas de 15 min : volume ou probabilité élevée. */
+    private fun detectFromMinutely(
+        minutely: List<MinutelyPrecipitation>,
+        nowEpochSeconds: Long
+    ): ImminentPrecipitation? {
+        val upcoming = minutely
+            .filter { it.dt > nowEpochSeconds }
+            .sortedBy { it.dt }
+        for (slot in upcoming) {
+            if (slot.precipitation >= MIN_MINUTELY_VOLUME_MM) {
+                return ImminentPrecipitation(
+                    startsInMinutes = ((slot.dt - nowEpochSeconds) / 60).coerceAtLeast(0),
+                    isSnow = slot.isSnow,
+                    probabilityPercent = slot.probabilityPercent
                 )
             }
         }

@@ -241,5 +241,5 @@ Ressenti %4$s · Max %5$s · Min %6$s
     <string name="widget_theme_dark">Sombre</string>
     <string name="widget_theme_material_you">Material You</string>
     <string name="hourly_widget_description">Prévisions horaires de votre ville</string>
-    <string name="api_key_optional_hint">Les prévisions fonctionnent sans clé ; ajoutez-en une via le menu « Clé API » pour la recherche et la qualité de l’air.</string>
+    <string name="api_key_optional_hint">Les prévisions et la qualité de l’air fonctionnent sans clé ; ajoutez-en une via le menu « Clé API » pour la recherche de ville.</string>
 </resources>

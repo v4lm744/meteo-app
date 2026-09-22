@@ -40,6 +40,7 @@ object OpenMeteoMapper {
 
         val hourly = mapHourly(response.hourly, offset, lang)
         val daily = mapDaily(response.daily, hourly, offset, lang)
+        val minutely = response.minutely15?.let { mapMinutely(it, offset) } ?: emptyList()
 
         val today = daily.firstOrNull()
         val currentData = CurrentData(
@@ -70,8 +71,38 @@ object OpenMeteoMapper {
             timezoneOffset = offset,
             current = currentData,
             hourly = hourly,
-            daily = daily
+            daily = daily,
+            minutely = minutely
         )
+    }
+
+    /**
+     * Précipitations au pas de 15 min : seuls les créneaux à venir sont
+     * conservés (jusqu'à 2 h) ; pluie/neige déduite du code WMO.
+     */
+    private fun mapMinutely(
+        minutely15: com.meteoapp.data.model.OpenMeteoMinutely15,
+        offset: Long
+    ): List<com.meteoapp.data.model.MinutelyPrecipitation> {
+        val nowLocal = LocalDateTime.now(ZoneOffset.UTC).plusSeconds(offset)
+        val result = mutableListOf<com.meteoapp.data.model.MinutelyPrecipitation>()
+        for (index in minutely15.time.indices) {
+            val local = parseLocalDateTime(minutely15.time[index])
+            if (local < nowLocal) continue
+            result.add(
+                com.meteoapp.data.model.MinutelyPrecipitation(
+                    dt = epochSeconds(local, offset),
+                    precipitation = minutely15.precipitation[index],
+                    probabilityPercent = minutely15.precipitationProbability[index]
+                        ?.toInt()?.coerceIn(0, 100) ?: 0,
+                    isSnow = minutely15.weatherCode[index].let { code ->
+                        code in 71..77 || code == 85L || code == 86L
+                    },
+                    timezoneOffset = offset
+                )
+            )
+        }
+        return result
     }
 
     /**

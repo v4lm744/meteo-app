@@ -32,7 +32,14 @@ class WeatherAlertWorker(
 
     companion object {
         private const val CHANNEL_ID = "weather_alerts"
-        private const val NOTIFICATION_ID = 4001
+        private const val NOTIFICATION_ID_BASE = 4000
+        /**
+         * Identifiant de notification dérivé de la ville : chaque ville
+         * suivie obtient sa propre notification au lieu d'écraser la
+         * précédente (ID fixe partagé par toutes les alertes avant).
+         */
+        private fun notificationId(lat: Double, lon: Double): Int =
+            NOTIFICATION_ID_BASE + (lat.toString() + ":" + lon.toString()).hashCode().mod(1000)
         private const val PREFS_SEEN = "meteo_alert_seen"
         private const val SEEN_WINDOW_MS = 12 * 60 * 60 * 1000L
     }
@@ -56,7 +63,7 @@ class WeatherAlertWorker(
 
         if (!hasNotificationPermission(context)) return Result.success()
         ensureChannel(context)
-        postAlert(context, city.displayName(context), fresh)
+        postAlert(context, city.displayName(context), fresh, notificationId(city.lat, city.lon))
         return Result.success()
     }
 
@@ -98,13 +105,14 @@ class WeatherAlertWorker(
     private fun postAlert(
         context: Context,
         cityName: String,
-        alerts: List<WeatherAlertEvaluator.Alert>
+        alerts: List<WeatherAlertEvaluator.Alert>,
+        notificationId: Int
     ) {
         val openIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pi = PendingIntent.getActivity(
-            context, NOTIFICATION_ID, openIntent,
+            context, notificationId, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val body = alerts.joinToString("\n") { it.message }
@@ -125,6 +133,6 @@ class WeatherAlertWorker(
         ) {
             return
         }
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 }
