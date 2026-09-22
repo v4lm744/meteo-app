@@ -16,7 +16,8 @@ data class CurrentData(
     val windDeg: Long,
     val weather: List<WeatherCondition>,
     val cloudiness: Long = 0L,
-    val timezoneOffset: Long
+    val timezoneOffset: Long,
+    val uvIndex: Double? = null
 )
 
 @JsonClass(generateAdapter = true)
@@ -34,7 +35,8 @@ data class HourlyData(
     val cloudiness: Long = 0L,
     val visibility: Long? = null,
     val rainVolume: Double = 0.0,
-    val snowVolume: Double = 0.0
+    val snowVolume: Double = 0.0,
+    val uvIndex: Double? = null
 )
 
 @JsonClass(generateAdapter = true)
@@ -55,7 +57,8 @@ data class DailyData(
     val windDeg: Long,
     val weather: List<WeatherCondition>,
     val pop: Double?,
-    val timezoneOffset: Long
+    val timezoneOffset: Long,
+    val uvIndexMax: Double? = null
 )
 
 @JsonClass(generateAdapter = true)

@@ -145,6 +145,7 @@
     </plurals>
     <string name="error_search">Search error</string>
     <string name="error_region_cities">Nearby cities error</string>
+    <string name="error_air_quality">Air quality error</string>
     <string name="error_reverse_geocode">Location error</string>
     <string name="error_location_permission">Location permission required</string>
     <string name="error_location_unavailable">Position unavailable</string>
@@ -236,4 +237,5 @@
     <string name="widget_theme_dark">Dark</string>
     <string name="widget_theme_material_you">Material You</string>
     <string name="hourly_widget_description">Hourly forecast for your city</string>
+    <string name="api_key_optional_hint">Forecasts work without an API key; add one via the “API key” menu for city search and air quality.</string>
 </resources>

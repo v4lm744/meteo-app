@@ -14,3 +14,4 @@ local.properties
 *.dex
 keystore.properties
 app/build/
+.kotlin/

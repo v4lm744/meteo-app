@@ -29,7 +29,7 @@ object HourlyForecastStore {
 
     /** Met à jour les prévisions du widget depuis l'API puis notifie la liste. */
     suspend fun refresh(context: Context, appWidgetId: Int, city: com.meteoapp.data.model.GeoLocation): Boolean {
-        val repository = WeatherRepository(context)
+        val repository = com.meteoapp.data.ServiceLocator.weatherRepository(context)
         val result = repository.getWeather(city.lat, city.lon)
         val weather = (result as? WeatherResult.Success)?.data ?: return false
         val entries = weather.hourly.take(12).map { hour ->

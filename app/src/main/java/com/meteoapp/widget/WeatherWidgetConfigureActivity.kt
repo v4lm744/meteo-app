@@ -43,7 +43,7 @@ class WeatherWidgetConfigureActivity : AppCompatActivity() {
         CitySearchController(
             binding = binding,
             lifecycleOwner = this,
-            repository = WeatherRepository(this),
+            repository = com.meteoapp.data.ServiceLocator.weatherRepository(this),
             onCitySelected = { city -> onCityChosen(city) }
         )
 

@@ -65,8 +65,8 @@ class MainActivityRenderTest {
         val field = WeatherViewModel::class.java.getDeclaredField("_state")
         field.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        val liveData = field.get(viewModel) as androidx.lifecycle.MutableLiveData<UiState>
-        liveData.value = state
+        val flow = field.get(viewModel) as kotlinx.coroutines.flow.MutableStateFlow<UiState>
+        flow.value = state
     }
 
     @Test

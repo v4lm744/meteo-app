@@ -111,7 +111,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         scope.launch {
             try {
-                val repository = WeatherRepository(context)
+                val repository = com.meteoapp.data.ServiceLocator.weatherRepository(context)
                 val result = repository.getWeather(city.lat, city.lon)
                 withContext(Dispatchers.Main) {
                     renderResult(context, appWidgetManager, appWidgetId, views, city, result)
@@ -151,7 +151,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widgetDesc, context.getString(R.string.loading))
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
-        val repository = WeatherRepository(context)
+        val repository = com.meteoapp.data.ServiceLocator.weatherRepository(context)
         val result = repository.getWeather(city.lat, city.lon)
         withContext(Dispatchers.Main) {
             renderResult(context, appWidgetManager, appWidgetId, views, city, result)

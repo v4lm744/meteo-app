@@ -34,7 +34,7 @@ class SearchCityDialog(
         searchController = CitySearchController(
             binding = binding,
             lifecycleOwner = this,
-            repository = WeatherRepository(requireContext()),
+            repository = com.meteoapp.data.ServiceLocator.weatherRepository(requireContext()),
             onCitySelected = { city ->
                 onCitySelected(city)
                 dismiss()
