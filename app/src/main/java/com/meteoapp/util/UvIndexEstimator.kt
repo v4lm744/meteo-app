@@ -10,7 +10,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
-private fun cosDeg(deg: Double): Double = cos(Math.toRadians(deg))
 private fun sinDeg(deg: Double): Double = sin(Math.toRadians(deg))
 
 /**
