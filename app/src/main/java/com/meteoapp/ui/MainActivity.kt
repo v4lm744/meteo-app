@@ -387,52 +387,16 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.cacheBanner.visibility = View.GONE
         }
-        showRainBanner(weather.hourly)
+        showRainBanner(weather.hourly, weather.minutely)
 
         val displayName = city?.displayName(this) ?: ""
         binding.cityName.text = displayName
         refreshCityChips()
-        binding.headerLayout.visibility = View.VISIBLE
-        binding.detailsCard.visibility = View.VISIBLE
-        binding.regionMapTitle.visibility = View.VISIBLE
-        binding.regionMapCard.visibility = View.VISIBLE
-        binding.hourlyTitle.visibility = View.VISIBLE
-        binding.dailyTitle.visibility = View.VISIBLE
-        binding.hourlyRecycler.visibility = View.VISIBLE
-        binding.dailyRecycler.visibility = View.VISIBLE
+        showHeaderVisibility()
 
         val current = weather.current
-        val cond = current.weather.firstOrNull()
-        binding.swipeRefresh.setWeatherCondition(
-            cond?.id ?: 800L,
-            cond?.icon?.endsWith("n") == false
-        )
-        com.meteoapp.util.WeatherTransition.animateTemperature(
-            binding.temperature,
-            { value -> WeatherUtils.formatTemp(this, value) },
-            current.temp
-        )
-        current.weather.firstOrNull()?.let { cond ->
-            WeatherIcons.bind(
-                binding.heroIcon,
-                cond.id,
-                isDay = !cond.icon.endsWith("n")
-            )
-        }
-        binding.weatherDescription.text =
-            current.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
-        binding.feelsLike.text = getString(R.string.feels_like_value, WeatherUtils.formatTemp(this, current.feelsLike))
-
-        val today = weather.daily.firstOrNull()
-        if (today != null) {
-            binding.minMax.text = getString(
-                R.string.min_max_format,
-                WeatherUtils.formatTemp(this, today.tempMax),
-                WeatherUtils.formatTemp(this, today.tempMin)
-            )
-        } else {
-            binding.minMax.text = ""
-        }
+        showCurrentCondition(current)
+        showDailySummary(weather, current)
 
         binding.humidityValue.text = getString(R.string.format_percent, current.humidity)
         binding.windValue.text = getString(
@@ -516,13 +480,63 @@ class MainActivity : AppCompatActivity() {
     private fun cityKeyFor(city: GeoLocation?): String? =
         city?.let { "%.2f_%.2f".format(java.util.Locale.US, it.lat, it.lon) }
 
+    private fun showHeaderVisibility() {
+        binding.headerLayout.visibility = View.VISIBLE
+        binding.detailsCard.visibility = View.VISIBLE
+        binding.regionMapTitle.visibility = View.VISIBLE
+        binding.regionMapCard.visibility = View.VISIBLE
+        binding.hourlyTitle.visibility = View.VISIBLE
+        binding.dailyTitle.visibility = View.VISIBLE
+        binding.hourlyRecycler.visibility = View.VISIBLE
+        binding.dailyRecycler.visibility = View.VISIBLE
+    }
+
+    private fun showCurrentCondition(current: com.meteoapp.data.model.CurrentData) {
+        val cond = current.weather.firstOrNull()
+        binding.swipeRefresh.setWeatherCondition(
+            cond?.id ?: 800L,
+            cond?.icon?.endsWith("n") == false
+        )
+        com.meteoapp.util.WeatherTransition.animateTemperature(
+            binding.temperature,
+            { value -> WeatherUtils.formatTemp(this, value) },
+            current.temp
+        )
+        current.weather.firstOrNull()?.let { cond ->
+            WeatherIcons.bind(
+                binding.heroIcon,
+                cond.id,
+                isDay = !cond.icon.endsWith("n")
+            )
+        }
+        binding.weatherDescription.text =
+            current.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: ""
+        binding.feelsLike.text = getString(R.string.feels_like_value, WeatherUtils.formatTemp(this, current.feelsLike))
+    }
+
+    private fun showDailySummary(weather: WeatherData, current: com.meteoapp.data.model.CurrentData) {
+        val today = weather.daily.firstOrNull()
+        if (today != null) {
+            binding.minMax.text = getString(
+                R.string.min_max_format,
+                WeatherUtils.formatTemp(this, today.tempMax),
+                WeatherUtils.formatTemp(this, today.tempMin)
+            )
+        } else {
+            binding.minMax.text = ""
+        }
+    }
+
     /**
      * Bandeau de précipitation imminente : calcule localement le premier
      * créneau pluvieux/neigeux à venir depuis les prévisions 3 h et
      * l'affiche sous l'en-tête (masqué si rien n'est prévu).
      */
-    private fun showRainBanner(hours: List<com.meteoapp.data.model.HourlyData>) {
-        val precipitation = com.meteoapp.util.ImminentRain.detect(hours)
+    private fun showRainBanner(
+        hours: List<com.meteoapp.data.model.HourlyData>,
+        minutely: List<com.meteoapp.data.model.MinutelyPrecipitation>
+    ) {
+        val precipitation = com.meteoapp.util.ImminentRain.detect(hours, minutely = minutely)
         if (precipitation == null) {
             binding.rainBanner.visibility = View.GONE
             return

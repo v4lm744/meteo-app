@@ -42,7 +42,12 @@ class WeatherRepositoryTest {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         ApiKeyStore.setApiKey(context, "test-key")
         context.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
-        repository = WeatherRepository(context, api, openMeteoApi = buildFailingOpenMeteoApi())
+        repository = WeatherRepository(
+            context,
+            api,
+            openMeteoApi = buildFailingOpenMeteoApi(),
+            airQualityApi = buildFailingAirQualityApi()
+        )
     }
 
     @After
@@ -84,7 +89,12 @@ class WeatherRepositoryTest {
     fun getWeather_returnsErrorWhenApiKeyMissing() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         ApiKeyStore.setApiKey(context, "")
-        val repo = WeatherRepository(context, buildApi(), openMeteoApi = buildFailingOpenMeteoApi())
+        val repo = WeatherRepository(
+            context,
+            buildApi(),
+            openMeteoApi = buildFailingOpenMeteoApi(),
+            airQualityApi = buildFailingAirQualityApi()
+        )
 
         val result = runBlocking { repo.getWeather(48.85, 2.35) }
 
@@ -117,6 +127,39 @@ class WeatherRepositoryTest {
 
         assertTrue(result is WeatherResult.Error)
         assertTrue((result as WeatherResult.Error).cityNotFound)
+    }
+
+    @Test
+    fun getAirQuality_succeedsWithoutApiKeyViaOpenMeteo() {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        ApiKeyStore.setApiKey(context, "")
+        server.enqueue(MockResponse().setBody(AIR_QUALITY_JSON))
+        val repo = WeatherRepository(
+            context,
+            buildApi(),
+            openMeteoApi = buildFailingOpenMeteoApi(),
+            airQualityApi = buildAirQualityApi()
+        )
+        val result = runBlocking { repo.getAirQuality(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Success)
+        val item = (result as WeatherResult.Success).data.list.first()
+        assertEquals(3L, item.main!!.aqi)
+        assertEquals(6.5, item.components!!.pm25, 0.001)
+    }
+
+    @Test
+    fun getAirQuality_fallsBackToOpenWeatherWhenOpenMeteoFails() {
+        server.enqueue(MockResponse().setBody(AIR_POLLUTION_JSON))
+        val result = runBlocking { repository.getAirQuality(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Success)
+        assertEquals(2L, ((result as WeatherResult.Success).data.list.first().main!!.aqi))
+    }
+
+    @Test
+    fun getAirQuality_errorWhenBothSourcesFail() {
+        server.shutdown()
+        val result = runBlocking { repository.getAirQuality(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Error)
     }
 
     @Test
@@ -237,6 +280,24 @@ class WeatherRepositoryTest {
         .build()
         .create(OpenMeteoApi::class.java)
 
+    /**
+     * API qualité de l'air Open-Meteo pointant vers un serveur mort :
+     * les tests existants valident le repli OpenWeatherMap.
+     */
+    private fun buildAirQualityApi(): com.meteoapp.data.api.OpenMeteoAirQualityApi =
+        Retrofit.Builder()
+            .baseUrl(server.url("/"))
+            .addConverterFactory(MoshiConverterFactory.create(ApiClient.moshi))
+            .build()
+            .create(com.meteoapp.data.api.OpenMeteoAirQualityApi::class.java)
+
+    private fun buildFailingAirQualityApi(): com.meteoapp.data.api.OpenMeteoAirQualityApi =
+        Retrofit.Builder()
+            .baseUrl("http://localhost:1/")
+            .addConverterFactory(MoshiConverterFactory.create(ApiClient.moshi))
+            .build()
+            .create(com.meteoapp.data.api.OpenMeteoAirQualityApi::class.java)
+
     private val CURRENT_JSON = """
         {
           "coord": {"lon": 2.35, "lat": 48.85},
@@ -266,6 +327,30 @@ class WeatherRepositoryTest {
         }
         append("]}")
     }
+
+    private val AIR_QUALITY_JSON = """
+        {
+          "latitude": 48.85, "longitude": 2.35,
+          "current": {
+            "time": "2026-09-22T14:00",
+            "european_aqi": 42,
+            "pm2_5": 6.5, "pm10": 12.7, "ozone": 51.0, "nitrogen_dioxide": 28.6
+          }
+        }
+    """.trimIndent()
+
+    private val AIR_POLLUTION_JSON = """
+        {
+          "coord": {"lon": 2.35, "lat": 48.85},
+          "list": [
+            {
+              "dt": 1700000000,
+              "main": {"aqi": 2},
+              "components": {"pm2_5": 8.1, "pm10": 14.2, "o3": 48.0, "no2": 30.0}
+            }
+          ]
+        }
+    """.trimIndent()
 
     private val GEO_JSON = """
         [

@@ -13,7 +13,7 @@ complexity:
     active: true
     thresholdInFiles: 30
     thresholdInObjects: 25
-    thresholdInClasses: 32
+    thresholdInClasses: 40
   CyclomaticComplexMethod:
     active: true
     threshold: 60

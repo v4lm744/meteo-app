@@ -82,6 +82,9 @@ class OpenMeteoRepositoryTest {
         assertEquals(4.8, data.daily.first().uvIndexMax!!, 0.001)
         assertTrue(data.hourly.size == 4)
         assertEquals(1.9, data.hourly.first().uvIndex!!, 0.001)
+        assertTrue(data.minutely.size == 4)
+        assertEquals(0.2, data.minutely.first().precipitation, 0.001)
+        assertEquals(60, data.minutely.first().probabilityPercent)
         assertEquals(0, openWeatherServer.requestCount)
     }
 
@@ -113,12 +116,25 @@ class OpenMeteoRepositoryTest {
         assertFalse((result as WeatherResult.Error).cityNotFound)
     }
 
-    private val OPEN_METEO_JSON = """
+    /**
+     * Réponse Open-Meteo à heures relatives à l'instant du test : le
+     * mapper exclut les créneaux passés, une date fixe casserait le test
+     * dès le lendemain de sa rédaction.
+     */
+    private val OPEN_METEO_JSON: String by lazy {
+        val offset = 7200L
+        val nowLocal = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).plusSeconds(offset)
+        val base = nowLocal.plusHours(1).truncatedTo(java.time.temporal.ChronoUnit.HOURS)
+        val fmt = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        val times = (0 until 4).joinToString(",") { "\"" + base.plusHours(it.toLong()).format(fmt) + "\"" }
+        val minutelyTimes = (0 until 4).joinToString(",") { "\"" + base.plusMinutes(it.toLong() * 15).format(fmt) + "\"" }
+        val today = base.toLocalDate()
+        """
         {
           "latitude": 48.85, "longitude": 2.35,
-          "timezone": "Europe/Paris", "utc_offset_seconds": 7200,
+          "timezone": "Europe/Paris", "utc_offset_seconds": $offset,
           "current": {
-            "time": "2026-09-22T14:00",
+            "time": "${nowLocal.format(fmt)}",
             "temperature_2m": 21.4, "relative_humidity_2m": 48,
             "apparent_temperature": 20.9, "is_day": 1,
             "precipitation": 0.0, "weather_code": 1,
@@ -126,7 +142,7 @@ class OpenMeteoRepositoryTest {
             "wind_speed_10m": 9.2, "wind_direction_10m": 220, "wind_gusts_10m": 16.6
           },
           "hourly": {
-            "time": ["2026-09-22T14:00", "2026-09-22T15:00", "2026-09-22T16:00", "2026-09-22T17:00"],
+            "time": [$times],
             "temperature_2m": [21.4, 21.9, 22.3, 22.1],
             "relative_humidity_2m": [48, 47, 45, 46],
             "apparent_temperature": [20.9, 21.4, 21.8, 21.6],
@@ -140,18 +156,25 @@ class OpenMeteoRepositoryTest {
             "wind_direction_10m": [220, 225, 230, 215],
             "uv_index": [1.9, 1.6, 1.2, 0.7]
           },
+          "minutely_15": {
+            "time": [$minutelyTimes],
+            "precipitation": [0.2, 0.0, 0.0, 0.0],
+            "precipitation_probability": [60, 10, 5, 0],
+            "weather_code": [61, 1, 1, 1]
+          },
           "daily": {
-            "time": ["2026-09-22", "2026-09-23"],
+            "time": ["$today", "${today.plusDays(1)}"],
             "weather_code": [1, 2],
             "temperature_2m_max": [24.2, 23.5],
             "temperature_2m_min": [12.7, 13.1],
-            "sunrise": ["2026-09-22T07:36", "2026-09-23T07:37"],
-            "sunset": ["2026-09-22T19:48", "2026-09-23T19:46"],
+            "sunrise": ["${today}T07:36", "${today.plusDays(1)}T07:37"],
+            "sunset": ["${today}T19:48", "${today.plusDays(1)}T19:46"],
             "uv_index_max": [4.8, 4.6],
             "precipitation_probability_max": [10, 20]
           }
         }
-    """.trimIndent()
+        """.trimIndent()
+    }
 
     private val OWM_FORECAST_JSON = """
         {

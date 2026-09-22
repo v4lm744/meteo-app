@@ -91,6 +91,60 @@ class ImminentRainTest {
     }
 
     @Test
+    fun detect_minutelyPreferredOverHourlySlots() {
+        val hours = listOf(hour(dt = 4500, conditionId = 500L, pop = 0.9))
+        val minutely = listOf(
+            com.meteoapp.data.model.MinutelyPrecipitation(
+                dt = 1900, precipitation = 0.2, probabilityPercent = 60,
+                isSnow = false, timezoneOffset = 0L
+            )
+        )
+        val result = ImminentRain.detect(hours, nowEpochSeconds = 1000, minutely = minutely)
+        assertNotNull(result)
+        assertEquals(15L, result!!.startsInMinutes)
+        assertEquals(60, result.probabilityPercent)
+    }
+
+    @Test
+    fun detect_minutelySnow_flagsSnow() {
+        val minutely = listOf(
+            com.meteoapp.data.model.MinutelyPrecipitation(
+                dt = 2500, precipitation = 0.3, probabilityPercent = 80,
+                isSnow = true, timezoneOffset = 0L
+            )
+        )
+        val result = ImminentRain.detect(emptyList(), nowEpochSeconds = 1000, minutely = minutely)
+        assertNotNull(result)
+        assertTrue(result!!.isSnow)
+    }
+
+    @Test
+    fun detect_minutelyDry_fallsBackToHourly() {
+        val hours = listOf(hour(dt = 4500, conditionId = 500L, pop = 0.8))
+        val minutely = listOf(
+            com.meteoapp.data.model.MinutelyPrecipitation(
+                dt = 1900, precipitation = 0.0, probabilityPercent = 10,
+                isSnow = false, timezoneOffset = 0L
+            )
+        )
+        val result = ImminentRain.detect(hours, nowEpochSeconds = 1000, minutely = minutely)
+        assertNotNull(result)
+        assertEquals(58L, result!!.startsInMinutes)
+    }
+
+    @Test
+    fun detect_minutelyAllPast_ignored() {
+        val minutely = listOf(
+            com.meteoapp.data.model.MinutelyPrecipitation(
+                dt = 500, precipitation = 1.0, probabilityPercent = 100,
+                isSnow = false, timezoneOffset = 0L
+            )
+        )
+        val result = ImminentRain.detect(emptyList(), nowEpochSeconds = 1000, minutely = minutely)
+        assertNull(result)
+    }
+
+    @Test
     fun roundToHumanMinutes_snapsToQuarterHour() {
         assertEquals(0L, ImminentRain.roundToHumanMinutes(0))
         assertEquals(15L, ImminentRain.roundToHumanMinutes(10))
