@@ -78,6 +78,13 @@
     <string name="moon_waning_crescent">Dernier croissant</string>
     <string name="moon_illumination_format">(%1$s éclairée)</string>
     <string name="compass_west">O</string>
+    <string name="rain_banner_rain">Pluie</string>
+    <string name="rain_banner_snow">Neige</string>
+    <string name="rain_banner_with_probability">%1$s attendue dans ~%2$s (%3$d %%)</string>
+    <string name="rain_banner_without_probability">%1$s attendue dans ~%2$s</string>
+    <string name="rain_banner_minutes">%1$d min</string>
+    <string name="rain_banner_hours">%1$d h</string>
+    <string name="rain_banner_hours_minutes">%1$d h %2$d</string>
     <string name="feels_like">Ressenti</string>
     <string name="humidity">Humidité</string>
     <string name="wind">Vent</string>

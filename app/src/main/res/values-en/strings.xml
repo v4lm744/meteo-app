@@ -78,6 +78,13 @@
     <string name="moon_waning_crescent">Waning crescent</string>
     <string name="moon_illumination_format">(%1$s illuminated)</string>
     <string name="compass_west">W</string>
+    <string name="rain_banner_rain">Rain</string>
+    <string name="rain_banner_snow">Snow</string>
+    <string name="rain_banner_with_probability">%1$s expected in ~%2$s (%3$d%%)</string>
+    <string name="rain_banner_without_probability">%1$s expected in ~%2$s</string>
+    <string name="rain_banner_minutes">%1$d min</string>
+    <string name="rain_banner_hours">%1$d h</string>
+    <string name="rain_banner_hours_minutes">%1$d h %2$d</string>
     <string name="feels_like">Feels like</string>
     <string name="humidity">Humidity</string>
     <string name="wind">Wind</string>

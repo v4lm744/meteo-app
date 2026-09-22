@@ -42,6 +42,13 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="32dp">
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/halfGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
                 <ProgressBar
                     android:id="@+id/loadingBar"
                     android:layout_width="wrap_content"
@@ -62,7 +69,7 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/halfGuideline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -157,7 +164,7 @@
                     android:layout_marginTop="24dp"
                     android:layout_marginEnd="16dp"
                     android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/halfGuideline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
@@ -383,7 +390,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/halfGuideline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/detailsCard">
 
@@ -420,8 +427,8 @@
                     android:layout_marginEnd="16dp"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/hourlyChartCard" />
+                    app:layout_constraintStart_toStartOf="@id/halfGuideline"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/sunArcCard"
@@ -432,9 +439,9 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/halfGuideline"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/airQualityCard">
+                    app:layout_constraintTop_toBottomOf="@id/hourlyChartCard">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -526,7 +533,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/halfGuideline"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/sunArcCard" />
 
@@ -540,8 +547,8 @@
                     android:text="@string/region_map"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/historyCard" />
+                    app:layout_constraintStart_toStartOf="@id/halfGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/airQualityCard" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/regionMapCard"
@@ -555,7 +562,7 @@
                     android:visibility="gone"
                     app:cardCornerRadius="20dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/halfGuideline"
                     app:layout_constraintTop_toBottomOf="@id/regionMapTitle">
 
                     <com.meteoapp.ui.map.RegionMapView
@@ -574,7 +581,7 @@
                     android:text="@string/hourly_forecast"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/halfGuideline"
                     app:layout_constraintTop_toBottomOf="@id/regionMapCard" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -590,7 +597,7 @@
                     android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/halfGuideline"
                     app:layout_constraintTop_toBottomOf="@id/hourlyTitle" />
 
                 <TextView
@@ -603,7 +610,7 @@
                     android:text="@string/daily_forecast"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/halfGuideline"
                     app:layout_constraintTop_toBottomOf="@id/hourlyRecycler" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -616,7 +623,7 @@
                     android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/halfGuideline"
                     app:layout_constraintTop_toBottomOf="@id/dailyTitle" />
 
                 <LinearLayout
