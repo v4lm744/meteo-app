@@ -74,11 +74,43 @@ class WeatherCacheTest {
     }
 
     @Test
+    fun trim_deletesExpiredEntries() {
+        val expired = java.io.File(cacheDir(), "weather_10.00_20.00.json").apply {
+            writeText("{}")
+            setLastModified(System.currentTimeMillis() - WeatherCache.MAX_AGE_MS - 1000L)
+        }
+        val recent = java.io.File(cacheDir(), "weather_30.00_40.00.json").apply {
+            writeText("{}")
+        }
+        cache.trim()
+        assertTrue("l'entrée périmée doit être supprimée", !expired.exists())
+        assertTrue("l'entrée récente doit être conservée", recent.exists())
+    }
+
+    @Test
+    fun trim_keepsOnlyMostRecentEntries() {
+        for (i in 0 until 6) {
+            val f = java.io.File(
+                cacheDir(),
+                String.format(java.util.Locale.US, "weather_%d.00_0.00.json", i)
+            )
+            f.writeText("{}")
+            f.setLastModified(System.currentTimeMillis() - (6 - i) * 60_000L)
+        }
+        cache.trim(maxEntries = 3, maxAgeMs = Long.MAX_VALUE)
+        val remaining = cacheDir().listFiles { f -> f.name.startsWith("weather_") }!!
+        assertEquals(3, remaining.size)
+    }
+
+    @Test
     fun load_returnsNullForDifferentKey() {
         cache.save(48.85, 2.35, sampleWeather(48.85, 2.35, 18.5))
 
         assertNull(cache.load(40.0, -3.7))
     }
+
+    private fun cacheDir(): java.io.File =
+        ApplicationProvider.getApplicationContext<android.content.Context>().cacheDir
 
     private fun sampleWeather(lat: Double, lon: Double, temp: Double): WeatherData {
         return WeatherData(

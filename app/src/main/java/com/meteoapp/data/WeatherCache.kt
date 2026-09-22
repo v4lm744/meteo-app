@@ -20,6 +20,8 @@ class WeatherCache(context: Context) {
 
     companion object {
         const val FRESH_MAX_AGE_MS = 10 * 60 * 1000L
+        const val MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000L
+        const val MAX_ENTRIES = 8
     }
 
     private val cacheDir: File = context.applicationContext.cacheDir
@@ -30,6 +32,26 @@ class WeatherCache(context: Context) {
         val json = adapter.toJson(data)
         runCatching {
             File(cacheDir, fileName(lat, lon)).writeText(json)
+        }
+        trim()
+    }
+
+    /**
+     * Éviction : les fichiers de cache des villes rarement consultées
+     * s'accumulaient indéfiniment. On conserve les [MAX_ENTRIES] plus
+     * récents et on supprime tout fichier plus vieux que [MAX_AGE_MS],
+     * quelle que soit leur position.
+     */
+    fun trim(maxEntries: Int = MAX_ENTRIES, maxAgeMs: Long = MAX_AGE_MS) {
+        val now = System.currentTimeMillis()
+        val files = cacheDir.listFiles { file -> file.isFile && file.name.startsWith("weather_") }
+            ?: return
+        val expired = files.filter { now - it.lastModified() > maxAgeMs }
+        expired.forEach { it.delete() }
+        val kept = files.filterNot { it in expired }
+            .sortedByDescending { it.lastModified() }
+        if (kept.size > maxEntries) {
+            kept.drop(maxEntries).forEach { it.delete() }
         }
     }
 
