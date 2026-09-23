@@ -13,9 +13,9 @@ data class OpenMeteoAirQualityResponse(
 @JsonClass(generateAdapter = true)
 data class OpenMeteoAirQualityCurrent(
     val time: String,
-    @Json(name = "european_aqi") val europeanAqi: Long?,
-    @Json(name = "pm2_5") val pm25: Double?,
+    @param:Json(name = "european_aqi") val europeanAqi: Long?,
+    @param:Json(name = "pm2_5") val pm25: Double?,
     val pm10: Double?,
     val ozone: Double?,
-    @Json(name = "nitrogen_dioxide") val nitrogenDioxide: Double?
+    @param:Json(name = "nitrogen_dioxide") val nitrogenDioxide: Double?
 )

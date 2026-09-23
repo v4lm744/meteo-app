@@ -19,7 +19,14 @@ import kotlinx.coroutines.launch
  * prochaines heures (icône, heure, température, probabilité de pluie) via
  * un RemoteViewsService. La ville est partagée avec le widget principal
  * ([WidgetPrefs]) mais possède son propre stockage pour rester autonome.
+ *
+ * Les API setRemoteAdapter(Intent) / notifyAppWidgetViewDataChanged sont
+ * dépréciées depuis l'API 35 au profit de RemoteCollectionItems, mais ce
+ * remplacement exige l'API 31 : avec minSdk 26, le service distant reste
+ * la seule implémentation compatible jusqu'à la disparition des
+ * appareils API 26–30.
  */
+@Suppress("DEPRECATION")
 class HourlyForecastWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(
