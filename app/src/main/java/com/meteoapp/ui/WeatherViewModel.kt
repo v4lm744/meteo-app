@@ -13,8 +13,9 @@ import com.meteoapp.data.model.GeoLocation
 import com.meteoapp.data.model.RegionCity
 import com.meteoapp.data.model.WeatherData
 import com.meteoapp.location.LocationHelper
+import com.meteoapp.util.LatestJobRunner
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -47,16 +48,23 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
      */
     val stateLiveData: LiveData<UiState> = _state.asLiveData()
 
-    private var weatherJob: Job? = null
+    /**
+     * Chargement météo en cours (ville choisie, rafraîchissement ou
+     * position) : un nouveau chargement annule le précédent, ainsi que ses
+     * chargements secondaires (minimap, qualité de l'air), pour qu'une
+     * réponse tardive n'écrase pas la ville affichée (BUG-005).
+     */
+    private val weatherJobs = LatestJobRunner(viewModelScope)
 
     val isApiKeyConfigured: Boolean
         get() = repository.isApiKeyConfigured
 
     fun loadWeatherForCity(city: GeoLocation) {
-        weatherJob?.cancel()
         com.meteoapp.city.FavoriteCitiesStore.setCurrentCity(getApplication(), city)
-        weatherJob = viewModelScope.launch {
-            _state.update { it.copy(loading = true, error = null, city = city) }
+        weatherJobs.launch {
+            // loading et refreshing sont fixés explicitement : le chargement
+            // annulé ne remettra jamais ses propres indicateurs à zéro.
+            _state.update { it.copy(loading = true, refreshing = false, error = null, city = city) }
             when (val result = repository.getWeather(city.lat, city.lon)) {
                 is WeatherResult.Success -> {
                     recordHistory(result.data)
@@ -85,9 +93,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         val current = _state.value
         val lat = current.weather?.lat ?: current.city?.lat ?: return
         val lon = current.weather?.lon ?: current.city?.lon ?: return
-        weatherJob?.cancel()
-        weatherJob = viewModelScope.launch {
-            _state.update { it.copy(refreshing = true, error = null) }
+        weatherJobs.launch {
+            _state.update { it.copy(loading = false, refreshing = true, error = null) }
             when (val result = repository.getWeather(lat, lon, forceRefresh = true)) {
                 is WeatherResult.Success -> {
                     recordHistory(result.data)
@@ -119,8 +126,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun loadRegionCities(lat: Double, lon: Double) {
-        viewModelScope.launch {
+    private fun CoroutineScope.loadRegionCities(lat: Double, lon: Double) {
+        launch {
             when (val result = repository.getRegionCities(lat, lon)) {
                 is WeatherResult.Success -> {
                     _state.update { it.copy(regionCities = result.data) }
@@ -130,8 +137,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun loadAirQuality(lat: Double, lon: Double) {
-        viewModelScope.launch {
+    private fun CoroutineScope.loadAirQuality(lat: Double, lon: Double) {
+        launch {
             when (val result = repository.getAirQuality(lat, lon)) {
                 is WeatherResult.Success -> {
                     _state.update {
@@ -144,17 +151,19 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun loadForCurrentLocation() {
-        viewModelScope.launch {
+        weatherJobs.launch {
             if (!locationHelper.hasLocationPermission()) {
                 _state.update {
                     it.copy(
+                        loading = false,
+                        refreshing = false,
                         error = getApplication<Application>()
                             .getString(R.string.error_location_permission)
                     )
                 }
                 return@launch
             }
-            _state.update { it.copy(loading = true, error = null) }
+            _state.update { it.copy(loading = true, refreshing = false, error = null) }
             val location = locationHelper.getCurrentLocation()
             if (location == null) {
                 _state.update {

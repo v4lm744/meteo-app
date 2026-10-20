@@ -24,6 +24,10 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
 - Hors ligne et sans clé API, la dernière météo connue s'affiche avec la
   bannière hors ligne au lieu de « Clé API non configurée »
   ([BUG-004](docs/incidents/BUG-004-hors-ligne-sans-cle.md)).
+- Une géolocalisation lente ne remplace plus la ville choisie entre-temps,
+  et la qualité de l'air ou la minimap d'une ville précédente ne s'affiche
+  plus sur la nouvelle
+  ([BUG-005](docs/incidents/BUG-005-chargements-concurrents.md)).
 
 ### Ajouté
 
