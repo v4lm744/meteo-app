@@ -78,7 +78,9 @@ class WeatherRepository(
                 return WeatherResult.Success(fresh, fromCache = true, stale = false)
             }
         }
-        val openMeteoResult = fetchWeatherFromOpenMeteo(lat, lon)
+        // forceRefresh contourne aussi le cache HTTP (BUG-003).
+        val cacheControl = if (forceRefresh) ApiClient.NO_CACHE else null
+        val openMeteoResult = fetchWeatherFromOpenMeteo(lat, lon, cacheControl)
         if (openMeteoResult is WeatherResult.Success) {
             return openMeteoResult
         }
@@ -87,8 +89,12 @@ class WeatherRepository(
         }
         return try {
             coroutineScope {
-                val currentDeferred = async { api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey, lang = lang) }
-                val forecastDeferred = async { api.getForecast(lat = lat, lon = lon, apiKey = apiKey, lang = lang) }
+                val currentDeferred = async {
+                    api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey, lang = lang, cacheControl = cacheControl)
+                }
+                val forecastDeferred = async {
+                    api.getForecast(lat = lat, lon = lon, apiKey = apiKey, lang = lang, cacheControl = cacheControl)
+                }
                 val current = currentDeferred.await()
                 val forecast = forecastDeferred.await()
 
@@ -183,10 +189,11 @@ class WeatherRepository(
      */
     private suspend fun fetchWeatherFromOpenMeteo(
         lat: Double,
-        lon: Double
+        lon: Double,
+        cacheControl: String?
     ): WeatherResult<WeatherData> {
         return try {
-            val response = openMeteoApi.getForecast(lat = lat, lon = lon)
+            val response = openMeteoApi.getForecast(lat = lat, lon = lon, cacheControl = cacheControl)
             val weatherData = OpenMeteoMapper.toWeatherData(response, lang)
             withContext(Dispatchers.IO) { cache.save(lat, lon, weatherData) }
             WeatherResult.Success(weatherData)

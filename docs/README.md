@@ -39,9 +39,11 @@ avec sa documentation dans le **même commit**.
 |---|---|---|---|
 | [BUG-001](incidents/BUG-001-unite-vitesse-vent.md) | Vent Open-Meteo affiché 3,6 fois trop fort | Majeure | Corrigé (non publié) |
 | [BUG-002](incidents/BUG-002-cumul-pluie-alertes.md) | Cumul de pluie et fenêtre des alertes faux | Majeure | Corrigé (non publié) |
+| [BUG-003](incidents/BUG-003-cache-http-inoperant.md) | Cache HTTP OkHttp inopérant | Mineure | Corrigé (non publié) |
 
 ## Index des décisions
 
 | ID | Titre | Statut |
 |---|---|---|
 | [ADR-001](decisions/ADR-001-processus-documentation.md) | Processus de documentation et de livraison | Acceptée |
+| [ADR-002](decisions/ADR-002-politique-cache-http.md) | Politique de cache HTTP | Acceptée |

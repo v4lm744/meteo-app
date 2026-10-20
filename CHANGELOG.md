@@ -17,6 +17,10 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
 - Alertes météo : cumul de pluie qui était triplé, et fenêtre de 36 h au
   lieu de 12 h avec OpenWeatherMap ; l'évaluation porte désormais sur
   12 h réelles ([BUG-002](docs/incidents/BUG-002-cumul-pluie-alertes.md)).
+- Cache HTTP inopérant : les réponses sont de nouveau mises en cache 5 min,
+  et le pull-to-refresh contourne ce cache
+  ([BUG-003](docs/incidents/BUG-003-cache-http-inoperant.md),
+  [ADR-002](docs/decisions/ADR-002-politique-cache-http.md)).
 
 ### Ajouté
 

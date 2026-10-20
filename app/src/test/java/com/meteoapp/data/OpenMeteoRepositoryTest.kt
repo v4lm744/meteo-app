@@ -102,6 +102,21 @@ class OpenMeteoRepositoryTest {
         assertEquals(9.2, (result as WeatherResult.Success).data.current.windSpeed, 0.001)
     }
 
+    /** BUG-003 : le pull-to-refresh doit contourner le cache HTTP. */
+    @Test
+    fun getWeather_forceRefreshSendsNoCacheHeader() {
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        runBlocking { repository().getWeather(48.85, 2.35, forceRefresh = true) }
+        assertEquals("no-cache", openMeteoServer.takeRequest().getHeader("Cache-Control"))
+    }
+
+    @Test
+    fun getWeather_withoutForceRefreshLetsHttpCacheAnswer() {
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        runBlocking { repository().getWeather(48.85, 2.35) }
+        assertEquals(null, openMeteoServer.takeRequest().getHeader("Cache-Control"))
+    }
+
     @Test
     fun getWeather_fallsBackToOpenWeatherWhenOpenMeteoFails() {
         openMeteoServer.enqueue(MockResponse().setResponseCode(500))
