@@ -22,6 +22,16 @@ class WeatherCache(context: Context) {
         const val FRESH_MAX_AGE_MS = 10 * 60 * 1000L
         const val MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000L
         const val MAX_ENTRIES = 8
+
+        /**
+         * Version du format des fichiers de cache, intégrée à leur nom.
+         * L'incrémenter invalide les entrées écrites par les versions
+         * précédentes (purgées par [trim]). v2 : vent Open-Meteo en m/s
+         * (BUG-001), les fichiers v1 contenaient des km/h.
+         */
+        const val CACHE_VERSION = 2
+        private const val LEGACY_PREFIX = "weather_"
+        const val FILE_PREFIX = "weather_v${CACHE_VERSION}_"
     }
 
     private val cacheDir: File = context.applicationContext.cacheDir
@@ -40,12 +50,15 @@ class WeatherCache(context: Context) {
      * Éviction : les fichiers de cache des villes rarement consultées
      * s'accumulaient indéfiniment. On conserve les [MAX_ENTRIES] plus
      * récents et on supprime tout fichier plus vieux que [MAX_AGE_MS],
-     * quelle que soit leur position.
+     * quelle que soit leur position. Les fichiers d'une version de
+     * format antérieure à [CACHE_VERSION] sont supprimés d'office.
      */
     fun trim(maxEntries: Int = MAX_ENTRIES, maxAgeMs: Long = MAX_AGE_MS) {
         val now = System.currentTimeMillis()
-        val files = cacheDir.listFiles { file -> file.isFile && file.name.startsWith("weather_") }
+        val all = cacheDir.listFiles { file -> file.isFile && file.name.startsWith(LEGACY_PREFIX) }
             ?: return
+        val (files, outdated) = all.partition { it.name.startsWith(FILE_PREFIX) }
+        outdated.forEach { it.delete() }
         val expired = files.filter { now - it.lastModified() > maxAgeMs }
         expired.forEach { it.delete() }
         val kept = files.filterNot { it in expired }
@@ -83,7 +96,7 @@ class WeatherCache(context: Context) {
     }
 
     private fun fileName(lat: Double, lon: Double): String =
-        "weather_${round(lat)}_${round(lon)}.json"
+        "$FILE_PREFIX${round(lat)}_${round(lon)}.json"
 
     private fun round(value: Double): String =
         String.format(java.util.Locale.US, "%.2f", value)

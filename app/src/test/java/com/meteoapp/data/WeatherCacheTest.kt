@@ -75,11 +75,11 @@ class WeatherCacheTest {
 
     @Test
     fun trim_deletesExpiredEntries() {
-        val expired = java.io.File(cacheDir(), "weather_10.00_20.00.json").apply {
+        val expired = java.io.File(cacheDir(), WeatherCache.FILE_PREFIX + "10.00_20.00.json").apply {
             writeText("{}")
             setLastModified(System.currentTimeMillis() - WeatherCache.MAX_AGE_MS - 1000L)
         }
-        val recent = java.io.File(cacheDir(), "weather_30.00_40.00.json").apply {
+        val recent = java.io.File(cacheDir(), WeatherCache.FILE_PREFIX + "30.00_40.00.json").apply {
             writeText("{}")
         }
         cache.trim()
@@ -92,7 +92,7 @@ class WeatherCacheTest {
         for (i in 0 until 6) {
             val f = java.io.File(
                 cacheDir(),
-                String.format(java.util.Locale.US, "weather_%d.00_0.00.json", i)
+                WeatherCache.FILE_PREFIX + String.format(java.util.Locale.US, "%d.00_0.00.json", i)
             )
             f.writeText("{}")
             f.setLastModified(System.currentTimeMillis() - (6 - i) * 60_000L)
@@ -100,6 +100,22 @@ class WeatherCacheTest {
         cache.trim(maxEntries = 3, maxAgeMs = Long.MAX_VALUE)
         val remaining = cacheDir().listFiles { f -> f.name.startsWith("weather_") }!!
         assertEquals(3, remaining.size)
+    }
+
+    @Test
+    fun trim_purgesFilesFromPreviousCacheVersion() {
+        val legacy = java.io.File(cacheDir(), "weather_48.85_2.35.json").apply { writeText("{}") }
+        val current = java.io.File(cacheDir(), WeatherCache.FILE_PREFIX + "48.85_2.35.json")
+            .apply { writeText("{}") }
+        cache.trim()
+        assertTrue("le fichier v1 (vent en km/h) doit être purgé", !legacy.exists())
+        assertTrue("le fichier de la version courante doit être conservé", current.exists())
+    }
+
+    @Test
+    fun load_ignoresFileFromPreviousCacheVersion() {
+        java.io.File(cacheDir(), "weather_48.85_2.35.json").writeText("{}")
+        assertNull(cache.load(48.85, 2.35))
     }
 
     @Test

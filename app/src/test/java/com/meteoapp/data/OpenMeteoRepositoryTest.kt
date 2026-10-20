@@ -88,6 +88,20 @@ class OpenMeteoRepositoryTest {
         assertEquals(0, openWeatherServer.requestCount)
     }
 
+    /**
+     * BUG-001 : sans `wind_speed_unit=ms`, Open-Meteo renvoie des km/h que
+     * l'app interprète comme des m/s (vent affiché 3,6 fois trop fort).
+     */
+    @Test
+    fun getWeather_requestsWindSpeedInMetersPerSecond() {
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        val result = runBlocking { repository().getWeather(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Success)
+        val request = openMeteoServer.takeRequest()
+        assertEquals("ms", request.requestUrl?.queryParameter("wind_speed_unit"))
+        assertEquals(9.2, (result as WeatherResult.Success).data.current.windSpeed, 0.001)
+    }
+
     @Test
     fun getWeather_fallsBackToOpenWeatherWhenOpenMeteoFails() {
         openMeteoServer.enqueue(MockResponse().setResponseCode(500))

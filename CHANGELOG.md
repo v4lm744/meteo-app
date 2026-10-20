@@ -9,6 +9,12 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
 
 ## [Non publié]
 
+### Corrigé
+
+- Vitesse du vent Open-Meteo affichée 3,6 fois trop forte (et fausses
+  alertes « vent violent ») ; les caches météo de l'ancien format sont
+  invalidés ([BUG-001](docs/incidents/BUG-001-unite-vitesse-vent.md)).
+
 ### Ajouté
 
 - Documentation projet : CHANGELOG, fiches d'incident, registre des
