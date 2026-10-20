@@ -42,6 +42,7 @@ avec sa documentation dans le **même commit**.
 | [BUG-003](incidents/BUG-003-cache-http-inoperant.md) | Cache HTTP OkHttp inopérant | Mineure | Corrigé (non publié) |
 | [BUG-004](incidents/BUG-004-hors-ligne-sans-cle.md) | Hors ligne sans clé API : pas de repli sur le cache | Majeure | Corrigé (non publié) |
 | [BUG-005](incidents/BUG-005-chargements-concurrents.md) | Chargements concurrents : une réponse tardive écrase la ville affichée | Mineure | Corrigé (non publié) |
+| [BUG-006](incidents/BUG-006-anti-spam-alertes-par-ville.md) | Une alerte vue pour une ville masque celle d'une autre ville | Mineure | Corrigé (non publié) |
 
 ## Index des décisions
 

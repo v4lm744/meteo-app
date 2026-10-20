@@ -8,6 +8,7 @@ Priorité : ⭐⭐⭐ haute, ⭐⭐ moyenne, ⭐ basse.
 | Priorité | Élément | Détail |
 |---|---|---|
 | ⭐⭐ | Icônes jour/nuit des prévisions horaires | `OpenMeteoMapper` considère qu'il fait jour de 7 h à 19 h au lieu d'utiliser le lever et le coucher du soleil |
+| ⭐ | Alertes marquées vues sans permission de notification | `WeatherAlertWorker` marque les alertes vues avant de vérifier `POST_NOTIFICATIONS` : si la permission est accordée ensuite, l'alerte en cours n'est pas renvoyée avant 12 h (relevé lors de BUG-006) |
 | ⭐ | Clignotement des cartes au changement de ville | `loadWeatherForCity` recrée un `UiState` vide : qualité de l'air et minimap disparaissent puis réapparaissent |
 
 ## Améliorations techniques

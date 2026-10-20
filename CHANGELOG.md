@@ -28,6 +28,9 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
   et la qualité de l'air ou la minimap d'une ville précédente ne s'affiche
   plus sur la nouvelle
   ([BUG-005](docs/incidents/BUG-005-chargements-concurrents.md)).
+- Une alerte météo déjà notifiée pour une ville ne masque plus la même
+  alerte pour une autre ville
+  ([BUG-006](docs/incidents/BUG-006-anti-spam-alertes-par-ville.md)).
 
 ### Ajouté
 
