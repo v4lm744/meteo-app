@@ -14,6 +14,9 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
 - Vitesse du vent Open-Meteo affichée 3,6 fois trop forte (et fausses
   alertes « vent violent ») ; les caches météo de l'ancien format sont
   invalidés ([BUG-001](docs/incidents/BUG-001-unite-vitesse-vent.md)).
+- Alertes météo : cumul de pluie qui était triplé, et fenêtre de 36 h au
+  lieu de 12 h avec OpenWeatherMap ; l'évaluation porte désormais sur
+  12 h réelles ([BUG-002](docs/incidents/BUG-002-cumul-pluie-alertes.md)).
 
 ### Ajouté
 

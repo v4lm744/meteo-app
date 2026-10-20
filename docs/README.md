@@ -38,6 +38,7 @@ avec sa documentation dans le **même commit**.
 | ID | Titre | Gravité | Statut |
 |---|---|---|---|
 | [BUG-001](incidents/BUG-001-unite-vitesse-vent.md) | Vent Open-Meteo affiché 3,6 fois trop fort | Majeure | Corrigé (non publié) |
+| [BUG-002](incidents/BUG-002-cumul-pluie-alertes.md) | Cumul de pluie et fenêtre des alertes faux | Majeure | Corrigé (non publié) |
 
 ## Index des décisions
 
