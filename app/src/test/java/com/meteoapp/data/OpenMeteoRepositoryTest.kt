@@ -137,6 +137,36 @@ class OpenMeteoRepositoryTest {
         assertEquals(18.5, data.current.temp, 0.001)
     }
 
+    /**
+     * BUG-004 : sans clé API, un échec Open-Meteo renvoyait « clé API non
+     * configurée » sans essayer la dernière météo connue.
+     */
+    @Test
+    fun getWeather_servesStaleCacheWhenOpenMeteoFailsWithoutApiKey() {
+        val repo = repository()
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        runBlocking { repo.getWeather(48.85, 2.35) }
+        openMeteoServer.enqueue(MockResponse().setResponseCode(500))
+
+        val result = runBlocking { repo.getWeather(48.85, 2.35, forceRefresh = true) }
+
+        assertTrue(result is WeatherResult.Success)
+        result as WeatherResult.Success
+        assertTrue(result.fromCache)
+        assertTrue(result.stale)
+        assertEquals(21.4, result.data.current.temp, 0.001)
+        assertEquals(0, openWeatherServer.requestCount)
+    }
+
+    @Test
+    fun getWeather_networkErrorWhenOpenMeteoFailsWithoutApiKeyNorCache() {
+        openMeteoServer.enqueue(MockResponse().setResponseCode(500))
+        val result = runBlocking { repository().getWeather(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Error)
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        assertEquals(context.getString(com.meteoapp.R.string.error_network), (result as WeatherResult.Error).message)
+    }
+
     @Test
     fun getWeather_errorWhenBothSourcesFailWithoutCache() {
         openMeteoServer.enqueue(MockResponse().setResponseCode(500))

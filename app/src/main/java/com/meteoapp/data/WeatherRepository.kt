@@ -85,7 +85,9 @@ class WeatherRepository(
             return openMeteoResult
         }
         if (!isApiKeyConfigured) {
-            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
+            // Pas de repli OpenWeatherMap possible : dernière météo connue,
+            // sinon erreur réseau, la vraie cause de l'échec (BUG-004).
+            return staleCacheOrNetworkError(lat, lon)
         }
         return try {
             coroutineScope {
@@ -172,12 +174,20 @@ class WeatherRepository(
                 cityNotFound = e.code() == 404
             )
         } catch (e: Exception) {
-            val cached = withContext(Dispatchers.IO) { cache.load(lat, lon) }
-            if (cached != null) {
-                WeatherResult.Success(cached, fromCache = true, stale = true)
-            } else {
-                WeatherResult.Error(appContext.getString(R.string.error_network))
-            }
+            staleCacheOrNetworkError(lat, lon)
+        }
+    }
+
+    /**
+     * Repli hors ligne : données du cache quel que soit leur âge (marquées
+     * `stale`, bannière hors ligne), sinon erreur réseau.
+     */
+    private suspend fun staleCacheOrNetworkError(lat: Double, lon: Double): WeatherResult<WeatherData> {
+        val cached = withContext(Dispatchers.IO) { cache.load(lat, lon) }
+        return if (cached != null) {
+            WeatherResult.Success(cached, fromCache = true, stale = true)
+        } else {
+            WeatherResult.Error(appContext.getString(R.string.error_network))
         }
     }
 

@@ -21,6 +21,9 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
   et le pull-to-refresh contourne ce cache
   ([BUG-003](docs/incidents/BUG-003-cache-http-inoperant.md),
   [ADR-002](docs/decisions/ADR-002-politique-cache-http.md)).
+- Hors ligne et sans clé API, la dernière météo connue s'affiche avec la
+  bannière hors ligne au lieu de « Clé API non configurée »
+  ([BUG-004](docs/incidents/BUG-004-hors-ligne-sans-cle.md)).
 
 ### Ajouté
 
