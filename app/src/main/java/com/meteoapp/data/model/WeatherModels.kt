@@ -31,7 +31,7 @@ data class Sys(
 @JsonClass(generateAdapter = true)
 data class MainMetrics(
     val temp: Double,
-    @Json(name = "feels_like") val feelsLike: Double,
+    @param:Json(name = "feels_like") val feelsLike: Double,
     val tempMin: Double? = null,
     val tempMax: Double? = null,
     val pressure: Long,
@@ -78,21 +78,21 @@ data class ForecastItem(
     val clouds: Clouds? = null,
     val wind: Wind,
     val pop: Double? = null,
-    @Json(name = "rain") val rain: RainVolume? = null,
-    @Json(name = "snow") val snow: SnowVolume? = null,
-    @Json(name = "dt_txt") val dtTxt: String? = null
+    @param:Json(name = "rain") val rain: RainVolume? = null,
+    @param:Json(name = "snow") val snow: SnowVolume? = null,
+    @param:Json(name = "dt_txt") val dtTxt: String? = null
 )
 
 @JsonClass(generateAdapter = true)
 data class RainVolume(
-    @Json(name = "1h") val oneHour: Double? = null,
-    @Json(name = "3h") val threeHour: Double? = null
+    @param:Json(name = "1h") val oneHour: Double? = null,
+    @param:Json(name = "3h") val threeHour: Double? = null
 )
 
 @JsonClass(generateAdapter = true)
 data class SnowVolume(
-    @Json(name = "1h") val oneHour: Double? = null,
-    @Json(name = "3h") val threeHour: Double? = null
+    @param:Json(name = "1h") val oneHour: Double? = null,
+    @param:Json(name = "3h") val threeHour: Double? = null
 )
 
 @JsonClass(generateAdapter = true)
@@ -124,7 +124,7 @@ data class FindResponse(
 @JsonClass(generateAdapter = true)
 data class GeoLocation(
     val name: String,
-    @Json(name = "local_names") val localNames: LocalNames? = null,
+    @param:Json(name = "local_names") val localNames: LocalNames? = null,
     val lat: Double,
     val lon: Double,
     val country: String?,
@@ -148,5 +148,5 @@ data class GeoLocation(
 data class LocalNames(
     val fr: String? = null,
     val en: String? = null,
-    @Json(name = "feature_name") val featureName: String? = null
+    @param:Json(name = "feature_name") val featureName: String? = null
 )
