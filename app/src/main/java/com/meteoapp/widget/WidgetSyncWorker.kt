@@ -55,6 +55,7 @@ class WidgetSyncWorker(
      * Rafraîchit le stockage du widget collection horaire pour chaque
      * instance installée, puis notifie les listes RemoteViews.
      */
+    @Suppress("DEPRECATION")
     private suspend fun syncHourlyWidget(context: Context): Boolean {
         val manager = AppWidgetManager.getInstance(context)
         val hourlyIds = manager.getAppWidgetIds(

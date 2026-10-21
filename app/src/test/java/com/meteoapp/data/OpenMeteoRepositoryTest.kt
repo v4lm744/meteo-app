@@ -88,6 +88,35 @@ class OpenMeteoRepositoryTest {
         assertEquals(0, openWeatherServer.requestCount)
     }
 
+    /**
+     * BUG-001 : sans `wind_speed_unit=ms`, Open-Meteo renvoie des km/h que
+     * l'app interprète comme des m/s (vent affiché 3,6 fois trop fort).
+     */
+    @Test
+    fun getWeather_requestsWindSpeedInMetersPerSecond() {
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        val result = runBlocking { repository().getWeather(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Success)
+        val request = openMeteoServer.takeRequest()
+        assertEquals("ms", request.requestUrl?.queryParameter("wind_speed_unit"))
+        assertEquals(9.2, (result as WeatherResult.Success).data.current.windSpeed, 0.001)
+    }
+
+    /** BUG-003 : le pull-to-refresh doit contourner le cache HTTP. */
+    @Test
+    fun getWeather_forceRefreshSendsNoCacheHeader() {
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        runBlocking { repository().getWeather(48.85, 2.35, forceRefresh = true) }
+        assertEquals("no-cache", openMeteoServer.takeRequest().getHeader("Cache-Control"))
+    }
+
+    @Test
+    fun getWeather_withoutForceRefreshLetsHttpCacheAnswer() {
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        runBlocking { repository().getWeather(48.85, 2.35) }
+        assertEquals(null, openMeteoServer.takeRequest().getHeader("Cache-Control"))
+    }
+
     @Test
     fun getWeather_fallsBackToOpenWeatherWhenOpenMeteoFails() {
         openMeteoServer.enqueue(MockResponse().setResponseCode(500))
@@ -106,6 +135,36 @@ class OpenMeteoRepositoryTest {
         assertTrue(result is WeatherResult.Success)
         val data = (result as WeatherResult.Success).data
         assertEquals(18.5, data.current.temp, 0.001)
+    }
+
+    /**
+     * BUG-004 : sans clé API, un échec Open-Meteo renvoyait « clé API non
+     * configurée » sans essayer la dernière météo connue.
+     */
+    @Test
+    fun getWeather_servesStaleCacheWhenOpenMeteoFailsWithoutApiKey() {
+        val repo = repository()
+        openMeteoServer.enqueue(MockResponse().setBody(OPEN_METEO_JSON))
+        runBlocking { repo.getWeather(48.85, 2.35) }
+        openMeteoServer.enqueue(MockResponse().setResponseCode(500))
+
+        val result = runBlocking { repo.getWeather(48.85, 2.35, forceRefresh = true) }
+
+        assertTrue(result is WeatherResult.Success)
+        result as WeatherResult.Success
+        assertTrue(result.fromCache)
+        assertTrue(result.stale)
+        assertEquals(21.4, result.data.current.temp, 0.001)
+        assertEquals(0, openWeatherServer.requestCount)
+    }
+
+    @Test
+    fun getWeather_networkErrorWhenOpenMeteoFailsWithoutApiKeyNorCache() {
+        openMeteoServer.enqueue(MockResponse().setResponseCode(500))
+        val result = runBlocking { repository().getWeather(48.85, 2.35) }
+        assertTrue(result is WeatherResult.Error)
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        assertEquals(context.getString(com.meteoapp.R.string.error_network), (result as WeatherResult.Error).message)
     }
 
     @Test

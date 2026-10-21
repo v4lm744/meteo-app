@@ -142,6 +142,12 @@ défini, et le workflow vérifie que l'APK publié est bien signé.
 Les installations antérieures à la première release signée avec la clé
 partagée devront être réinstallées une dernière fois.
 
+## Documentation projet
+
+- [`CHANGELOG.md`](CHANGELOG.md) : journal des versions
+- [`docs/`](docs/README.md) : fiches d'incident, registre des décisions (ADR)
+  et backlog produit
+
 ## Architecture
 
 - `data/` : modèles, API Retrofit, repository, cache météo

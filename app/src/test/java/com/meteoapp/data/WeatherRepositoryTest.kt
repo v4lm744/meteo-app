@@ -75,7 +75,7 @@ class WeatherRepositoryTest {
 
     private fun ageCacheFile(lat: Double, lon: Double, ageMillis: Long) {
         val cacheDir = ApplicationProvider.getApplicationContext<android.content.Context>().cacheDir
-        val name = "weather_" + String.format(java.util.Locale.US, "%.2f_%.2f", lat, lon) + ".json"
+        val name = WeatherCache.FILE_PREFIX + String.format(java.util.Locale.US, "%.2f_%.2f", lat, lon) + ".json"
         java.io.File(cacheDir, name).setLastModified(System.currentTimeMillis() - ageMillis)
     }
 

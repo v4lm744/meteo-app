@@ -6,6 +6,7 @@ import com.meteoapp.data.model.FindResponse
 import com.meteoapp.data.model.ForecastResponse
 import com.meteoapp.data.model.GeoLocation
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface OpenWeatherApi {
@@ -16,7 +17,8 @@ interface OpenWeatherApi {
         @Query("lon") lon: Double,
         @Query("units") units: String = "metric",
         @Query("lang") lang: String = "fr",
-        @Query("appid") apiKey: String
+        @Query("appid") apiKey: String,
+        @Header("Cache-Control") cacheControl: String? = null
     ): CurrentWeatherResponse
 
     @GET("data/2.5/forecast")
@@ -25,7 +27,8 @@ interface OpenWeatherApi {
         @Query("lon") lon: Double,
         @Query("units") units: String = "metric",
         @Query("lang") lang: String = "fr",
-        @Query("appid") apiKey: String
+        @Query("appid") apiKey: String,
+        @Header("Cache-Control") cacheControl: String? = null
     ): ForecastResponse
 
     @GET("data/2.5/find")

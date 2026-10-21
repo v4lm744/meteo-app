@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.core.content.edit
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -23,7 +22,8 @@ import com.meteoapp.data.WeatherResult
  * Worker des alertes météo : récupère la météo de la ville courante et
  * poste une notification critique (CATEGORY_ALARM) si les prévisions des
  * 12 prochaines heures dépassent un seuil configuré. Chaque alerte est
- * silencée 12 h après son envoi pour éviter le spam.
+ * silencée 12 h après son envoi, pour sa ville, afin d'éviter le spam
+ * ([AlertSeenStore]).
  */
 class WeatherAlertWorker(
     context: Context,
@@ -40,8 +40,6 @@ class WeatherAlertWorker(
          */
         private fun notificationId(lat: Double, lon: Double): Int =
             NOTIFICATION_ID_BASE + (lat.toString() + ":" + lon.toString()).hashCode().mod(1000)
-        private const val PREFS_SEEN = "meteo_alert_seen"
-        private const val SEEN_WINDOW_MS = 12 * 60 * 60 * 1000L
     }
 
     override suspend fun doWork(): Result {
@@ -58,29 +56,13 @@ class WeatherAlertWorker(
         val alerts = WeatherAlertEvaluator.evaluate(context, weather)
         if (alerts.isEmpty()) return Result.success()
 
-        val fresh = filterAlreadySeen(context, alerts)
+        val fresh = AlertSeenStore.filterUnseen(context, city.lat, city.lon, alerts)
         if (fresh.isEmpty()) return Result.success()
 
         if (!hasNotificationPermission(context)) return Result.success()
         ensureChannel(context)
         postAlert(context, city.displayName(context), fresh, notificationId(city.lat, city.lon))
         return Result.success()
-    }
-
-    private fun filterAlreadySeen(
-        context: Context,
-        alerts: List<WeatherAlertEvaluator.Alert>
-    ): List<WeatherAlertEvaluator.Alert> {
-        val prefs = context.getSharedPreferences(PREFS_SEEN, Context.MODE_PRIVATE)
-        val now = System.currentTimeMillis()
-        return alerts.filter { alert ->
-            val seenAt = prefs.getLong(alert.key, 0L)
-            val isFresh = now - seenAt >= SEEN_WINDOW_MS
-            if (isFresh) {
-                prefs.edit { putLong(alert.key, now) }
-            }
-            isFresh
-        }
     }
 
     private fun hasNotificationPermission(context: Context): Boolean =

@@ -2,6 +2,7 @@ package com.meteoapp.data.api
 
 import com.meteoapp.data.model.OpenMeteoResponse
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface OpenMeteoApi {
@@ -10,15 +11,26 @@ interface OpenMeteoApi {
      * Le pas de 15 min (minutely_15) est demandé systématiquement avec une
      * profondeur fixe (2 h) : les créneaux sont consommés par le bandeau
      * de pluie imminente.
+     *
+     * Le vent est demandé en m/s (`wind_speed_unit=ms`), l'unité attendue
+     * par tout le modèle de l'app ; Open-Meteo renvoie des km/h par défaut
+     * (BUG-001).
+     *
+     * [cacheControl] vaut [ApiClient.NO_CACHE] pour forcer l'appel réseau
+     * (pull-to-refresh) ; `null` laisse le cache HTTP répondre.
      */
-    @GET("v1/forecast?minutely_15=$MINUTELY15_FIELDS&forecast_minutely_15=$FORECAST_MINUTELY15_SLOTS&timezone=auto")
+    @GET(
+        "v1/forecast?minutely_15=$MINUTELY15_FIELDS&forecast_minutely_15=$FORECAST_MINUTELY15_SLOTS" +
+            "&timezone=auto&wind_speed_unit=ms"
+    )
     suspend fun getForecast(
         @Query("latitude") lat: Double,
         @Query("longitude") lon: Double,
         @Query("current") current: String = CURRENT_FIELDS,
         @Query("hourly") hourly: String = HOURLY_FIELDS,
         @Query("daily") daily: String = DAILY_FIELDS,
-        @Query("forecast_days") forecastDays: Int = 7
+        @Query("forecast_days") forecastDays: Int = 7,
+        @Header("Cache-Control") cacheControl: String? = null
     ): OpenMeteoResponse
 
     companion object {

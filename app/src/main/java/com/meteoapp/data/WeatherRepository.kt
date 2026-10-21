@@ -78,17 +78,25 @@ class WeatherRepository(
                 return WeatherResult.Success(fresh, fromCache = true, stale = false)
             }
         }
-        val openMeteoResult = fetchWeatherFromOpenMeteo(lat, lon)
+        // forceRefresh contourne aussi le cache HTTP (BUG-003).
+        val cacheControl = if (forceRefresh) ApiClient.NO_CACHE else null
+        val openMeteoResult = fetchWeatherFromOpenMeteo(lat, lon, cacheControl)
         if (openMeteoResult is WeatherResult.Success) {
             return openMeteoResult
         }
         if (!isApiKeyConfigured) {
-            return WeatherResult.Error(appContext.getString(R.string.error_api_key_not_configured))
+            // Pas de repli OpenWeatherMap possible : dernière météo connue,
+            // sinon erreur réseau, la vraie cause de l'échec (BUG-004).
+            return staleCacheOrNetworkError(lat, lon)
         }
         return try {
             coroutineScope {
-                val currentDeferred = async { api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey, lang = lang) }
-                val forecastDeferred = async { api.getForecast(lat = lat, lon = lon, apiKey = apiKey, lang = lang) }
+                val currentDeferred = async {
+                    api.getCurrentWeather(lat = lat, lon = lon, apiKey = apiKey, lang = lang, cacheControl = cacheControl)
+                }
+                val forecastDeferred = async {
+                    api.getForecast(lat = lat, lon = lon, apiKey = apiKey, lang = lang, cacheControl = cacheControl)
+                }
                 val current = currentDeferred.await()
                 val forecast = forecastDeferred.await()
 
@@ -166,12 +174,20 @@ class WeatherRepository(
                 cityNotFound = e.code() == 404
             )
         } catch (e: Exception) {
-            val cached = withContext(Dispatchers.IO) { cache.load(lat, lon) }
-            if (cached != null) {
-                WeatherResult.Success(cached, fromCache = true, stale = true)
-            } else {
-                WeatherResult.Error(appContext.getString(R.string.error_network))
-            }
+            staleCacheOrNetworkError(lat, lon)
+        }
+    }
+
+    /**
+     * Repli hors ligne : données du cache quel que soit leur âge (marquées
+     * `stale`, bannière hors ligne), sinon erreur réseau.
+     */
+    private suspend fun staleCacheOrNetworkError(lat: Double, lon: Double): WeatherResult<WeatherData> {
+        val cached = withContext(Dispatchers.IO) { cache.load(lat, lon) }
+        return if (cached != null) {
+            WeatherResult.Success(cached, fromCache = true, stale = true)
+        } else {
+            WeatherResult.Error(appContext.getString(R.string.error_network))
         }
     }
 
@@ -183,10 +199,11 @@ class WeatherRepository(
      */
     private suspend fun fetchWeatherFromOpenMeteo(
         lat: Double,
-        lon: Double
+        lon: Double,
+        cacheControl: String?
     ): WeatherResult<WeatherData> {
         return try {
-            val response = openMeteoApi.getForecast(lat = lat, lon = lon)
+            val response = openMeteoApi.getForecast(lat = lat, lon = lon, cacheControl = cacheControl)
             val weatherData = OpenMeteoMapper.toWeatherData(response, lang)
             withContext(Dispatchers.IO) { cache.save(lat, lon, weatherData) }
             WeatherResult.Success(weatherData)
