@@ -2,12 +2,12 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | Corrigé (non publié) |
+| Statut | Publié en v1.11.0 |
 | Gravité | Majeure |
 | Composant | `data/api/OpenMeteoApi.kt`, `data/WeatherCache.kt` |
 | Détecté le | 2026-10-20 (audit) |
 | Corrigé le | 2026-10-20 |
-| Commit / PR | Branche `ccr-0558170e-6d9gd4` |
+| Commit / PR | PR #85, publiée en v1.11.0 |
 
 ## Symptôme
 

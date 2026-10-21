@@ -2,12 +2,12 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | Corrigé (non publié) |
+| Statut | Publié en v1.11.0 |
 | Gravité | Mineure (performance, consommation de données) |
 | Composant | `data/api/ApiClient.kt`, `data/api/*Api.kt`, `data/WeatherRepository.kt` |
 | Détecté le | 2026-10-20 (audit) |
 | Corrigé le | 2026-10-20 |
-| Commit / PR | Branche `ccr-0558170e-6d9gd4` |
+| Commit / PR | PR #85, publiée en v1.11.0 |
 
 ## Symptôme
 
