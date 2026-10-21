@@ -32,6 +32,20 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
   alerte pour une autre ville
   ([BUG-006](docs/incidents/BUG-006-anti-spam-alertes-par-ville.md)).
 
+### Modifié
+
+- Suppression des 51 warnings de compilation Kotlin : annotations Moshi
+  `@param:Json` explicites, dépréciations `RemoteViews` documentées
+  (contrainte minSdk 26) (PR #81).
+- Dépendances AndroidX : core-ktx 1.19.1, fragment-ktx 1.9.1,
+  work-runtime-ktx 2.12.0 (PR #82).
+
+### Sécurité
+
+- Gradle wrapper 9.8.1 : corrige trois vulnérabilités de gravité haute
+  (désérialisation non authentifiée entre client, démon et workers ;
+  désactivation des dépôts en échec SSL) (PR #84).
+
 ### Ajouté
 
 - Documentation projet : CHANGELOG, fiches d'incident, registre des
