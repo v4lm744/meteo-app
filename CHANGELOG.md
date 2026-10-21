@@ -9,6 +9,8 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
 
 ## [Non publié]
 
+## [1.11.0] - 2026-10-21
+
 ### Corrigé
 
 - Vitesse du vent Open-Meteo affichée 3,6 fois trop forte (et fausses
@@ -52,7 +54,7 @@ Le détail de chaque correctif (cause racine, décisions, tests) se trouve dans
   décisions et backlog dans `docs/`
   ([ADR-001](docs/decisions/ADR-001-processus-documentation.md)).
 
-## [1.10.1] - version courante
+## [1.10.1] - 2026-09-21
 
 Versions antérieures : voir les
 [releases GitHub](https://github.com/v4lm744/meteo-app/releases) et
