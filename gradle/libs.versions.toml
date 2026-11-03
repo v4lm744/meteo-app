@@ -1,7 +1,7 @@
 [versions]
-agp = "9.4.1"
+agp = "9.5.0"
 detekt = "1.23.8"
-ksp = "2.3.12"
+ksp = "2.3.13"
 coreKtx = "1.19.1"
 appcompat = "1.8.0"
 material = "1.14.0"
